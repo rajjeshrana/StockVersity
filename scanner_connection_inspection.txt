@@ -1,0 +1,2125 @@
+=== UI APP SCANNER PAGE CREATION ===
+
+  ui\app.py:31:    QMainWindow,
+  ui\app.py:32:    QPushButton,
+  ui\app.py:33:    QStackedWidget,
+  ui\app.py:34:    QVBoxLayout,
+  ui\app.py:35:    QWidget,
+  ui\app.py:36:)
+  ui\app.py:37:
+  ui\app.py:38:from ui.pages.dashboard_page import DashboardPage
+> ui\app.py:39:from ui.pages.intraday_page import IntradayScannerPage
+  ui\app.py:40:
+  ui\app.py:41:from core.market_data.upstox_provider import UpstoxProvider
+  ui\app.py:42:
+  ui\app.py:43:from core.market_data.upstox_auto_login import (
+  ui\app.py:44:    get_upstox_access_token_sync,
+  ui\app.py:45:)
+  ui\app.py:46:
+  ui\app.py:47:from core.market_data.authentication import (
+  ui\app.py:48:    AuthenticationManager,
+  ui\app.py:49:    UpstoxAuthentication,
+  ui\app.py:50:)
+  ui\app.py:51:
+  ui\app.py:52:from core.config import (
+  ui\app.py:53:    UPSTOX_API_KEY,
+  ui\app.py:54:    UPSTOX_API_SECRET,
+  ui\app.py:640:
+  ui\app.py:641:        self._add_page(
+  ui\app.py:642:            "dashboard",
+  ui\app.py:643:            self.dashboard_page,
+  ui\app.py:644:        )
+  ui\app.py:645:
+  ui\app.py:646:        self._add_page(
+  ui\app.py:647:            "scanner",
+> ui\app.py:648:            IntradayScannerPage(),
+  ui\app.py:649:        )
+  ui\app.py:650:
+  ui\app.py:651:
+  ui\app.py:652:    # =====================================================
+  ui\app.py:653:    # SIDEBAR
+  ui\app.py:654:    # =====================================================
+  ui\app.py:655:
+  ui\app.py:656:    def _create_sidebar(self) -> QFrame:
+  ui\app.py:657:        """
+  ui\app.py:658:        Create approved larger StockVersity sidebar.
+  ui\app.py:659:        """
+  ui\app.py:660:
+  ui\app.py:661:        sidebar = QFrame()
+  ui\app.py:662:
+  ui\app.py:663:        sidebar.setObjectName(
+
+
+
+
+=== APPLICATION CONTROLLER SCANNER METHODS ===
+
+  core\application_controller.py:1:"""
+  core\application_controller.py:2:==========================================================
+> core\application_controller.py:3:StockVersity Scanner Pro
+  core\application_controller.py:4:Application Controller
+  core\application_controller.py:5:Version : 4.0
+  core\application_controller.py:6:Powered By : AI
+  core\application_controller.py:7:==========================================================
+  core\application_controller.py:8:"""
+  core\application_controller.py:9:
+  core\application_controller.py:10:from __future__ import annotations
+  core\application_controller.py:11:
+  core\application_controller.py:12:import threading
+  core\application_controller.py:13:import time
+  core\application_controller.py:14:import logging
+  core\application_controller.py:15:from datetime import datetime
+  core\application_controller.py:16:from typing import Dict, List, Optional, Any
+  core\application_controller.py:17:
+  core\application_controller.py:18:from PySide6.QtCore import QObject, Signal, QTimer
+  core\application_controller.py:19:
+  core\application_controller.py:20:# ==========================================================
+  core\application_controller.py:21:# Backend Engines
+  core\application_controller.py:22:# ==========================================================
+  core\application_controller.py:23:
+> core\application_controller.py:24:from backend.scanner.nse_data_engine import NSEDataEngine
+> core\application_controller.py:25:from backend.scanner.scanner_executor import ScannerExecutor
+  core\application_controller.py:26:
+  core\application_controller.py:27:from backend.ai.market_prediction_engine import MarketPredictionEngine
+  core\application_controller.py:28:from backend.ai.market_sentiment_engine import MarketSentimentEngine
+  core\application_controller.py:29:from backend.ai.market_regime_engine import MarketRegimeEngine
+  core\application_controller.py:30:
+  core\application_controller.py:31:from backend.ai.opportunity_ranker import OpportunityRanker
+  core\application_controller.py:32:from backend.ai.pattern_recognition_engine import PatternRecognitionEngine
+  core\application_controller.py:33:from backend.ai.risk_management_engine import RiskManagementEngine
+  core\application_controller.py:34:from backend.ai.market_structure_engine import MarketStructureEngine
+  core\application_controller.py:35:from backend.ai.volume_analysis_engine import VolumeAnalysisEngine
+  core\application_controller.py:36:from backend.ai.sector_rotation_engine import SectorRotationEngine
+  core\application_controller.py:37:
+  core\application_controller.py:38:
+  core\application_controller.py:39:# ==========================================================
+  core\application_controller.py:48:
+  core\application_controller.py:49:    statusChanged = Signal(str)
+  core\application_controller.py:50:    marketStatusChanged = Signal(str)
+  core\application_controller.py:51:
+  core\application_controller.py:52:    dashboardUpdated = Signal(dict)
+  core\application_controller.py:53:
+> core\application_controller.py:54:    scannerCompleted = Signal(list)
+  core\application_controller.py:55:
+  core\application_controller.py:56:    opportunityFound = Signal(dict)
+  core\application_controller.py:57:
+  core\application_controller.py:58:    errorOccurred = Signal(str)
+  core\application_controller.py:59:
+  core\application_controller.py:60:    countdownUpdated = Signal(int)
+  core\application_controller.py:61:
+  core\application_controller.py:62:    # ------------------------------------------------------
+  core\application_controller.py:63:
+  core\application_controller.py:64:    def __init__(self):
+  core\application_controller.py:65:
+  core\application_controller.py:66:        super().__init__()
+  core\application_controller.py:67:
+  core\application_controller.py:68:        self.logger = logging.getLogger("ApplicationController")
+  core\application_controller.py:100:        self.statusChanged.emit(
+  core\application_controller.py:101:            "Loading Trading Engines..."
+  core\application_controller.py:102:        )
+  core\application_controller.py:103:
+  core\application_controller.py:104:        self.nse_engine = NSEDataEngine()
+  core\application_controller.py:105:
+> core\application_controller.py:106:        self.scanner = ScannerExecutor()
+  core\application_controller.py:107:
+  core\application_controller.py:108:        self.market_prediction = MarketPredictionEngine()
+  core\application_controller.py:109:
+  core\application_controller.py:110:        self.market_sentiment = MarketSentimentEngine()
+  core\application_controller.py:111:
+  core\application_controller.py:112:        self.market_regime = MarketRegimeEngine()
+  core\application_controller.py:113:
+  core\application_controller.py:114:        self.pattern_engine = PatternRecognitionEngine()
+  core\application_controller.py:115:
+  core\application_controller.py:116:        self.ranker = OpportunityRanker()
+  core\application_controller.py:117:
+  core\application_controller.py:118:        self.risk_engine = RiskManagementEngine()
+  core\application_controller.py:119:
+  core\application_controller.py:120:        self.structure_engine = MarketStructureEngine()
+  core\application_controller.py:167:
+  core\application_controller.py:168:        self.running = True
+  core\application_controller.py:169:
+  core\application_controller.py:170:        self.stop_event.clear()
+  core\application_controller.py:171:
+  core\application_controller.py:172:        self.statusChanged.emit(
+> core\application_controller.py:173:            "Starting StockVersity Scanner..."
+  core\application_controller.py:174:        )
+  core\application_controller.py:175:
+  core\application_controller.py:176:        self.nse_engine.initialize()
+  core\application_controller.py:177:
+  core\application_controller.py:178:        self.scheduler_thread = threading.Thread(
+  core\application_controller.py:179:            target=self.scheduler_loop,
+  core\application_controller.py:180:            daemon=True
+  core\application_controller.py:181:        )
+  core\application_controller.py:182:
+  core\application_controller.py:183:        self.scheduler_thread.start()
+  core\application_controller.py:184:
+  core\application_controller.py:185:        self.timer.start(1000)
+  core\application_controller.py:186:
+  core\application_controller.py:187:        self.statusChanged.emit(
+  core\application_controller.py:333:        start = time.perf_counter()
+  core\application_controller.py:334:
+  core\application_controller.py:335:        self.fetch_market_data()
+  core\application_controller.py:336:
+  core\application_controller.py:337:        self.calculate_indicators()
+  core\application_controller.py:338:
+> core\application_controller.py:339:        opportunities = self.execute_scanner()
+  core\application_controller.py:340:
+  core\application_controller.py:341:        ranked = self.rank_opportunities(
+  core\application_controller.py:342:            opportunities
+  core\application_controller.py:343:        )
+  core\application_controller.py:344:
+  core\application_controller.py:345:        trades = self.generate_trade_cards(
+  core\application_controller.py:346:            ranked
+  core\application_controller.py:347:        )
+  core\application_controller.py:348:
+  core\application_controller.py:349:        self.best_opportunities = trades
+  core\application_controller.py:350:
+  core\application_controller.py:351:        self.dashboard_data = {
+  core\application_controller.py:352:
+  core\application_controller.py:353:            "scan_number": self.scan_counter,
+  core\application_controller.py:361:        }
+  core\application_controller.py:362:
+  core\application_controller.py:363:        self.dashboardUpdated.emit(
+  core\application_controller.py:364:            self.dashboard_data
+  core\application_controller.py:365:        )
+  core\application_controller.py:366:
+> core\application_controller.py:367:        self.scannerCompleted.emit(
+  core\application_controller.py:368:            trades
+  core\application_controller.py:369:        )
+  core\application_controller.py:370:
+  core\application_controller.py:371:        runtime = round(
+  core\application_controller.py:372:
+  core\application_controller.py:373:            time.perf_counter() - start,
+  core\application_controller.py:374:
+  core\application_controller.py:375:            2
+  core\application_controller.py:376:
+  core\application_controller.py:377:        )
+  core\application_controller.py:378:
+  core\application_controller.py:379:        self.statusChanged.emit(
+  core\application_controller.py:380:
+  core\application_controller.py:381:            f"Completed in {runtime} sec"
+  core\application_controller.py:411:        )
+  core\application_controller.py:412:
+  core\application_controller.py:413:        self.nse_engine.update_indicators_batch()
+  core\application_controller.py:414:
+  core\application_controller.py:415:
+  core\application_controller.py:416:# ==========================================================
+> core\application_controller.py:417:# EXECUTE SCANNER
+  core\application_controller.py:418:# ==========================================================
+  core\application_controller.py:419:
+> core\application_controller.py:420:    def execute_scanner(self):
+  core\application_controller.py:421:
+  core\application_controller.py:422:        self.statusChanged.emit(
+  core\application_controller.py:423:
+> core\application_controller.py:424:            "Executing Scanner..."
+  core\application_controller.py:425:
+  core\application_controller.py:426:        )
+  core\application_controller.py:427:
+> core\application_controller.py:428:        return self.scanner.execute(
+  core\application_controller.py:429:
+  core\application_controller.py:430:            self.nse_engine.market_data
+  core\application_controller.py:431:
+  core\application_controller.py:432:        )
+  core\application_controller.py:433:
+  core\application_controller.py:434:
+  core\application_controller.py:435:# ==========================================================
+  core\application_controller.py:436:# RANK OPPORTUNITIES
+  core\application_controller.py:437:# ==========================================================
+  core\application_controller.py:438:
+  core\application_controller.py:439:    def rank_opportunities(
+  core\application_controller.py:440:
+  core\application_controller.py:441:        self,
+  core\application_controller.py:442:
+  core\application_controller.py:695:            if x["signal"] == "SELL"
+  core\application_controller.py:696:
+  core\application_controller.py:697:        ]
+  core\application_controller.py:698:
+  core\application_controller.py:699:
+  core\application_controller.py:700:# ==========================================================
+> core\application_controller.py:701:# TOP INTRADAY
+  core\application_controller.py:702:# ==========================================================
+  core\application_controller.py:703:
+> core\application_controller.py:704:    def top_intraday(self):
+  core\application_controller.py:705:
+  core\application_controller.py:706:        data = [
+  core\application_controller.py:707:
+  core\application_controller.py:708:            x
+  core\application_controller.py:709:
+  core\application_controller.py:710:            for x in self.buy_signals()
+  core\application_controller.py:711:
+  core\application_controller.py:712:            if x["confidence"] >= 70
+  core\application_controller.py:713:
+  core\application_controller.py:714:        ]
+  core\application_controller.py:715:
+  core\application_controller.py:716:        data.sort(
+  core\application_controller.py:717:
+  core\application_controller.py:718:            key=lambda x: x["confidence"],
+  core\application_controller.py:836:        payload = {
+  core\application_controller.py:837:
+  core\application_controller.py:838:            "summary":
+  core\application_controller.py:839:
+  core\application_controller.py:840:                self.market_summary(),
+  core\application_controller.py:841:
+> core\application_controller.py:842:            "top_intraday":
+  core\application_controller.py:843:
+> core\application_controller.py:844:                self.top_intraday(),
+  core\application_controller.py:845:
+  core\application_controller.py:846:            "top_swing":
+  core\application_controller.py:847:
+  core\application_controller.py:848:                self.top_swing(),
+  core\application_controller.py:849:
+  core\application_controller.py:850:            "top_positional":
+  core\application_controller.py:851:
+  core\application_controller.py:852:                self.top_positional(),
+  core\application_controller.py:853:
+  core\application_controller.py:854:            "buy":
+  core\application_controller.py:855:
+  core\application_controller.py:856:                self.buy_signals(),
+  core\application_controller.py:857:
+  core\application_controller.py:858:            "sell":
+  core\application_controller.py:1475:                self.running,
+  core\application_controller.py:1476:
+  core\application_controller.py:1477:            "market":
+  core\application_controller.py:1478:
+  core\application_controller.py:1479:                self.market_open,
+  core\application_controller.py:1480:
+> core\application_controller.py:1481:            "scanner":
+  core\application_controller.py:1482:
+> core\application_controller.py:1483:                self.scanner is not None,
+  core\application_controller.py:1484:
+  core\application_controller.py:1485:            "engine":
+  core\application_controller.py:1486:
+  core\application_controller.py:1487:                self.nse_engine is not None
+  core\application_controller.py:1488:
+  core\application_controller.py:1489:        }
+  core\application_controller.py:1490:
+  core\application_controller.py:1491:
+  core\application_controller.py:1492:# ==========================================================
+  core\application_controller.py:1493:# STARTUP SEQUENCE
+  core\application_controller.py:1494:# ==========================================================
+  core\application_controller.py:1495:
+  core\application_controller.py:1496:    def startup_sequence(self):
+  core\application_controller.py:1497:
+  core\application_controller.py:1522:# APPLICATION INFORMATION
+  core\application_controller.py:1523:# ==========================================================
+  core\application_controller.py:1524:
+  core\application_controller.py:1525:    @property
+  core\application_controller.py:1526:    def application_name(self):
+  core\application_controller.py:1527:
+> core\application_controller.py:1528:        return "StockVersity Scanner Pro"
+  core\application_controller.py:1529:
+  core\application_controller.py:1530:    @property
+  core\application_controller.py:1531:    def version(self):
+  core\application_controller.py:1532:
+  core\application_controller.py:1533:        return "4.0"
+  core\application_controller.py:1534:
+  core\application_controller.py:1535:    @property
+  core\application_controller.py:1536:    def powered_by(self):
+  core\application_controller.py:1537:
+  core\application_controller.py:1538:        return "AI"
+  core\application_controller.py:1539:
+  core\application_controller.py:1540:
+  core\application_controller.py:1541:# ==========================================================
+  core\application_controller.py:1542:# BUILD INFORMATION
+  core\application_controller.py:1572:        }
+  core\application_controller.py:1573:
+  core\application_controller.py:1574:    def verify_engines(self) -> Dict[str, bool]:
+  core\application_controller.py:1575:        """Verify that all core backend engines are properly initialized."""
+  core\application_controller.py:1576:        return {
+  core\application_controller.py:1577:            "nse_engine": self.nse_engine is not None,
+> core\application_controller.py:1578:            "scanner": self.scanner is not None,
+  core\application_controller.py:1579:            "market_prediction": self.market_prediction is not None,
+  core\application_controller.py:1580:            "market_sentiment": self.market_sentiment is not None,
+  core\application_controller.py:1581:            "market_regime": self.market_regime is not None,
+  core\application_controller.py:1582:            "pattern_engine": self.pattern_engine is not None,
+  core\application_controller.py:1583:            "ranker": self.ranker is not None,
+  core\application_controller.py:1584:            "risk_engine": self.risk_engine is not None,
+  core\application_controller.py:1585:            "structure_engine": self.structure_engine is not None,
+  core\application_controller.py:1586:            "volume_engine": self.volume_engine is not None,
+  core\application_controller.py:1587:            "rotation_engine": self.rotation_engine is not None
+  core\application_controller.py:1588:        }
+
+
+
+
+=== SCANNER MANAGER RUN METHODS ===
+
+  core\scanner\scanner_manager.py:386:
+  core\scanner\scanner_manager.py:387:    # =====================================================
+  core\scanner\scanner_manager.py:388:    # RUN
+  core\scanner\scanner_manager.py:389:    # =====================================================
+  core\scanner\scanner_manager.py:390:
+> core\scanner\scanner_manager.py:391:    def run(
+  core\scanner\scanner_manager.py:392:        self,
+  core\scanner\scanner_manager.py:393:        market_data: Dict[str, Any],
+  core\scanner\scanner_manager.py:394:    ) -> List[Signal]:
+  core\scanner\scanner_manager.py:395:        """
+  core\scanner\scanner_manager.py:396:        Execute all enabled scanners.
+  core\scanner\scanner_manager.py:397:        """
+  core\scanner\scanner_manager.py:398:
+  core\scanner\scanner_manager.py:399:        if not isinstance(
+  core\scanner\scanner_manager.py:400:            market_data,
+  core\scanner\scanner_manager.py:401:            dict,
+  core\scanner\scanner_manager.py:402:        ):
+  core\scanner\scanner_manager.py:403:
+  core\scanner\scanner_manager.py:404:            raise TypeError(
+  core\scanner\scanner_manager.py:405:                "market_data must be a dictionary."
+  core\scanner\scanner_manager.py:406:            )
+  core\scanner\scanner_manager.py:407:
+  core\scanner\scanner_manager.py:408:        if not self.loaded:
+  core\scanner\scanner_manager.py:409:
+  core\scanner\scanner_manager.py:434:
+  core\scanner\scanner_manager.py:435:    # =====================================================
+  core\scanner\scanner_manager.py:436:    # REFRESH
+  core\scanner\scanner_manager.py:437:    # =====================================================
+  core\scanner\scanner_manager.py:438:
+> core\scanner\scanner_manager.py:439:    def refresh(
+  core\scanner\scanner_manager.py:440:        self,
+  core\scanner\scanner_manager.py:441:        market_data: Optional[
+  core\scanner\scanner_manager.py:442:            Dict[str, Any]
+  core\scanner\scanner_manager.py:443:        ] = None,
+  core\scanner\scanner_manager.py:444:    ) -> List[Signal]:
+  core\scanner\scanner_manager.py:445:        """
+  core\scanner\scanner_manager.py:446:        Re-run scanners.
+  core\scanner\scanner_manager.py:447:
+  core\scanner\scanner_manager.py:448:        If market_data is not supplied, previous
+  core\scanner\scanner_manager.py:449:        market data is used.
+  core\scanner\scanner_manager.py:450:        """
+  core\scanner\scanner_manager.py:451:
+  core\scanner\scanner_manager.py:452:        data = (
+  core\scanner\scanner_manager.py:453:            market_data
+  core\scanner\scanner_manager.py:454:            if market_data is not None
+  core\scanner\scanner_manager.py:455:            else self.last_market_data
+  core\scanner\scanner_manager.py:456:        )
+  core\scanner\scanner_manager.py:457:
+  core\scanner\scanner_manager.py:472:    # =====================================================
+  core\scanner\scanner_manager.py:473:    # RESULTS
+  core\scanner\scanner_manager.py:474:    # =====================================================
+  core\scanner\scanner_manager.py:475:
+  core\scanner\scanner_manager.py:476:    @property
+> core\scanner\scanner_manager.py:477:    def results(
+  core\scanner\scanner_manager.py:478:        self,
+  core\scanner\scanner_manager.py:479:    ) -> List[Signal]:
+  core\scanner\scanner_manager.py:480:
+  core\scanner\scanner_manager.py:481:        return list(
+  core\scanner\scanner_manager.py:482:            self.engine.results
+  core\scanner\scanner_manager.py:483:        )
+  core\scanner\scanner_manager.py:484:
+  core\scanner\scanner_manager.py:485:    # =====================================================
+  core\scanner\scanner_manager.py:486:    # TOP OPPORTUNITIES
+  core\scanner\scanner_manager.py:487:    # =====================================================
+  core\scanner\scanner_manager.py:488:
+  core\scanner\scanner_manager.py:489:    def top_opportunities(
+  core\scanner\scanner_manager.py:490:        self,
+  core\scanner\scanner_manager.py:491:        limit: int = 10,
+  core\scanner\scanner_manager.py:492:    ) -> List[Signal]:
+  core\scanner\scanner_manager.py:493:
+  core\scanner\scanner_manager.py:494:        return self.engine.priority_ranking(
+  core\scanner\scanner_manager.py:495:            limit
+  core\scanner\scanner_manager.py:592:
+  core\scanner\scanner_manager.py:593:    # =====================================================
+  core\scanner\scanner_manager.py:594:    # DASHBOARD FEED
+  core\scanner\scanner_manager.py:595:    # =====================================================
+  core\scanner\scanner_manager.py:596:
+> core\scanner\scanner_manager.py:597:    def dashboard_feed(
+  core\scanner\scanner_manager.py:598:        self,
+  core\scanner\scanner_manager.py:599:        limit: int = 10,
+  core\scanner\scanner_manager.py:600:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_manager.py:601:
+  core\scanner\scanner_manager.py:602:        return self.engine.dashboard_feed(
+  core\scanner\scanner_manager.py:603:            limit
+  core\scanner\scanner_manager.py:604:        )
+  core\scanner\scanner_manager.py:605:
+  core\scanner\scanner_manager.py:606:    # =====================================================
+  core\scanner\scanner_manager.py:607:    # DASHBOARD SUMMARY
+  core\scanner\scanner_manager.py:608:    # =====================================================
+  core\scanner\scanner_manager.py:609:
+> core\scanner\scanner_manager.py:610:    def dashboard_summary(
+  core\scanner\scanner_manager.py:611:        self,
+  core\scanner\scanner_manager.py:612:    ) -> Dict[str, Any]:
+  core\scanner\scanner_manager.py:613:
+  core\scanner\scanner_manager.py:614:        return self.engine.dashboard_summary()
+  core\scanner\scanner_manager.py:615:
+  core\scanner\scanner_manager.py:616:    # =====================================================
+  core\scanner\scanner_manager.py:617:    # MARKET SENTIMENT
+  core\scanner\scanner_manager.py:618:    # =====================================================
+  core\scanner\scanner_manager.py:619:
+  core\scanner\scanner_manager.py:620:    def market_sentiment(
+  core\scanner\scanner_manager.py:621:        self,
+  core\scanner\scanner_manager.py:622:    ) -> str:
+  core\scanner\scanner_manager.py:623:
+  core\scanner\scanner_manager.py:624:        return self.engine.market_sentiment()
+  core\scanner\scanner_manager.py:625:
+  core\scanner\scanner_manager.py:626:    # =====================================================
+  core\scanner\scanner_manager.py:627:    # MARKET HEALTH
+  core\scanner\scanner_manager.py:628:    # =====================================================
+  core\scanner\scanner_manager.py:655:
+  core\scanner\scanner_manager.py:656:    # =====================================================
+  core\scanner\scanner_manager.py:657:    # SCANNER RANKING
+  core\scanner\scanner_manager.py:658:    # =====================================================
+  core\scanner\scanner_manager.py:659:
+> core\scanner\scanner_manager.py:660:    def scanner_ranking(
+  core\scanner\scanner_manager.py:661:        self,
+  core\scanner\scanner_manager.py:662:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_manager.py:663:
+  core\scanner\scanner_manager.py:664:        return self.engine.scanner_ranking()
+  core\scanner\scanner_manager.py:665:
+  core\scanner\scanner_manager.py:666:    # =====================================================
+  core\scanner\scanner_manager.py:667:    # CONSENSUS
+  core\scanner\scanner_manager.py:668:    # =====================================================
+  core\scanner\scanner_manager.py:669:
+  core\scanner\scanner_manager.py:670:    def consensus(
+  core\scanner\scanner_manager.py:671:        self,
+  core\scanner\scanner_manager.py:672:        minimum_scanners: int = 2,
+  core\scanner\scanner_manager.py:673:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_manager.py:674:
+  core\scanner\scanner_manager.py:675:        return self.engine.consensus_signals(
+  core\scanner\scanner_manager.py:676:            minimum_scanners
+  core\scanner\scanner_manager.py:677:        )
+  core\scanner\scanner_manager.py:678:
+  core\scanner\scanner_manager.py:699:    # =====================================================
+  core\scanner\scanner_manager.py:700:    # SCANNER NAMES
+  core\scanner\scanner_manager.py:701:    # =====================================================
+  core\scanner\scanner_manager.py:702:
+  core\scanner\scanner_manager.py:703:    @property
+> core\scanner\scanner_manager.py:704:    def scanner_names(
+  core\scanner\scanner_manager.py:705:        self,
+  core\scanner\scanner_manager.py:706:    ) -> List[str]:
+  core\scanner\scanner_manager.py:707:
+  core\scanner\scanner_manager.py:708:        return sorted(
+  core\scanner\scanner_manager.py:709:
+  core\scanner\scanner_manager.py:710:            scanner.name
+  core\scanner\scanner_manager.py:711:
+  core\scanner\scanner_manager.py:712:            for scanner in self.engine.scanners.values()
+  core\scanner\scanner_manager.py:713:
+  core\scanner\scanner_manager.py:714:        )
+  core\scanner\scanner_manager.py:715:
+  core\scanner\scanner_manager.py:716:    # =====================================================
+  core\scanner\scanner_manager.py:717:    # ACTIVE SCANNERS
+  core\scanner\scanner_manager.py:718:    # =====================================================
+  core\scanner\scanner_manager.py:719:
+  core\scanner\scanner_manager.py:720:    @property
+  core\scanner\scanner_manager.py:721:    def active_scanners(
+  core\scanner\scanner_manager.py:722:        self,
+
+
+
+
+=== SCANNER ENGINE RUN METHODS ===
+
+  core\scanner\scanner_engine.py:107:        # SCANNERS
+  core\scanner\scanner_engine.py:108:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:109:
+  core\scanner\scanner_engine.py:110:        self.scanners: Dict[str, BaseScanner] = {}
+  core\scanner\scanner_engine.py:111:
+> core\scanner\scanner_engine.py:112:        self.enabled_scanners: Dict[str, BaseScanner] = {}
+  core\scanner\scanner_engine.py:113:
+  core\scanner\scanner_engine.py:114:        # -------------------------------------------------
+> core\scanner\scanner_engine.py:115:        # RESULTS
+  core\scanner\scanner_engine.py:116:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:117:
+  core\scanner\scanner_engine.py:118:        # Every signal generated by every scanner.
+  core\scanner\scanner_engine.py:119:        # Duplicates are intentionally preserved here.
+> core\scanner\scanner_engine.py:120:        self.raw_results: List[Signal] = []
+  core\scanner\scanner_engine.py:121:
+> core\scanner\scanner_engine.py:122:        # Final merged / ranked results.
+> core\scanner\scanner_engine.py:123:        self.results: List[Signal] = []
+  core\scanner\scanner_engine.py:124:
+  core\scanner\scanner_engine.py:125:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:126:        # MARKET DATA
+  core\scanner\scanner_engine.py:127:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:128:
+> core\scanner\scanner_engine.py:129:        self.market_data: Dict[str, Any] = {}
+  core\scanner\scanner_engine.py:130:
+  core\scanner\scanner_engine.py:131:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:132:        # EXECUTION
+  core\scanner\scanner_engine.py:133:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:134:
+  core\scanner\scanner_engine.py:135:        self.execution_started: Optional[datetime] = None
+  core\scanner\scanner_engine.py:136:
+  core\scanner\scanner_engine.py:137:        self.execution_finished: Optional[datetime] = None
+  core\scanner\scanner_engine.py:138:
+  core\scanner\scanner_engine.py:139:        self.execution_time: float = 0.0
+  core\scanner\scanner_engine.py:140:
+  core\scanner\scanner_engine.py:141:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:142:        # CONFIGURATION
+  core\scanner\scanner_engine.py:143:        # -------------------------------------------------
+  core\scanner\scanner_engine.py:144:
+  core\scanner\scanner_engine.py:145:        self.parallel = bool(parallel)
+  core\scanner\scanner_engine.py:146:
+  core\scanner\scanner_engine.py:147:        self.max_workers = max(
+  core\scanner\scanner_engine.py:195:            scanner_name
+  core\scanner\scanner_engine.py:196:        ] = scanner
+  core\scanner\scanner_engine.py:197:
+  core\scanner\scanner_engine.py:198:        if enabled:
+  core\scanner\scanner_engine.py:199:
+> core\scanner\scanner_engine.py:200:            self.enabled_scanners[
+  core\scanner\scanner_engine.py:201:                scanner_name
+  core\scanner\scanner_engine.py:202:            ] = scanner
+  core\scanner\scanner_engine.py:203:
+  core\scanner\scanner_engine.py:204:        self.log(
+  core\scanner\scanner_engine.py:205:            "Registered scanner:",
+  core\scanner\scanner_engine.py:206:            scanner_name,
+  core\scanner\scanner_engine.py:207:        )
+  core\scanner\scanner_engine.py:208:
+  core\scanner\scanner_engine.py:209:    # =====================================================
+  core\scanner\scanner_engine.py:210:    # BULK REGISTER
+  core\scanner\scanner_engine.py:211:    # =====================================================
+  core\scanner\scanner_engine.py:212:
+  core\scanner\scanner_engine.py:213:    def register_many(
+  core\scanner\scanner_engine.py:214:        self,
+  core\scanner\scanner_engine.py:215:        scanners: List[BaseScanner],
+  core\scanner\scanner_engine.py:216:        *,
+  core\scanner\scanner_engine.py:217:        enabled: bool = True,
+  core\scanner\scanner_engine.py:218:    ) -> None:
+  core\scanner\scanner_engine.py:242:        self.scanners.pop(
+  core\scanner\scanner_engine.py:243:            scanner_name,
+  core\scanner\scanner_engine.py:244:            None,
+  core\scanner\scanner_engine.py:245:        )
+  core\scanner\scanner_engine.py:246:
+> core\scanner\scanner_engine.py:247:        self.enabled_scanners.pop(
+  core\scanner\scanner_engine.py:248:            scanner_name,
+  core\scanner\scanner_engine.py:249:            None,
+  core\scanner\scanner_engine.py:250:        )
+  core\scanner\scanner_engine.py:251:
+  core\scanner\scanner_engine.py:252:        self.log(
+  core\scanner\scanner_engine.py:253:            "Unregistered scanner:",
+  core\scanner\scanner_engine.py:254:            scanner_name,
+  core\scanner\scanner_engine.py:255:        )
+  core\scanner\scanner_engine.py:256:
+  core\scanner\scanner_engine.py:257:    # =====================================================
+  core\scanner\scanner_engine.py:258:    # BULK UNREGISTER
+  core\scanner\scanner_engine.py:259:    # =====================================================
+  core\scanner\scanner_engine.py:260:
+  core\scanner\scanner_engine.py:261:    def unregister_many(
+  core\scanner\scanner_engine.py:262:        self,
+  core\scanner\scanner_engine.py:263:        scanner_names: List[str],
+  core\scanner\scanner_engine.py:264:    ) -> None:
+  core\scanner\scanner_engine.py:265:
+  core\scanner\scanner_engine.py:311:            raise KeyError(
+  core\scanner\scanner_engine.py:312:                f"Scanner not registered: "
+  core\scanner\scanner_engine.py:313:                f"{scanner_name}"
+  core\scanner\scanner_engine.py:314:            )
+  core\scanner\scanner_engine.py:315:
+> core\scanner\scanner_engine.py:316:        self.enabled_scanners[
+  core\scanner\scanner_engine.py:317:            scanner_name
+  core\scanner\scanner_engine.py:318:        ] = scanner
+  core\scanner\scanner_engine.py:319:
+  core\scanner\scanner_engine.py:320:        self.log(
+  core\scanner\scanner_engine.py:321:            "Enabled scanner:",
+  core\scanner\scanner_engine.py:322:            scanner_name,
+  core\scanner\scanner_engine.py:323:        )
+  core\scanner\scanner_engine.py:324:
+  core\scanner\scanner_engine.py:325:    # =====================================================
+  core\scanner\scanner_engine.py:326:    # DISABLE SCANNER
+  core\scanner\scanner_engine.py:327:    # =====================================================
+  core\scanner\scanner_engine.py:328:
+  core\scanner\scanner_engine.py:329:    def disable(
+  core\scanner\scanner_engine.py:330:        self,
+  core\scanner\scanner_engine.py:331:        scanner_name: str,
+  core\scanner\scanner_engine.py:332:    ) -> None:
+  core\scanner\scanner_engine.py:333:
+> core\scanner\scanner_engine.py:334:        self.enabled_scanners.pop(
+  core\scanner\scanner_engine.py:335:            scanner_name,
+  core\scanner\scanner_engine.py:336:            None,
+  core\scanner\scanner_engine.py:337:        )
+  core\scanner\scanner_engine.py:338:
+  core\scanner\scanner_engine.py:339:        self.log(
+  core\scanner\scanner_engine.py:340:            "Disabled scanner:",
+  core\scanner\scanner_engine.py:341:            scanner_name,
+  core\scanner\scanner_engine.py:342:        )
+  core\scanner\scanner_engine.py:343:
+  core\scanner\scanner_engine.py:344:    # =====================================================
+  core\scanner\scanner_engine.py:345:    # ENABLE ALL
+  core\scanner\scanner_engine.py:346:    # =====================================================
+  core\scanner\scanner_engine.py:347:
+  core\scanner\scanner_engine.py:348:    def enable_all(
+  core\scanner\scanner_engine.py:349:        self,
+  core\scanner\scanner_engine.py:350:    ) -> None:
+  core\scanner\scanner_engine.py:351:
+> core\scanner\scanner_engine.py:352:        self.enabled_scanners = dict(
+  core\scanner\scanner_engine.py:353:            self.scanners
+  core\scanner\scanner_engine.py:354:        )
+  core\scanner\scanner_engine.py:355:
+  core\scanner\scanner_engine.py:356:    # =====================================================
+  core\scanner\scanner_engine.py:357:    # DISABLE ALL
+  core\scanner\scanner_engine.py:358:    # =====================================================
+  core\scanner\scanner_engine.py:359:
+  core\scanner\scanner_engine.py:360:    def disable_all(
+  core\scanner\scanner_engine.py:361:        self,
+  core\scanner\scanner_engine.py:362:    ) -> None:
+  core\scanner\scanner_engine.py:363:
+> core\scanner\scanner_engine.py:364:        self.enabled_scanners.clear()
+  core\scanner\scanner_engine.py:365:
+  core\scanner\scanner_engine.py:366:    # =====================================================
+> core\scanner\scanner_engine.py:367:    # RESET RESULTS
+  core\scanner\scanner_engine.py:368:    # =====================================================
+  core\scanner\scanner_engine.py:369:
+> core\scanner\scanner_engine.py:370:    def reset_results(
+  core\scanner\scanner_engine.py:371:        self,
+  core\scanner\scanner_engine.py:372:    ) -> None:
+  core\scanner\scanner_engine.py:373:        """
+> core\scanner\scanner_engine.py:374:        Clear scanner results without clearing
+  core\scanner\scanner_engine.py:375:        current market data.
+  core\scanner\scanner_engine.py:376:        """
+  core\scanner\scanner_engine.py:377:
+> core\scanner\scanner_engine.py:378:        self.raw_results.clear()
+  core\scanner\scanner_engine.py:379:
+> core\scanner\scanner_engine.py:380:        self.results.clear()
+  core\scanner\scanner_engine.py:381:
+  core\scanner\scanner_engine.py:382:    # =====================================================
+  core\scanner\scanner_engine.py:383:    # RESET
+  core\scanner\scanner_engine.py:384:    # =====================================================
+  core\scanner\scanner_engine.py:385:
+  core\scanner\scanner_engine.py:386:    def reset(
+  core\scanner\scanner_engine.py:387:        self,
+  core\scanner\scanner_engine.py:388:    ) -> None:
+  core\scanner\scanner_engine.py:389:        """
+  core\scanner\scanner_engine.py:390:        Reset runtime state.
+  core\scanner\scanner_engine.py:391:        """
+  core\scanner\scanner_engine.py:392:
+> core\scanner\scanner_engine.py:393:        self.reset_results()
+  core\scanner\scanner_engine.py:394:
+> core\scanner\scanner_engine.py:395:        self.market_data = {}
+  core\scanner\scanner_engine.py:396:
+  core\scanner\scanner_engine.py:397:        self.execution_started = None
+  core\scanner\scanner_engine.py:398:
+  core\scanner\scanner_engine.py:399:        self.execution_finished = None
+  core\scanner\scanner_engine.py:400:
+  core\scanner\scanner_engine.py:401:        self.execution_time = 0.0
+  core\scanner\scanner_engine.py:402:
+  core\scanner\scanner_engine.py:403:    # =====================================================
+  core\scanner\scanner_engine.py:404:    # RUN ENGINE
+  core\scanner\scanner_engine.py:405:    # =====================================================
+  core\scanner\scanner_engine.py:406:
+> core\scanner\scanner_engine.py:407:    def run(
+  core\scanner\scanner_engine.py:408:        self,
+> core\scanner\scanner_engine.py:409:        market_data: Dict[str, Any],
+  core\scanner\scanner_engine.py:410:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:411:        """
+  core\scanner\scanner_engine.py:412:        Execute all enabled scanners.
+  core\scanner\scanner_engine.py:413:
+  core\scanner\scanner_engine.py:414:        Parameters
+  core\scanner\scanner_engine.py:415:        ----------
+> core\scanner\scanner_engine.py:416:        market_data:
+  core\scanner\scanner_engine.py:417:            Parsed market-data structure supplied
+  core\scanner\scanner_engine.py:418:            by StockVersity market-data layer.
+  core\scanner\scanner_engine.py:419:
+  core\scanner\scanner_engine.py:420:        Returns
+  core\scanner\scanner_engine.py:421:        -------
+  core\scanner\scanner_engine.py:422:        List[Signal]
+  core\scanner\scanner_engine.py:423:            Final merged and ranked opportunities.
+  core\scanner\scanner_engine.py:424:        """
+  core\scanner\scanner_engine.py:425:
+> core\scanner\scanner_engine.py:426:        if market_data is None:
+  core\scanner\scanner_engine.py:427:
+  core\scanner\scanner_engine.py:428:            raise ValueError(
+> core\scanner\scanner_engine.py:429:                "market_data cannot be None"
+  core\scanner\scanner_engine.py:430:            )
+  core\scanner\scanner_engine.py:431:
+> core\scanner\scanner_engine.py:432:        self.reset_results()
+  core\scanner\scanner_engine.py:433:
+> core\scanner\scanner_engine.py:434:        self.market_data = market_data
+  core\scanner\scanner_engine.py:435:
+  core\scanner\scanner_engine.py:436:        self.execution_started = datetime.now()
+  core\scanner\scanner_engine.py:437:
+  core\scanner\scanner_engine.py:438:        self.execution_finished = None
+  core\scanner\scanner_engine.py:439:
+  core\scanner\scanner_engine.py:440:        self.execution_time = 0.0
+  core\scanner\scanner_engine.py:441:
+> core\scanner\scanner_engine.py:442:        if not self.enabled_scanners:
+  core\scanner\scanner_engine.py:443:
+  core\scanner\scanner_engine.py:444:            self.execution_finished = datetime.now()
+  core\scanner\scanner_engine.py:445:
+  core\scanner\scanner_engine.py:446:            self.execution_time = (
+  core\scanner\scanner_engine.py:447:                self.execution_finished
+  core\scanner\scanner_engine.py:448:                - self.execution_started
+  core\scanner\scanner_engine.py:449:            ).total_seconds()
+  core\scanner\scanner_engine.py:450:
+  core\scanner\scanner_engine.py:451:            return []
+  core\scanner\scanner_engine.py:452:
+  core\scanner\scanner_engine.py:453:        if (
+  core\scanner\scanner_engine.py:454:            self.parallel
+> core\scanner\scanner_engine.py:455:            and len(self.enabled_scanners) > 1
+  core\scanner\scanner_engine.py:456:        ):
+  core\scanner\scanner_engine.py:457:
+  core\scanner\scanner_engine.py:458:            self._run_parallel()
+  core\scanner\scanner_engine.py:459:
+  core\scanner\scanner_engine.py:460:        else:
+  core\scanner\scanner_engine.py:461:
+  core\scanner\scanner_engine.py:462:            self._run_sequential()
+  core\scanner\scanner_engine.py:463:
+  core\scanner\scanner_engine.py:464:        # IMPORTANT:
+> core\scanner\scanner_engine.py:465:        # raw_results remains untouched so consensus
+  core\scanner\scanner_engine.py:466:        # can detect multiple scanners finding the
+  core\scanner\scanner_engine.py:467:        # same symbol.
+  core\scanner\scanner_engine.py:468:
+> core\scanner\scanner_engine.py:469:        self._merge_results()
+  core\scanner\scanner_engine.py:470:
+  core\scanner\scanner_engine.py:471:        self.execution_finished = datetime.now()
+  core\scanner\scanner_engine.py:472:
+  core\scanner\scanner_engine.py:473:        self.execution_time = (
+  core\scanner\scanner_engine.py:474:            self.execution_finished
+  core\scanner\scanner_engine.py:475:            - self.execution_started
+  core\scanner\scanner_engine.py:476:        ).total_seconds()
+  core\scanner\scanner_engine.py:477:
+  core\scanner\scanner_engine.py:478:        self.log(
+  core\scanner\scanner_engine.py:479:            "Execution completed.",
+> core\scanner\scanner_engine.py:480:            f"Raw signals={len(self.raw_results)}",
+> core\scanner\scanner_engine.py:481:            f"Final signals={len(self.results)}",
+  core\scanner\scanner_engine.py:482:            f"Time={self.execution_time:.3f}s",
+  core\scanner\scanner_engine.py:483:        )
+  core\scanner\scanner_engine.py:484:
+  core\scanner\scanner_engine.py:485:        return list(
+> core\scanner\scanner_engine.py:486:            self.results
+  core\scanner\scanner_engine.py:487:        )
+  core\scanner\scanner_engine.py:488:
+  core\scanner\scanner_engine.py:489:    # =====================================================
+  core\scanner\scanner_engine.py:490:    # SEQUENTIAL EXECUTION
+  core\scanner\scanner_engine.py:491:    # =====================================================
+  core\scanner\scanner_engine.py:492:
+  core\scanner\scanner_engine.py:493:    def _run_sequential(
+  core\scanner\scanner_engine.py:494:        self,
+  core\scanner\scanner_engine.py:495:    ) -> None:
+  core\scanner\scanner_engine.py:496:
+> core\scanner\scanner_engine.py:497:        for scanner in self.enabled_scanners.values():
+  core\scanner\scanner_engine.py:498:
+  core\scanner\scanner_engine.py:499:            try:
+  core\scanner\scanner_engine.py:500:
+  core\scanner\scanner_engine.py:501:                signals = self._execute_scanner(
+  core\scanner\scanner_engine.py:502:                    scanner
+  core\scanner\scanner_engine.py:503:                )
+  core\scanner\scanner_engine.py:504:
+  core\scanner\scanner_engine.py:505:                if signals:
+  core\scanner\scanner_engine.py:506:
+> core\scanner\scanner_engine.py:507:                    self.raw_results.extend(
+  core\scanner\scanner_engine.py:508:                        signals
+  core\scanner\scanner_engine.py:509:                    )
+  core\scanner\scanner_engine.py:510:
+  core\scanner\scanner_engine.py:511:            except Exception as exc:
+  core\scanner\scanner_engine.py:512:
+  core\scanner\scanner_engine.py:513:                self.log(
+  core\scanner\scanner_engine.py:514:                    "Scanner failed:",
+  core\scanner\scanner_engine.py:515:                    scanner.name,
+  core\scanner\scanner_engine.py:516:                    repr(exc),
+  core\scanner\scanner_engine.py:517:                )
+  core\scanner\scanner_engine.py:518:
+  core\scanner\scanner_engine.py:519:    # =====================================================
+  core\scanner\scanner_engine.py:520:    # PARALLEL EXECUTION
+  core\scanner\scanner_engine.py:521:    # =====================================================
+  core\scanner\scanner_engine.py:522:
+  core\scanner\scanner_engine.py:523:    def _run_parallel(
+  core\scanner\scanner_engine.py:524:        self,
+  core\scanner\scanner_engine.py:525:    ) -> None:
+  core\scanner\scanner_engine.py:526:
+  core\scanner\scanner_engine.py:527:        worker_count = min(
+  core\scanner\scanner_engine.py:528:            self.max_workers,
+  core\scanner\scanner_engine.py:529:            max(
+  core\scanner\scanner_engine.py:530:                1,
+> core\scanner\scanner_engine.py:531:                len(self.enabled_scanners),
+  core\scanner\scanner_engine.py:532:            ),
+  core\scanner\scanner_engine.py:533:        )
+  core\scanner\scanner_engine.py:534:
+  core\scanner\scanner_engine.py:535:        with ThreadPoolExecutor(
+  core\scanner\scanner_engine.py:536:            max_workers=worker_count
+  core\scanner\scanner_engine.py:537:        ) as executor:
+  core\scanner\scanner_engine.py:538:
+  core\scanner\scanner_engine.py:539:            futures = {
+  core\scanner\scanner_engine.py:540:
+  core\scanner\scanner_engine.py:541:                executor.submit(
+  core\scanner\scanner_engine.py:542:                    self._execute_scanner,
+  core\scanner\scanner_engine.py:543:                    scanner,
+  core\scanner\scanner_engine.py:544:                ): scanner
+  core\scanner\scanner_engine.py:545:
+  core\scanner\scanner_engine.py:546:                for scanner
+> core\scanner\scanner_engine.py:547:                in self.enabled_scanners.values()
+  core\scanner\scanner_engine.py:548:            }
+  core\scanner\scanner_engine.py:549:
+  core\scanner\scanner_engine.py:550:            for future in as_completed(
+  core\scanner\scanner_engine.py:551:                futures
+  core\scanner\scanner_engine.py:552:            ):
+  core\scanner\scanner_engine.py:553:
+  core\scanner\scanner_engine.py:554:                scanner = futures[
+  core\scanner\scanner_engine.py:555:                    future
+  core\scanner\scanner_engine.py:556:                ]
+  core\scanner\scanner_engine.py:557:
+  core\scanner\scanner_engine.py:558:                try:
+  core\scanner\scanner_engine.py:559:
+  core\scanner\scanner_engine.py:560:                    signals = future.result()
+  core\scanner\scanner_engine.py:561:
+  core\scanner\scanner_engine.py:562:                    if signals:
+  core\scanner\scanner_engine.py:563:
+> core\scanner\scanner_engine.py:564:                        self.raw_results.extend(
+  core\scanner\scanner_engine.py:565:                            signals
+  core\scanner\scanner_engine.py:566:                        )
+  core\scanner\scanner_engine.py:567:
+  core\scanner\scanner_engine.py:568:                except Exception as exc:
+  core\scanner\scanner_engine.py:569:
+  core\scanner\scanner_engine.py:570:                    self.log(
+  core\scanner\scanner_engine.py:571:                        "Scanner failed:",
+  core\scanner\scanner_engine.py:572:                        scanner.name,
+  core\scanner\scanner_engine.py:573:                        repr(exc),
+  core\scanner\scanner_engine.py:574:                    )
+  core\scanner\scanner_engine.py:575:
+  core\scanner\scanner_engine.py:576:    # =====================================================
+  core\scanner\scanner_engine.py:577:    # EXECUTE ONE SCANNER
+  core\scanner\scanner_engine.py:578:    # =====================================================
+  core\scanner\scanner_engine.py:579:
+  core\scanner\scanner_engine.py:580:    def _execute_scanner(
+  core\scanner\scanner_engine.py:581:        self,
+  core\scanner\scanner_engine.py:582:        scanner: BaseScanner,
+  core\scanner\scanner_engine.py:583:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:584:
+  core\scanner\scanner_engine.py:585:        scanner.reset()
+  core\scanner\scanner_engine.py:586:
+  core\scanner\scanner_engine.py:587:        signals = scanner.run(
+> core\scanner\scanner_engine.py:588:            self.market_data
+  core\scanner\scanner_engine.py:589:        )
+  core\scanner\scanner_engine.py:590:
+  core\scanner\scanner_engine.py:591:        if signals is None:
+  core\scanner\scanner_engine.py:592:
+  core\scanner\scanner_engine.py:593:            return []
+  core\scanner\scanner_engine.py:594:
+  core\scanner\scanner_engine.py:595:        return list(
+  core\scanner\scanner_engine.py:596:            signals
+  core\scanner\scanner_engine.py:597:        )
+  core\scanner\scanner_engine.py:598:
+  core\scanner\scanner_engine.py:599:    # =====================================================
+> core\scanner\scanner_engine.py:600:    # MERGE RESULTS
+  core\scanner\scanner_engine.py:601:    # =====================================================
+  core\scanner\scanner_engine.py:602:
+> core\scanner\scanner_engine.py:603:    def _merge_results(
+  core\scanner\scanner_engine.py:604:        self,
+  core\scanner\scanner_engine.py:605:    ) -> None:
+  core\scanner\scanner_engine.py:606:        """
+  core\scanner\scanner_engine.py:607:        Merge duplicate symbols.
+  core\scanner\scanner_engine.py:608:
+  core\scanner\scanner_engine.py:609:        The highest-quality signal for each symbol
+  core\scanner\scanner_engine.py:610:        becomes the final dashboard signal.
+  core\scanner\scanner_engine.py:611:
+> core\scanner\scanner_engine.py:612:        raw_results remains unchanged.
+  core\scanner\scanner_engine.py:613:        """
+  core\scanner\scanner_engine.py:614:
+  core\scanner\scanner_engine.py:615:        merged: Dict[str, Signal] = {}
+  core\scanner\scanner_engine.py:616:
+> core\scanner\scanner_engine.py:617:        for signal in self.raw_results:
+  core\scanner\scanner_engine.py:618:
+  core\scanner\scanner_engine.py:619:            symbol = signal.symbol.upper()
+  core\scanner\scanner_engine.py:620:
+  core\scanner\scanner_engine.py:621:            existing = merged.get(
+  core\scanner\scanner_engine.py:622:                symbol
+  core\scanner\scanner_engine.py:623:            )
+  core\scanner\scanner_engine.py:624:
+  core\scanner\scanner_engine.py:625:            if existing is None:
+  core\scanner\scanner_engine.py:626:
+  core\scanner\scanner_engine.py:627:                merged[
+  core\scanner\scanner_engine.py:628:                    symbol
+  core\scanner\scanner_engine.py:629:                ] = signal
+  core\scanner\scanner_engine.py:630:
+  core\scanner\scanner_engine.py:631:                continue
+  core\scanner\scanner_engine.py:632:
+  core\scanner\scanner_engine.py:633:            current_quality = (
+  core\scanner\scanner_engine.py:634:                signal.score,
+  core\scanner\scanner_engine.py:635:                signal.confidence,
+  core\scanner\scanner_engine.py:650:
+  core\scanner\scanner_engine.py:651:                merged[
+  core\scanner\scanner_engine.py:652:                    symbol
+  core\scanner\scanner_engine.py:653:                ] = signal
+  core\scanner\scanner_engine.py:654:
+> core\scanner\scanner_engine.py:655:        self.results = sorted(
+  core\scanner\scanner_engine.py:656:            merged.values(),
+  core\scanner\scanner_engine.py:657:            key=lambda signal: (
+  core\scanner\scanner_engine.py:658:                signal.score,
+  core\scanner\scanner_engine.py:659:                signal.confidence,
+  core\scanner\scanner_engine.py:660:                signal.risk_reward,
+  core\scanner\scanner_engine.py:661:            ),
+  core\scanner\scanner_engine.py:662:            reverse=True,
+  core\scanner\scanner_engine.py:663:        )
+  core\scanner\scanner_engine.py:664:
+  core\scanner\scanner_engine.py:665:    # =====================================================
+  core\scanner\scanner_engine.py:666:    # EXECUTION SUMMARY
+  core\scanner\scanner_engine.py:667:    # =====================================================
+  core\scanner\scanner_engine.py:668:
+  core\scanner\scanner_engine.py:669:    def execution_summary(
+  core\scanner\scanner_engine.py:670:        self,
+  core\scanner\scanner_engine.py:671:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:672:
+  core\scanner\scanner_engine.py:673:        return {
+  core\scanner\scanner_engine.py:674:
+  core\scanner\scanner_engine.py:675:            "scanners": len(
+> core\scanner\scanner_engine.py:676:                self.enabled_scanners
+  core\scanner\scanner_engine.py:677:            ),
+  core\scanner\scanner_engine.py:678:
+  core\scanner\scanner_engine.py:679:            "raw_signals": len(
+> core\scanner\scanner_engine.py:680:                self.raw_results
+  core\scanner\scanner_engine.py:681:            ),
+  core\scanner\scanner_engine.py:682:
+  core\scanner\scanner_engine.py:683:            "signals": len(
+> core\scanner\scanner_engine.py:684:                self.results
+  core\scanner\scanner_engine.py:685:            ),
+  core\scanner\scanner_engine.py:686:
+  core\scanner\scanner_engine.py:687:            "execution_time": round(
+  core\scanner\scanner_engine.py:688:                self.execution_time,
+  core\scanner\scanner_engine.py:689:                3,
+  core\scanner\scanner_engine.py:690:            ),
+  core\scanner\scanner_engine.py:691:
+  core\scanner\scanner_engine.py:692:            "parallel": self.parallel,
+  core\scanner\scanner_engine.py:693:
+  core\scanner\scanner_engine.py:694:            "timestamp": datetime.now().isoformat(),
+  core\scanner\scanner_engine.py:695:
+  core\scanner\scanner_engine.py:696:        }
+  core\scanner\scanner_engine.py:697:
+  core\scanner\scanner_engine.py:698:    # =====================================================
+  core\scanner\scanner_engine.py:699:    # SCANNER REPORTS
+  core\scanner\scanner_engine.py:700:    # =====================================================
+  core\scanner\scanner_engine.py:701:
+> core\scanner\scanner_engine.py:702:    def scanner_reports(
+  core\scanner\scanner_engine.py:703:        self,
+  core\scanner\scanner_engine.py:704:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_engine.py:705:
+  core\scanner\scanner_engine.py:706:        reports: List[
+  core\scanner\scanner_engine.py:707:            Dict[str, Any]
+  core\scanner\scanner_engine.py:708:        ] = []
+  core\scanner\scanner_engine.py:709:
+  core\scanner\scanner_engine.py:710:        for scanner in (
+> core\scanner\scanner_engine.py:711:            self.enabled_scanners.values()
+  core\scanner\scanner_engine.py:712:        ):
+  core\scanner\scanner_engine.py:713:
+  core\scanner\scanner_engine.py:714:            try:
+  core\scanner\scanner_engine.py:715:
+  core\scanner\scanner_engine.py:716:                report = scanner.performance()
+  core\scanner\scanner_engine.py:717:
+  core\scanner\scanner_engine.py:718:                reports.append(
+  core\scanner\scanner_engine.py:719:                    report
+  core\scanner\scanner_engine.py:720:                )
+  core\scanner\scanner_engine.py:721:
+  core\scanner\scanner_engine.py:722:            except Exception as exc:
+  core\scanner\scanner_engine.py:723:
+  core\scanner\scanner_engine.py:724:                reports.append(
+  core\scanner\scanner_engine.py:725:                    {
+  core\scanner\scanner_engine.py:726:                        "scanner": scanner.name,
+  core\scanner\scanner_engine.py:727:                        "status": "FAILED",
+  core\scanner\scanner_engine.py:728:                        "error": str(exc),
+  core\scanner\scanner_engine.py:729:                    }
+  core\scanner\scanner_engine.py:743:        count = max(
+  core\scanner\scanner_engine.py:744:            0,
+  core\scanner\scanner_engine.py:745:            int(count),
+  core\scanner\scanner_engine.py:746:        )
+  core\scanner\scanner_engine.py:747:
+> core\scanner\scanner_engine.py:748:        return self.results[
+  core\scanner\scanner_engine.py:749:            :count
+  core\scanner\scanner_engine.py:750:        ]
+  core\scanner\scanner_engine.py:751:
+  core\scanner\scanner_engine.py:752:    # =====================================================
+  core\scanner\scanner_engine.py:753:    # BUY SIGNALS
+  core\scanner\scanner_engine.py:754:    # =====================================================
+  core\scanner\scanner_engine.py:755:
+  core\scanner\scanner_engine.py:756:    def buy_signals(
+  core\scanner\scanner_engine.py:757:        self,
+  core\scanner\scanner_engine.py:758:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:759:
+  core\scanner\scanner_engine.py:760:        return [
+  core\scanner\scanner_engine.py:761:            signal
+> core\scanner\scanner_engine.py:762:            for signal in self.results
+  core\scanner\scanner_engine.py:763:            if signal.is_buy
+  core\scanner\scanner_engine.py:764:        ]
+  core\scanner\scanner_engine.py:765:
+  core\scanner\scanner_engine.py:766:    # =====================================================
+  core\scanner\scanner_engine.py:767:    # SELL SIGNALS
+  core\scanner\scanner_engine.py:768:    # =====================================================
+  core\scanner\scanner_engine.py:769:
+  core\scanner\scanner_engine.py:770:    def sell_signals(
+  core\scanner\scanner_engine.py:771:        self,
+  core\scanner\scanner_engine.py:772:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:773:
+  core\scanner\scanner_engine.py:774:        return [
+  core\scanner\scanner_engine.py:775:            signal
+> core\scanner\scanner_engine.py:776:            for signal in self.results
+  core\scanner\scanner_engine.py:777:            if signal.is_sell
+  core\scanner\scanner_engine.py:778:        ]
+  core\scanner\scanner_engine.py:779:
+  core\scanner\scanner_engine.py:780:    # =====================================================
+  core\scanner\scanner_engine.py:781:    # WATCH SIGNALS
+  core\scanner\scanner_engine.py:782:    # =====================================================
+  core\scanner\scanner_engine.py:783:
+  core\scanner\scanner_engine.py:784:    def watch_signals(
+  core\scanner\scanner_engine.py:785:        self,
+  core\scanner\scanner_engine.py:786:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:787:
+  core\scanner\scanner_engine.py:788:        return [
+  core\scanner\scanner_engine.py:789:            signal
+> core\scanner\scanner_engine.py:790:            for signal in self.results
+  core\scanner\scanner_engine.py:791:            if signal.is_watch
+  core\scanner\scanner_engine.py:792:        ]
+  core\scanner\scanner_engine.py:793:
+  core\scanner\scanner_engine.py:794:    # =====================================================
+  core\scanner\scanner_engine.py:795:    # SCORE DISTRIBUTION
+  core\scanner\scanner_engine.py:796:    # =====================================================
+  core\scanner\scanner_engine.py:797:
+  core\scanner\scanner_engine.py:798:    def score_distribution(
+  core\scanner\scanner_engine.py:799:        self,
+  core\scanner\scanner_engine.py:800:    ) -> Dict[str, int]:
+  core\scanner\scanner_engine.py:801:
+  core\scanner\scanner_engine.py:802:        distribution = {
+  core\scanner\scanner_engine.py:803:            "90+": 0,
+  core\scanner\scanner_engine.py:804:            "80-89": 0,
+  core\scanner\scanner_engine.py:805:            "70-79": 0,
+  core\scanner\scanner_engine.py:806:            "60-69": 0,
+  core\scanner\scanner_engine.py:807:            "<60": 0,
+  core\scanner\scanner_engine.py:808:        }
+  core\scanner\scanner_engine.py:809:
+> core\scanner\scanner_engine.py:810:        for signal in self.results:
+  core\scanner\scanner_engine.py:811:
+  core\scanner\scanner_engine.py:812:            score = signal.score
+  core\scanner\scanner_engine.py:813:
+  core\scanner\scanner_engine.py:814:            if score >= 90:
+  core\scanner\scanner_engine.py:815:
+  core\scanner\scanner_engine.py:816:                distribution[
+  core\scanner\scanner_engine.py:817:                    "90+"
+  core\scanner\scanner_engine.py:818:                ] += 1
+  core\scanner\scanner_engine.py:819:
+  core\scanner\scanner_engine.py:820:            elif score >= 80:
+  core\scanner\scanner_engine.py:821:
+  core\scanner\scanner_engine.py:822:                distribution[
+  core\scanner\scanner_engine.py:823:                    "80-89"
+  core\scanner\scanner_engine.py:824:                ] += 1
+  core\scanner\scanner_engine.py:825:
+  core\scanner\scanner_engine.py:826:            elif score >= 70:
+  core\scanner\scanner_engine.py:827:
+  core\scanner\scanner_engine.py:828:                distribution[
+  core\scanner\scanner_engine.py:856:            "80-89": 0,
+  core\scanner\scanner_engine.py:857:            "70-79": 0,
+  core\scanner\scanner_engine.py:858:            "<70": 0,
+  core\scanner\scanner_engine.py:859:        }
+  core\scanner\scanner_engine.py:860:
+> core\scanner\scanner_engine.py:861:        for signal in self.results:
+  core\scanner\scanner_engine.py:862:
+  core\scanner\scanner_engine.py:863:            confidence = signal.confidence
+  core\scanner\scanner_engine.py:864:
+  core\scanner\scanner_engine.py:865:            if confidence >= 90:
+  core\scanner\scanner_engine.py:866:
+  core\scanner\scanner_engine.py:867:                distribution[
+  core\scanner\scanner_engine.py:868:                    "90+"
+  core\scanner\scanner_engine.py:869:                ] += 1
+  core\scanner\scanner_engine.py:870:
+  core\scanner\scanner_engine.py:871:            elif confidence >= 80:
+  core\scanner\scanner_engine.py:872:
+  core\scanner\scanner_engine.py:873:                distribution[
+  core\scanner\scanner_engine.py:874:                    "80-89"
+  core\scanner\scanner_engine.py:875:                ] += 1
+  core\scanner\scanner_engine.py:876:
+  core\scanner\scanner_engine.py:877:            elif confidence >= 70:
+  core\scanner\scanner_engine.py:878:
+  core\scanner\scanner_engine.py:879:                distribution[
+  core\scanner\scanner_engine.py:899:        patterns: Dict[
+  core\scanner\scanner_engine.py:900:            str,
+  core\scanner\scanner_engine.py:901:            int,
+  core\scanner\scanner_engine.py:902:        ] = {}
+  core\scanner\scanner_engine.py:903:
+> core\scanner\scanner_engine.py:904:        for signal in self.results:
+  core\scanner\scanner_engine.py:905:
+  core\scanner\scanner_engine.py:906:            pattern = signal.pattern.value
+  core\scanner\scanner_engine.py:907:
+  core\scanner\scanner_engine.py:908:            patterns[
+  core\scanner\scanner_engine.py:909:                pattern
+  core\scanner\scanner_engine.py:910:            ] = (
+  core\scanner\scanner_engine.py:911:                patterns.get(
+  core\scanner\scanner_engine.py:912:                    pattern,
+  core\scanner\scanner_engine.py:913:                    0,
+  core\scanner\scanner_engine.py:914:                )
+  core\scanner\scanner_engine.py:915:                + 1
+  core\scanner\scanner_engine.py:916:            )
+  core\scanner\scanner_engine.py:917:
+  core\scanner\scanner_engine.py:918:        return dict(
+  core\scanner\scanner_engine.py:919:            sorted(
+  core\scanner\scanner_engine.py:920:                patterns.items(),
+  core\scanner\scanner_engine.py:921:                key=lambda item: item[1],
+  core\scanner\scanner_engine.py:922:                reverse=True,
+  core\scanner\scanner_engine.py:934:        sectors: Dict[
+  core\scanner\scanner_engine.py:935:            str,
+  core\scanner\scanner_engine.py:936:            int,
+  core\scanner\scanner_engine.py:937:        ] = {}
+  core\scanner\scanner_engine.py:938:
+> core\scanner\scanner_engine.py:939:        for signal in self.results:
+  core\scanner\scanner_engine.py:940:
+  core\scanner\scanner_engine.py:941:            sector = (
+  core\scanner\scanner_engine.py:942:                signal.sector
+  core\scanner\scanner_engine.py:943:                or "UNKNOWN"
+  core\scanner\scanner_engine.py:944:            )
+  core\scanner\scanner_engine.py:945:
+  core\scanner\scanner_engine.py:946:            sectors[
+  core\scanner\scanner_engine.py:947:                sector
+  core\scanner\scanner_engine.py:948:            ] = (
+  core\scanner\scanner_engine.py:949:                sectors.get(
+  core\scanner\scanner_engine.py:950:                    sector,
+  core\scanner\scanner_engine.py:951:                    0,
+  core\scanner\scanner_engine.py:952:                )
+  core\scanner\scanner_engine.py:953:                + 1
+  core\scanner\scanner_engine.py:954:            )
+  core\scanner\scanner_engine.py:955:
+  core\scanner\scanner_engine.py:956:        return dict(
+  core\scanner\scanner_engine.py:957:            sorted(
+  core\scanner\scanner_engine.py:1084:        NOTE:
+  core\scanner\scanner_engine.py:1085:        This measures scanner opportunity quality.
+  core\scanner\scanner_engine.py:1086:        It is not intended to replace true NSE breadth.
+  core\scanner\scanner_engine.py:1087:        """
+  core\scanner\scanner_engine.py:1088:
+> core\scanner\scanner_engine.py:1089:        if not self.results:
+  core\scanner\scanner_engine.py:1090:
+  core\scanner\scanner_engine.py:1091:            return 0.0
+  core\scanner\scanner_engine.py:1092:
+  core\scanner\scanner_engine.py:1093:        average_score = sum(
+  core\scanner\scanner_engine.py:1094:            signal.score
+> core\scanner\scanner_engine.py:1095:            for signal in self.results
+  core\scanner\scanner_engine.py:1096:        ) / len(
+> core\scanner\scanner_engine.py:1097:            self.results
+  core\scanner\scanner_engine.py:1098:        )
+  core\scanner\scanner_engine.py:1099:
+  core\scanner\scanner_engine.py:1100:        average_confidence = sum(
+  core\scanner\scanner_engine.py:1101:            signal.confidence
+> core\scanner\scanner_engine.py:1102:            for signal in self.results
+  core\scanner\scanner_engine.py:1103:        ) / len(
+> core\scanner\scanner_engine.py:1104:            self.results
+  core\scanner\scanner_engine.py:1105:        )
+  core\scanner\scanner_engine.py:1106:
+  core\scanner\scanner_engine.py:1107:        breadth = self.market_breadth()
+  core\scanner\scanner_engine.py:1108:
+  core\scanner\scanner_engine.py:1109:        bullish = breadth[
+  core\scanner\scanner_engine.py:1110:            "bullish_percent"
+  core\scanner\scanner_engine.py:1111:        ]
+  core\scanner\scanner_engine.py:1112:
+  core\scanner\scanner_engine.py:1113:        health = (
+  core\scanner\scanner_engine.py:1114:            average_score * 0.45
+  core\scanner\scanner_engine.py:1115:            + average_confidence * 0.35
+  core\scanner\scanner_engine.py:1116:            + bullish * 0.20
+  core\scanner\scanner_engine.py:1117:        )
+  core\scanner\scanner_engine.py:1118:
+  core\scanner\scanner_engine.py:1119:        return round(
+  core\scanner\scanner_engine.py:1120:            max(
+  core\scanner\scanner_engine.py:1121:                0.0,
+  core\scanner\scanner_engine.py:1122:                min(
+  core\scanner\scanner_engine.py:1138:        ranking: Dict[
+  core\scanner\scanner_engine.py:1139:            str,
+  core\scanner\scanner_engine.py:1140:            Dict[str, Any],
+  core\scanner\scanner_engine.py:1141:        ] = {}
+  core\scanner\scanner_engine.py:1142:
+> core\scanner\scanner_engine.py:1143:        for signal in self.results:
+  core\scanner\scanner_engine.py:1144:
+  core\scanner\scanner_engine.py:1145:            sector = (
+  core\scanner\scanner_engine.py:1146:                signal.sector
+  core\scanner\scanner_engine.py:1147:                or "UNKNOWN"
+  core\scanner\scanner_engine.py:1148:            )
+  core\scanner\scanner_engine.py:1149:
+  core\scanner\scanner_engine.py:1150:            if sector not in ranking:
+  core\scanner\scanner_engine.py:1151:
+  core\scanner\scanner_engine.py:1152:                ranking[
+  core\scanner\scanner_engine.py:1153:                    sector
+  core\scanner\scanner_engine.py:1154:                ] = {
+  core\scanner\scanner_engine.py:1155:                    "sector": sector,
+  core\scanner\scanner_engine.py:1156:                    "signals": 0,
+  core\scanner\scanner_engine.py:1157:                    "_score_total": 0.0,
+  core\scanner\scanner_engine.py:1158:                    "_confidence_total": 0.0,
+  core\scanner\scanner_engine.py:1159:                }
+  core\scanner\scanner_engine.py:1160:
+  core\scanner\scanner_engine.py:1161:            item = ranking[
+  core\scanner\scanner_engine.py:1226:
+  core\scanner\scanner_engine.py:1227:    # =====================================================
+  core\scanner\scanner_engine.py:1228:    # SCANNER RANKING
+  core\scanner\scanner_engine.py:1229:    # =====================================================
+  core\scanner\scanner_engine.py:1230:
+> core\scanner\scanner_engine.py:1231:    def scanner_ranking(
+  core\scanner\scanner_engine.py:1232:        self,
+  core\scanner\scanner_engine.py:1233:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_engine.py:1234:
+  core\scanner\scanner_engine.py:1235:        ranking: List[
+  core\scanner\scanner_engine.py:1236:            Dict[str, Any]
+  core\scanner\scanner_engine.py:1237:        ] = []
+  core\scanner\scanner_engine.py:1238:
+  core\scanner\scanner_engine.py:1239:        for scanner in (
+> core\scanner\scanner_engine.py:1240:            self.enabled_scanners.values()
+  core\scanner\scanner_engine.py:1241:        ):
+  core\scanner\scanner_engine.py:1242:
+  core\scanner\scanner_engine.py:1243:            try:
+  core\scanner\scanner_engine.py:1244:
+  core\scanner\scanner_engine.py:1245:                report = scanner.performance()
+  core\scanner\scanner_engine.py:1246:
+  core\scanner\scanner_engine.py:1247:            except Exception:
+  core\scanner\scanner_engine.py:1248:
+  core\scanner\scanner_engine.py:1249:                report = {}
+  core\scanner\scanner_engine.py:1250:
+  core\scanner\scanner_engine.py:1251:            ranking.append(
+  core\scanner\scanner_engine.py:1252:                {
+  core\scanner\scanner_engine.py:1253:                    "scanner": scanner.name,
+  core\scanner\scanner_engine.py:1254:                    "signals": report.get(
+  core\scanner\scanner_engine.py:1255:                        "signals_found",
+  core\scanner\scanner_engine.py:1256:                        0,
+  core\scanner\scanner_engine.py:1257:                    ),
+  core\scanner\scanner_engine.py:1258:                    "average_score": report.get(
+  core\scanner\scanner_engine.py:1292:        self,
+  core\scanner\scanner_engine.py:1293:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_engine.py:1294:        """
+  core\scanner\scanner_engine.py:1295:        Group RAW signals by symbol.
+  core\scanner\scanner_engine.py:1296:
+> core\scanner\scanner_engine.py:1297:        This is intentionally based on raw_results rather
+> core\scanner\scanner_engine.py:1298:        than final results so multiple scanner detections
+  core\scanner\scanner_engine.py:1299:        are preserved.
+  core\scanner\scanner_engine.py:1300:        """
+  core\scanner\scanner_engine.py:1301:
+  core\scanner\scanner_engine.py:1302:        grouped: Dict[
+  core\scanner\scanner_engine.py:1303:            str,
+  core\scanner\scanner_engine.py:1304:            List[Signal],
+  core\scanner\scanner_engine.py:1305:        ] = {}
+  core\scanner\scanner_engine.py:1306:
+> core\scanner\scanner_engine.py:1307:        for signal in self.raw_results:
+  core\scanner\scanner_engine.py:1308:
+  core\scanner\scanner_engine.py:1309:            symbol = signal.symbol.upper()
+  core\scanner\scanner_engine.py:1310:
+  core\scanner\scanner_engine.py:1311:            grouped.setdefault(
+  core\scanner\scanner_engine.py:1312:                symbol,
+  core\scanner\scanner_engine.py:1313:                [],
+  core\scanner\scanner_engine.py:1314:            ).append(
+  core\scanner\scanner_engine.py:1315:                signal
+  core\scanner\scanner_engine.py:1316:            )
+  core\scanner\scanner_engine.py:1317:
+  core\scanner\scanner_engine.py:1318:        consensus_rows: List[
+  core\scanner\scanner_engine.py:1319:            Dict[str, Any]
+  core\scanner\scanner_engine.py:1320:        ] = []
+  core\scanner\scanner_engine.py:1321:
+  core\scanner\scanner_engine.py:1322:        for symbol, signals in (
+  core\scanner\scanner_engine.py:1323:            grouped.items()
+  core\scanner\scanner_engine.py:1324:        ):
+  core\scanner\scanner_engine.py:1325:
+  core\scanner\scanner_engine.py:1557:            0,
+  core\scanner\scanner_engine.py:1558:            int(limit),
+  core\scanner\scanner_engine.py:1559:        )
+  core\scanner\scanner_engine.py:1560:
+  core\scanner\scanner_engine.py:1561:        ranked = sorted(
+> core\scanner\scanner_engine.py:1562:            self.results,
+  core\scanner\scanner_engine.py:1563:            key=lambda signal: (
+  core\scanner\scanner_engine.py:1564:                self.priority_score(
+  core\scanner\scanner_engine.py:1565:                    signal
+  core\scanner\scanner_engine.py:1566:                ),
+  core\scanner\scanner_engine.py:1567:                signal.score,
+  core\scanner\scanner_engine.py:1568:                signal.confidence,
+  core\scanner\scanner_engine.py:1569:            ),
+  core\scanner\scanner_engine.py:1570:            reverse=True,
+  core\scanner\scanner_engine.py:1571:        )
+  core\scanner\scanner_engine.py:1572:
+  core\scanner\scanner_engine.py:1573:        return ranked[
+  core\scanner\scanner_engine.py:1574:            :limit
+  core\scanner\scanner_engine.py:1575:        ]
+  core\scanner\scanner_engine.py:1576:
+  core\scanner\scanner_engine.py:1577:    # =====================================================
+  core\scanner\scanner_engine.py:1578:    # RANKED OPPORTUNITIES
+  core\scanner\scanner_engine.py:1579:    # =====================================================
+  core\scanner\scanner_engine.py:1580:
+  core\scanner\scanner_engine.py:1587:            0,
+  core\scanner\scanner_engine.py:1588:            int(limit),
+  core\scanner\scanner_engine.py:1589:        )
+  core\scanner\scanner_engine.py:1590:
+  core\scanner\scanner_engine.py:1591:        ranked = sorted(
+> core\scanner\scanner_engine.py:1592:            self.results,
+  core\scanner\scanner_engine.py:1593:            key=lambda signal: (
+  core\scanner\scanner_engine.py:1594:                signal.score,
+  core\scanner\scanner_engine.py:1595:                signal.confidence,
+  core\scanner\scanner_engine.py:1596:                signal.risk_reward,
+  core\scanner\scanner_engine.py:1597:                signal.volume_ratio,
+  core\scanner\scanner_engine.py:1598:            ),
+  core\scanner\scanner_engine.py:1599:            reverse=True,
+  core\scanner\scanner_engine.py:1600:        )
+  core\scanner\scanner_engine.py:1601:
+  core\scanner\scanner_engine.py:1602:        return ranked[
+  core\scanner\scanner_engine.py:1603:            :limit
+  core\scanner\scanner_engine.py:1604:        ]
+  core\scanner\scanner_engine.py:1605:
+  core\scanner\scanner_engine.py:1606:    # =====================================================
+  core\scanner\scanner_engine.py:1607:    # WATCHLIST
+  core\scanner\scanner_engine.py:1608:    # =====================================================
+  core\scanner\scanner_engine.py:1609:
+  core\scanner\scanner_engine.py:1610:    def generate_watchlist(
+  core\scanner\scanner_engine.py:1622:
+  core\scanner\scanner_engine.py:1623:    def dashboard_summary(
+  core\scanner\scanner_engine.py:1624:        self,
+  core\scanner\scanner_engine.py:1625:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:1626:
+> core\scanner\scanner_engine.py:1627:        if self.results:
+  core\scanner\scanner_engine.py:1628:
+  core\scanner\scanner_engine.py:1629:            average_score = (
+  core\scanner\scanner_engine.py:1630:                sum(
+  core\scanner\scanner_engine.py:1631:                    signal.score
+> core\scanner\scanner_engine.py:1632:                    for signal in self.results
+  core\scanner\scanner_engine.py:1633:                )
+  core\scanner\scanner_engine.py:1634:                / len(
+> core\scanner\scanner_engine.py:1635:                    self.results
+  core\scanner\scanner_engine.py:1636:                )
+  core\scanner\scanner_engine.py:1637:            )
+  core\scanner\scanner_engine.py:1638:
+  core\scanner\scanner_engine.py:1639:            average_confidence = (
+  core\scanner\scanner_engine.py:1640:                sum(
+  core\scanner\scanner_engine.py:1641:                    signal.confidence
+> core\scanner\scanner_engine.py:1642:                    for signal in self.results
+  core\scanner\scanner_engine.py:1643:                )
+  core\scanner\scanner_engine.py:1644:                / len(
+> core\scanner\scanner_engine.py:1645:                    self.results
+  core\scanner\scanner_engine.py:1646:                )
+  core\scanner\scanner_engine.py:1647:            )
+  core\scanner\scanner_engine.py:1648:
+  core\scanner\scanner_engine.py:1649:        else:
+  core\scanner\scanner_engine.py:1650:
+  core\scanner\scanner_engine.py:1651:            average_score = 0.0
+  core\scanner\scanner_engine.py:1652:
+  core\scanner\scanner_engine.py:1653:            average_confidence = 0.0
+  core\scanner\scanner_engine.py:1654:
+  core\scanner\scanner_engine.py:1655:        return {
+  core\scanner\scanner_engine.py:1656:
+  core\scanner\scanner_engine.py:1657:            "total_scanners": len(
+> core\scanner\scanner_engine.py:1658:                self.enabled_scanners
+  core\scanner\scanner_engine.py:1659:            ),
+  core\scanner\scanner_engine.py:1660:
+  core\scanner\scanner_engine.py:1661:            "raw_signals": len(
+> core\scanner\scanner_engine.py:1662:                self.raw_results
+  core\scanner\scanner_engine.py:1663:            ),
+  core\scanner\scanner_engine.py:1664:
+  core\scanner\scanner_engine.py:1665:            "total_signals": len(
+> core\scanner\scanner_engine.py:1666:                self.results
+  core\scanner\scanner_engine.py:1667:            ),
+  core\scanner\scanner_engine.py:1668:
+  core\scanner\scanner_engine.py:1669:            "buy_signals": len(
+  core\scanner\scanner_engine.py:1670:                self.buy_signals()
+  core\scanner\scanner_engine.py:1671:            ),
+  core\scanner\scanner_engine.py:1672:
+  core\scanner\scanner_engine.py:1673:            "sell_signals": len(
+  core\scanner\scanner_engine.py:1674:                self.sell_signals()
+  core\scanner\scanner_engine.py:1675:            ),
+  core\scanner\scanner_engine.py:1676:
+  core\scanner\scanner_engine.py:1677:            "watch_signals": len(
+  core\scanner\scanner_engine.py:1678:                self.watch_signals()
+  core\scanner\scanner_engine.py:1679:            ),
+  core\scanner\scanner_engine.py:1680:
+  core\scanner\scanner_engine.py:1681:            "average_score": round(
+  core\scanner\scanner_engine.py:1682:                average_score,
+  core\scanner\scanner_engine.py:1683:                2,
+  core\scanner\scanner_engine.py:1684:            ),
+  core\scanner\scanner_engine.py:1812:        minimum_confidence: float = 80.0,
+  core\scanner\scanner_engine.py:1813:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:1814:
+  core\scanner\scanner_engine.py:1815:        candidates = [
+  core\scanner\scanner_engine.py:1816:            signal
+> core\scanner\scanner_engine.py:1817:            for signal in self.results
+  core\scanner\scanner_engine.py:1818:            if (
+  core\scanner\scanner_engine.py:1819:                signal.score
+  core\scanner\scanner_engine.py:1820:                >= minimum_score
+  core\scanner\scanner_engine.py:1821:                and signal.confidence
+  core\scanner\scanner_engine.py:1822:                >= minimum_confidence
+  core\scanner\scanner_engine.py:1823:            )
+  core\scanner\scanner_engine.py:1824:        ]
+  core\scanner\scanner_engine.py:1825:
+  core\scanner\scanner_engine.py:1826:        return sorted(
+  core\scanner\scanner_engine.py:1827:            candidates,
+  core\scanner\scanner_engine.py:1828:            key=lambda signal: (
+  core\scanner\scanner_engine.py:1829:                self.priority_score(
+  core\scanner\scanner_engine.py:1830:                    signal
+  core\scanner\scanner_engine.py:1831:                ),
+  core\scanner\scanner_engine.py:1832:                signal.score,
+  core\scanner\scanner_engine.py:1833:                signal.confidence,
+  core\scanner\scanner_engine.py:1834:            ),
+  core\scanner\scanner_engine.py:1835:            reverse=True,
+  core\scanner\scanner_engine.py:1907:        ] = []
+  core\scanner\scanner_engine.py:1908:
+  core\scanner\scanner_engine.py:1909:        for signal in (
+  core\scanner\scanner_engine.py:1910:            self.priority_ranking(
+  core\scanner\scanner_engine.py:1911:                len(
+> core\scanner\scanner_engine.py:1912:                    self.results
+  core\scanner\scanner_engine.py:1913:                )
+  core\scanner\scanner_engine.py:1914:            )
+  core\scanner\scanner_engine.py:1915:        ):
+  core\scanner\scanner_engine.py:1916:
+  core\scanner\scanner_engine.py:1917:            if (
+  core\scanner\scanner_engine.py:1918:                signal.score
+  core\scanner\scanner_engine.py:1919:                < minimum_score
+  core\scanner\scanner_engine.py:1920:            ):
+  core\scanner\scanner_engine.py:1921:
+  core\scanner\scanner_engine.py:1922:                continue
+  core\scanner\scanner_engine.py:1923:
+  core\scanner\scanner_engine.py:1924:            if (
+  core\scanner\scanner_engine.py:1925:                signal.confidence
+  core\scanner\scanner_engine.py:1926:                < minimum_confidence
+  core\scanner\scanner_engine.py:1927:            ):
+  core\scanner\scanner_engine.py:1928:
+  core\scanner\scanner_engine.py:1929:                continue
+  core\scanner\scanner_engine.py:1930:
+  core\scanner\scanner_engine.py:1983:
+  core\scanner\scanner_engine.py:1984:        alerts: List[
+  core\scanner\scanner_engine.py:1985:            Dict[str, Any]
+  core\scanner\scanner_engine.py:1986:        ] = []
+  core\scanner\scanner_engine.py:1987:
+> core\scanner\scanner_engine.py:1988:        for signal in self.results:
+  core\scanner\scanner_engine.py:1989:
+  core\scanner\scanner_engine.py:1990:            if (
+  core\scanner\scanner_engine.py:1991:                signal.volume_ratio
+  core\scanner\scanner_engine.py:1992:                < minimum_volume_ratio
+  core\scanner\scanner_engine.py:1993:            ):
+  core\scanner\scanner_engine.py:1994:
+  core\scanner\scanner_engine.py:1995:                continue
+  core\scanner\scanner_engine.py:1996:
+  core\scanner\scanner_engine.py:1997:            if (
+  core\scanner\scanner_engine.py:1998:                signal.score
+  core\scanner\scanner_engine.py:1999:                < minimum_score
+  core\scanner\scanner_engine.py:2000:            ):
+  core\scanner\scanner_engine.py:2001:
+  core\scanner\scanner_engine.py:2002:                continue
+  core\scanner\scanner_engine.py:2003:
+  core\scanner\scanner_engine.py:2004:            alerts.append(
+  core\scanner\scanner_engine.py:2005:                self.create_alert(
+  core\scanner\scanner_engine.py:2006:                    signal
+  core\scanner\scanner_engine.py:2020:
+  core\scanner\scanner_engine.py:2021:        alerts: List[
+  core\scanner\scanner_engine.py:2022:            Dict[str, Any]
+  core\scanner\scanner_engine.py:2023:        ] = []
+  core\scanner\scanner_engine.py:2024:
+> core\scanner\scanner_engine.py:2025:        for signal in self.results:
+  core\scanner\scanner_engine.py:2026:
+  core\scanner\scanner_engine.py:2027:            if (
+  core\scanner\scanner_engine.py:2028:                signal.risk_reward
+  core\scanner\scanner_engine.py:2029:                >= minimum_rr
+  core\scanner\scanner_engine.py:2030:            ):
+  core\scanner\scanner_engine.py:2031:
+  core\scanner\scanner_engine.py:2032:                continue
+  core\scanner\scanner_engine.py:2033:
+  core\scanner\scanner_engine.py:2034:            alert = self.create_alert(
+  core\scanner\scanner_engine.py:2035:                signal
+  core\scanner\scanner_engine.py:2036:            )
+  core\scanner\scanner_engine.py:2037:
+  core\scanner\scanner_engine.py:2038:            alert[
+  core\scanner\scanner_engine.py:2039:                "warning"
+  core\scanner\scanner_engine.py:2040:            ] = "LOW_RISK_REWARD"
+  core\scanner\scanner_engine.py:2041:
+  core\scanner\scanner_engine.py:2042:            alerts.append(
+  core\scanner\scanner_engine.py:2043:                alert
+  core\scanner\scanner_engine.py:2061:        tolerance = max(
+  core\scanner\scanner_engine.py:2062:            0.0,
+  core\scanner\scanner_engine.py:2063:            float(tolerance),
+  core\scanner\scanner_engine.py:2064:        )
+  core\scanner\scanner_engine.py:2065:
+> core\scanner\scanner_engine.py:2066:        for signal in self.results:
+  core\scanner\scanner_engine.py:2067:
+  core\scanner\scanner_engine.py:2068:            if signal.entry <= 0:
+  core\scanner\scanner_engine.py:2069:
+  core\scanner\scanner_engine.py:2070:                continue
+  core\scanner\scanner_engine.py:2071:
+  core\scanner\scanner_engine.py:2072:            difference = abs(
+  core\scanner\scanner_engine.py:2073:                signal.last_price
+  core\scanner\scanner_engine.py:2074:                - signal.entry
+  core\scanner\scanner_engine.py:2075:            )
+  core\scanner\scanner_engine.py:2076:
+  core\scanner\scanner_engine.py:2077:            percentage = (
+  core\scanner\scanner_engine.py:2078:                difference
+  core\scanner\scanner_engine.py:2079:                / signal.entry
+  core\scanner\scanner_engine.py:2080:            ) * 100
+  core\scanner\scanner_engine.py:2081:
+  core\scanner\scanner_engine.py:2082:            if (
+  core\scanner\scanner_engine.py:2083:                percentage
+  core\scanner\scanner_engine.py:2084:                <= tolerance
+  core\scanner\scanner_engine.py:2211:        symbol: str,
+  core\scanner\scanner_engine.py:2212:    ) -> Optional[Signal]:
+  core\scanner\scanner_engine.py:2213:
+  core\scanner\scanner_engine.py:2214:        symbol = symbol.upper()
+  core\scanner\scanner_engine.py:2215:
+> core\scanner\scanner_engine.py:2216:        for signal in self.results:
+  core\scanner\scanner_engine.py:2217:
+  core\scanner\scanner_engine.py:2218:            if (
+  core\scanner\scanner_engine.py:2219:                signal.symbol.upper()
+  core\scanner\scanner_engine.py:2220:                == symbol
+  core\scanner\scanner_engine.py:2221:            ):
+  core\scanner\scanner_engine.py:2222:
+  core\scanner\scanner_engine.py:2223:                return signal
+  core\scanner\scanner_engine.py:2224:
+  core\scanner\scanner_engine.py:2225:        return None
+  core\scanner\scanner_engine.py:2226:
+  core\scanner\scanner_engine.py:2227:    # =====================================================
+  core\scanner\scanner_engine.py:2228:    # FIND RAW SYMBOL SIGNALS
+  core\scanner\scanner_engine.py:2229:    # =====================================================
+  core\scanner\scanner_engine.py:2230:
+  core\scanner\scanner_engine.py:2231:    def find_raw_symbol(
+  core\scanner\scanner_engine.py:2232:        self,
+  core\scanner\scanner_engine.py:2233:        symbol: str,
+  core\scanner\scanner_engine.py:2234:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2238:
+  core\scanner\scanner_engine.py:2239:        symbol = symbol.upper()
+  core\scanner\scanner_engine.py:2240:
+  core\scanner\scanner_engine.py:2241:        return [
+  core\scanner\scanner_engine.py:2242:            signal
+> core\scanner\scanner_engine.py:2243:            for signal in self.raw_results
+  core\scanner\scanner_engine.py:2244:            if (
+  core\scanner\scanner_engine.py:2245:                signal.symbol.upper()
+  core\scanner\scanner_engine.py:2246:                == symbol
+  core\scanner\scanner_engine.py:2247:            )
+  core\scanner\scanner_engine.py:2248:        ]
+  core\scanner\scanner_engine.py:2249:
+  core\scanner\scanner_engine.py:2250:    # =====================================================
+  core\scanner\scanner_engine.py:2251:    # FILTER BY SCANNER
+  core\scanner\scanner_engine.py:2252:    # =====================================================
+  core\scanner\scanner_engine.py:2253:
+  core\scanner\scanner_engine.py:2254:    def filter_by_scanner(
+  core\scanner\scanner_engine.py:2255:        self,
+  core\scanner\scanner_engine.py:2256:        scanner_name: str,
+  core\scanner\scanner_engine.py:2257:        *,
+  core\scanner\scanner_engine.py:2258:        raw: bool = False,
+  core\scanner\scanner_engine.py:2259:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2260:
+  core\scanner\scanner_engine.py:2261:        source = (
+> core\scanner\scanner_engine.py:2262:            self.raw_results
+  core\scanner\scanner_engine.py:2263:            if raw
+> core\scanner\scanner_engine.py:2264:            else self.results
+  core\scanner\scanner_engine.py:2265:        )
+  core\scanner\scanner_engine.py:2266:
+  core\scanner\scanner_engine.py:2267:        scanner_name = (
+  core\scanner\scanner_engine.py:2268:            scanner_name.lower()
+  core\scanner\scanner_engine.py:2269:        )
+  core\scanner\scanner_engine.py:2270:
+  core\scanner\scanner_engine.py:2271:        return [
+  core\scanner\scanner_engine.py:2272:            signal
+  core\scanner\scanner_engine.py:2273:            for signal in source
+  core\scanner\scanner_engine.py:2274:            if (
+  core\scanner\scanner_engine.py:2275:                signal.scanner_name.lower()
+  core\scanner\scanner_engine.py:2276:                == scanner_name
+  core\scanner\scanner_engine.py:2277:            )
+  core\scanner\scanner_engine.py:2278:        ]
+  core\scanner\scanner_engine.py:2279:
+  core\scanner\scanner_engine.py:2280:    # =====================================================
+  core\scanner\scanner_engine.py:2281:    # FILTER BY SECTOR
+  core\scanner\scanner_engine.py:2282:    # =====================================================
+  core\scanner\scanner_engine.py:2288:
+  core\scanner\scanner_engine.py:2289:        sector = sector.lower()
+  core\scanner\scanner_engine.py:2290:
+  core\scanner\scanner_engine.py:2291:        return [
+  core\scanner\scanner_engine.py:2292:            signal
+> core\scanner\scanner_engine.py:2293:            for signal in self.results
+  core\scanner\scanner_engine.py:2294:            if (
+  core\scanner\scanner_engine.py:2295:                signal.sector
+  core\scanner\scanner_engine.py:2296:                and signal.sector.lower()
+  core\scanner\scanner_engine.py:2297:                == sector
+  core\scanner\scanner_engine.py:2298:            )
+  core\scanner\scanner_engine.py:2299:        ]
+  core\scanner\scanner_engine.py:2300:
+  core\scanner\scanner_engine.py:2301:    # =====================================================
+  core\scanner\scanner_engine.py:2302:    # FILTER BY PATTERN
+  core\scanner\scanner_engine.py:2303:    # =====================================================
+  core\scanner\scanner_engine.py:2304:
+  core\scanner\scanner_engine.py:2305:    def filter_by_pattern(
+  core\scanner\scanner_engine.py:2306:        self,
+  core\scanner\scanner_engine.py:2307:        pattern: str,
+  core\scanner\scanner_engine.py:2308:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2309:
+  core\scanner\scanner_engine.py:2310:        pattern = pattern.lower()
+  core\scanner\scanner_engine.py:2311:
+  core\scanner\scanner_engine.py:2312:        return [
+  core\scanner\scanner_engine.py:2313:            signal
+> core\scanner\scanner_engine.py:2314:            for signal in self.results
+  core\scanner\scanner_engine.py:2315:            if (
+  core\scanner\scanner_engine.py:2316:                signal.pattern.value.lower()
+  core\scanner\scanner_engine.py:2317:                == pattern
+  core\scanner\scanner_engine.py:2318:            )
+  core\scanner\scanner_engine.py:2319:        ]
+  core\scanner\scanner_engine.py:2320:
+  core\scanner\scanner_engine.py:2321:    # =====================================================
+  core\scanner\scanner_engine.py:2322:    # SORT SIGNALS
+  core\scanner\scanner_engine.py:2323:    # =====================================================
+  core\scanner\scanner_engine.py:2324:
+  core\scanner\scanner_engine.py:2325:    def sort_signals(
+  core\scanner\scanner_engine.py:2326:        self,
+  core\scanner\scanner_engine.py:2327:        key: str = "score",
+  core\scanner\scanner_engine.py:2328:        reverse: bool = True,
+  core\scanner\scanner_engine.py:2329:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2330:
+  core\scanner\scanner_engine.py:2331:        allowed = {
+  core\scanner\scanner_engine.py:2332:            "score",
+  core\scanner\scanner_engine.py:2342:        if key not in allowed:
+  core\scanner\scanner_engine.py:2343:
+  core\scanner\scanner_engine.py:2344:            key = "score"
+  core\scanner\scanner_engine.py:2345:
+  core\scanner\scanner_engine.py:2346:        return sorted(
+> core\scanner\scanner_engine.py:2347:            self.results,
+  core\scanner\scanner_engine.py:2348:            key=lambda signal: getattr(
+  core\scanner\scanner_engine.py:2349:                signal,
+  core\scanner\scanner_engine.py:2350:                key,
+  core\scanner\scanner_engine.py:2351:                0,
+  core\scanner\scanner_engine.py:2352:            ),
+  core\scanner\scanner_engine.py:2353:            reverse=reverse,
+  core\scanner\scanner_engine.py:2354:        )
+  core\scanner\scanner_engine.py:2355:
+  core\scanner\scanner_engine.py:2356:    # =====================================================
+  core\scanner\scanner_engine.py:2357:    # PAGINATION
+  core\scanner\scanner_engine.py:2358:    # =====================================================
+  core\scanner\scanner_engine.py:2359:
+  core\scanner\scanner_engine.py:2360:    def page(
+  core\scanner\scanner_engine.py:2361:        self,
+  core\scanner\scanner_engine.py:2362:        page: int = 1,
+  core\scanner\scanner_engine.py:2363:        page_size: int = 20,
+  core\scanner\scanner_engine.py:2364:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2365:
+  core\scanner\scanner_engine.py:2380:        end = (
+  core\scanner\scanner_engine.py:2381:            start
+  core\scanner\scanner_engine.py:2382:            + page_size
+  core\scanner\scanner_engine.py:2383:        )
+  core\scanner\scanner_engine.py:2384:
+> core\scanner\scanner_engine.py:2385:        return self.results[
+  core\scanner\scanner_engine.py:2386:            start:end
+  core\scanner\scanner_engine.py:2387:        ]
+  core\scanner\scanner_engine.py:2388:
+  core\scanner\scanner_engine.py:2389:    # =====================================================
+  core\scanner\scanner_engine.py:2390:    # EXPORT
+  core\scanner\scanner_engine.py:2391:    # =====================================================
+  core\scanner\scanner_engine.py:2392:
+  core\scanner\scanner_engine.py:2393:    def export(
+  core\scanner\scanner_engine.py:2394:        self,
+  core\scanner\scanner_engine.py:2395:        *,
+  core\scanner\scanner_engine.py:2396:        raw: bool = False,
+  core\scanner\scanner_engine.py:2397:    ) -> List[Dict[str, Any]]:
+  core\scanner\scanner_engine.py:2398:
+  core\scanner\scanner_engine.py:2399:        source = (
+> core\scanner\scanner_engine.py:2400:            self.raw_results
+  core\scanner\scanner_engine.py:2401:            if raw
+> core\scanner\scanner_engine.py:2402:            else self.results
+  core\scanner\scanner_engine.py:2403:        )
+  core\scanner\scanner_engine.py:2404:
+  core\scanner\scanner_engine.py:2405:        return [
+  core\scanner\scanner_engine.py:2406:            signal.to_dict()
+  core\scanner\scanner_engine.py:2407:            for signal in source
+  core\scanner\scanner_engine.py:2408:        ]
+  core\scanner\scanner_engine.py:2409:
+  core\scanner\scanner_engine.py:2410:    # =====================================================
+  core\scanner\scanner_engine.py:2411:    # SNAPSHOT
+  core\scanner\scanner_engine.py:2412:    # =====================================================
+  core\scanner\scanner_engine.py:2413:
+  core\scanner\scanner_engine.py:2414:    def snapshot(
+  core\scanner\scanner_engine.py:2415:        self,
+  core\scanner\scanner_engine.py:2416:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:2417:
+  core\scanner\scanner_engine.py:2418:        return {
+  core\scanner\scanner_engine.py:2419:
+  core\scanner\scanner_engine.py:2420:            "generated_at": (
+  core\scanner\scanner_engine.py:2446:            ),
+  core\scanner\scanner_engine.py:2447:
+  core\scanner\scanner_engine.py:2448:        }
+  core\scanner\scanner_engine.py:2449:
+  core\scanner\scanner_engine.py:2450:    # =====================================================
+> core\scanner\scanner_engine.py:2451:    # CLEAR RESULTS
+  core\scanner\scanner_engine.py:2452:    # =====================================================
+  core\scanner\scanner_engine.py:2453:
+> core\scanner\scanner_engine.py:2454:    def clear_results(
+  core\scanner\scanner_engine.py:2455:        self,
+  core\scanner\scanner_engine.py:2456:    ) -> None:
+  core\scanner\scanner_engine.py:2457:
+> core\scanner\scanner_engine.py:2458:        self.reset_results()
+  core\scanner\scanner_engine.py:2459:
+  core\scanner\scanner_engine.py:2460:    # =====================================================
+  core\scanner\scanner_engine.py:2461:    # CONFIGURATION
+  core\scanner\scanner_engine.py:2462:    # =====================================================
+  core\scanner\scanner_engine.py:2463:
+  core\scanner\scanner_engine.py:2464:    def configure(
+  core\scanner\scanner_engine.py:2465:        self,
+  core\scanner\scanner_engine.py:2466:        *,
+  core\scanner\scanner_engine.py:2467:        parallel: Optional[bool] = None,
+  core\scanner\scanner_engine.py:2468:        max_workers: Optional[int] = None,
+  core\scanner\scanner_engine.py:2469:        debug: Optional[bool] = None,
+  core\scanner\scanner_engine.py:2470:    ) -> None:
+  core\scanner\scanner_engine.py:2471:
+  core\scanner\scanner_engine.py:2472:        if parallel is not None:
+  core\scanner\scanner_engine.py:2473:
+  core\scanner\scanner_engine.py:2474:            self.parallel = bool(
+  core\scanner\scanner_engine.py:2475:                parallel
+  core\scanner\scanner_engine.py:2476:            )
+  core\scanner\scanner_engine.py:2500:
+  core\scanner\scanner_engine.py:2501:            "registered_scanners": len(
+  core\scanner\scanner_engine.py:2502:                self.scanners
+  core\scanner\scanner_engine.py:2503:            ),
+  core\scanner\scanner_engine.py:2504:
+> core\scanner\scanner_engine.py:2505:            "enabled_scanners": len(
+> core\scanner\scanner_engine.py:2506:                self.enabled_scanners
+  core\scanner\scanner_engine.py:2507:            ),
+  core\scanner\scanner_engine.py:2508:
+> core\scanner\scanner_engine.py:2509:            "raw_results": len(
+> core\scanner\scanner_engine.py:2510:                self.raw_results
+  core\scanner\scanner_engine.py:2511:            ),
+  core\scanner\scanner_engine.py:2512:
+> core\scanner\scanner_engine.py:2513:            "results": len(
+> core\scanner\scanner_engine.py:2514:                self.results
+  core\scanner\scanner_engine.py:2515:            ),
+  core\scanner\scanner_engine.py:2516:
+  core\scanner\scanner_engine.py:2517:            "parallel": self.parallel,
+  core\scanner\scanner_engine.py:2518:
+  core\scanner\scanner_engine.py:2519:            "max_workers": self.max_workers,
+  core\scanner\scanner_engine.py:2520:
+  core\scanner\scanner_engine.py:2521:            "debug": self.debug,
+  core\scanner\scanner_engine.py:2522:
+  core\scanner\scanner_engine.py:2523:            "execution_started": (
+  core\scanner\scanner_engine.py:2524:                self.execution_started.isoformat()
+  core\scanner\scanner_engine.py:2525:                if self.execution_started
+  core\scanner\scanner_engine.py:2526:                else None
+  core\scanner\scanner_engine.py:2527:            ),
+  core\scanner\scanner_engine.py:2528:
+  core\scanner\scanner_engine.py:2529:            "execution_finished": (
+  core\scanner\scanner_engine.py:2530:                self.execution_finished.isoformat()
+  core\scanner\scanner_engine.py:2531:                if self.execution_finished
+  core\scanner\scanner_engine.py:2532:                else None
+  core\scanner\scanner_engine.py:2573:                    f"Scanner registry mismatch: "
+  core\scanner\scanner_engine.py:2574:                    f"{name} != {scanner.name}"
+  core\scanner\scanner_engine.py:2575:                )
+  core\scanner\scanner_engine.py:2576:
+  core\scanner\scanner_engine.py:2577:        for name in (
+> core\scanner\scanner_engine.py:2578:            self.enabled_scanners
+  core\scanner\scanner_engine.py:2579:        ):
+  core\scanner\scanner_engine.py:2580:
+  core\scanner\scanner_engine.py:2581:            if name not in self.scanners:
+  core\scanner\scanner_engine.py:2582:
+  core\scanner\scanner_engine.py:2583:                errors.append(
+  core\scanner\scanner_engine.py:2584:                    f"Enabled scanner not registered: "
+  core\scanner\scanner_engine.py:2585:                    f"{name}"
+  core\scanner\scanner_engine.py:2586:                )
+  core\scanner\scanner_engine.py:2587:
+  core\scanner\scanner_engine.py:2588:        return errors
+  core\scanner\scanner_engine.py:2589:
+  core\scanner\scanner_engine.py:2590:    # =====================================================
+  core\scanner\scanner_engine.py:2591:    # HEALTH CHECK
+  core\scanner\scanner_engine.py:2592:    # =====================================================
+  core\scanner\scanner_engine.py:2593:
+  core\scanner\scanner_engine.py:2594:    def health_check(
+  core\scanner\scanner_engine.py:2595:        self,
+  core\scanner\scanner_engine.py:2596:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:2603:
+  core\scanner\scanner_engine.py:2604:            issues.append(
+  core\scanner\scanner_engine.py:2605:                "No scanners registered."
+  core\scanner\scanner_engine.py:2606:            )
+  core\scanner\scanner_engine.py:2607:
+> core\scanner\scanner_engine.py:2608:        elif not self.enabled_scanners:
+  core\scanner\scanner_engine.py:2609:
+  core\scanner\scanner_engine.py:2610:            issues.append(
+  core\scanner\scanner_engine.py:2611:                "No scanners enabled."
+  core\scanner\scanner_engine.py:2612:            )
+  core\scanner\scanner_engine.py:2613:
+  core\scanner\scanner_engine.py:2614:        if self.max_workers < 1:
+  core\scanner\scanner_engine.py:2615:
+  core\scanner\scanner_engine.py:2616:            issues.append(
+  core\scanner\scanner_engine.py:2617:                "Invalid worker count."
+  core\scanner\scanner_engine.py:2618:            )
+  core\scanner\scanner_engine.py:2619:
+  core\scanner\scanner_engine.py:2620:        return {
+  core\scanner\scanner_engine.py:2621:
+  core\scanner\scanner_engine.py:2622:            "healthy": (
+  core\scanner\scanner_engine.py:2623:                len(issues) == 0
+  core\scanner\scanner_engine.py:2624:            ),
+  core\scanner\scanner_engine.py:2625:
+  core\scanner\scanner_engine.py:2626:            "issues": issues,
+  core\scanner\scanner_engine.py:2629:
+  core\scanner\scanner_engine.py:2630:    # =====================================================
+  core\scanner\scanner_engine.py:2631:    # RUNTIME STATISTICS
+  core\scanner\scanner_engine.py:2632:    # =====================================================
+  core\scanner\scanner_engine.py:2633:
+> core\scanner\scanner_engine.py:2634:    def runtime_statistics(
+  core\scanner\scanner_engine.py:2635:        self,
+  core\scanner\scanner_engine.py:2636:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:2637:
+  core\scanner\scanner_engine.py:2638:        return {
+  core\scanner\scanner_engine.py:2639:
+  core\scanner\scanner_engine.py:2640:            "execution_time": round(
+  core\scanner\scanner_engine.py:2641:                self.execution_time,
+  core\scanner\scanner_engine.py:2642:                3,
+  core\scanner\scanner_engine.py:2643:            ),
+  core\scanner\scanner_engine.py:2644:
+  core\scanner\scanner_engine.py:2645:            "raw_signals": len(
+> core\scanner\scanner_engine.py:2646:                self.raw_results
+  core\scanner\scanner_engine.py:2647:            ),
+  core\scanner\scanner_engine.py:2648:
+  core\scanner\scanner_engine.py:2649:            "signals": len(
+> core\scanner\scanner_engine.py:2650:                self.results
+  core\scanner\scanner_engine.py:2651:            ),
+  core\scanner\scanner_engine.py:2652:
+  core\scanner\scanner_engine.py:2653:            "buy": len(
+  core\scanner\scanner_engine.py:2654:                self.buy_signals()
+  core\scanner\scanner_engine.py:2655:            ),
+  core\scanner\scanner_engine.py:2656:
+  core\scanner\scanner_engine.py:2657:            "sell": len(
+  core\scanner\scanner_engine.py:2658:                self.sell_signals()
+  core\scanner\scanner_engine.py:2659:            ),
+  core\scanner\scanner_engine.py:2660:
+  core\scanner\scanner_engine.py:2661:            "watch": len(
+  core\scanner\scanner_engine.py:2662:                self.watch_signals()
+  core\scanner\scanner_engine.py:2663:            ),
+  core\scanner\scanner_engine.py:2664:
+  core\scanner\scanner_engine.py:2665:            "market_health": (
+  core\scanner\scanner_engine.py:2666:                self.market_health_score()
+  core\scanner\scanner_engine.py:2667:            ),
+  core\scanner\scanner_engine.py:2668:
+  core\scanner\scanner_engine.py:2693:            "registered": len(
+  core\scanner\scanner_engine.py:2694:                self.scanners
+  core\scanner\scanner_engine.py:2695:            ),
+  core\scanner\scanner_engine.py:2696:
+  core\scanner\scanner_engine.py:2697:            "enabled": len(
+> core\scanner\scanner_engine.py:2698:                self.enabled_scanners
+  core\scanner\scanner_engine.py:2699:            ),
+  core\scanner\scanner_engine.py:2700:
+  core\scanner\scanner_engine.py:2701:        }
+  core\scanner\scanner_engine.py:2702:
+  core\scanner\scanner_engine.py:2703:    # =====================================================
+  core\scanner\scanner_engine.py:2704:    # DIAGNOSTICS
+  core\scanner\scanner_engine.py:2705:    # =====================================================
+  core\scanner\scanner_engine.py:2706:
+  core\scanner\scanner_engine.py:2707:    def diagnostics(
+  core\scanner\scanner_engine.py:2708:        self,
+  core\scanner\scanner_engine.py:2709:    ) -> Dict[str, Any]:
+  core\scanner\scanner_engine.py:2710:
+  core\scanner\scanner_engine.py:2711:        return {
+  core\scanner\scanner_engine.py:2712:
+  core\scanner\scanner_engine.py:2713:            "info": self.info(),
+  core\scanner\scanner_engine.py:2714:
+  core\scanner\scanner_engine.py:2715:            "status": self.status(),
+  core\scanner\scanner_engine.py:2716:
+  core\scanner\scanner_engine.py:2749:            "registered_scanners": len(
+  core\scanner\scanner_engine.py:2750:                self.scanners
+  core\scanner\scanner_engine.py:2751:            ),
+  core\scanner\scanner_engine.py:2752:
+  core\scanner\scanner_engine.py:2753:            "active_scanners": len(
+> core\scanner\scanner_engine.py:2754:                self.enabled_scanners
+  core\scanner\scanner_engine.py:2755:            ),
+  core\scanner\scanner_engine.py:2756:
+  core\scanner\scanner_engine.py:2757:        }
+  core\scanner\scanner_engine.py:2758:
+  core\scanner\scanner_engine.py:2759:    # =====================================================
+  core\scanner\scanner_engine.py:2760:    # CLEANUP
+  core\scanner\scanner_engine.py:2761:    # =====================================================
+  core\scanner\scanner_engine.py:2762:
+  core\scanner\scanner_engine.py:2763:    def cleanup(
+  core\scanner\scanner_engine.py:2764:        self,
+  core\scanner\scanner_engine.py:2765:    ) -> None:
+  core\scanner\scanner_engine.py:2766:        """
+  core\scanner\scanner_engine.py:2767:        Clear runtime state while keeping scanner
+  core\scanner\scanner_engine.py:2768:        registration and configuration intact.
+  core\scanner\scanner_engine.py:2769:        """
+  core\scanner\scanner_engine.py:2770:
+  core\scanner\scanner_engine.py:2771:        self.reset()
+  core\scanner\scanner_engine.py:2772:
+  core\scanner\scanner_engine.py:2790:    # REFRESH
+  core\scanner\scanner_engine.py:2791:    # =====================================================
+  core\scanner\scanner_engine.py:2792:
+  core\scanner\scanner_engine.py:2793:    def refresh(
+  core\scanner\scanner_engine.py:2794:        self,
+> core\scanner\scanner_engine.py:2795:        market_data: Dict[str, Any],
+  core\scanner\scanner_engine.py:2796:    ) -> List[Signal]:
+  core\scanner\scanner_engine.py:2797:
+  core\scanner\scanner_engine.py:2798:        return self.run(
+> core\scanner\scanner_engine.py:2799:            market_data
+  core\scanner\scanner_engine.py:2800:        )
+  core\scanner\scanner_engine.py:2801:
+  core\scanner\scanner_engine.py:2802:    # =====================================================
+  core\scanner\scanner_engine.py:2803:    # LOG
+  core\scanner\scanner_engine.py:2804:    # =====================================================
+  core\scanner\scanner_engine.py:2805:
+  core\scanner\scanner_engine.py:2806:    def log(
+  core\scanner\scanner_engine.py:2807:        self,
+  core\scanner\scanner_engine.py:2808:        *args: Any,
+  core\scanner\scanner_engine.py:2809:    ) -> None:
+  core\scanner\scanner_engine.py:2810:
+  core\scanner\scanner_engine.py:2811:        if not self.debug:
+  core\scanner\scanner_engine.py:2812:
+  core\scanner\scanner_engine.py:2813:            return
+  core\scanner\scanner_engine.py:2814:
+  core\scanner\scanner_engine.py:2815:        print(
+  core\scanner\scanner_engine.py:2816:            "[ScannerEngine]",
+  core\scanner\scanner_engine.py:2817:            *args,
+  core\scanner\scanner_engine.py:2848:    def active_scanners(
+  core\scanner\scanner_engine.py:2849:        self,
+  core\scanner\scanner_engine.py:2850:    ) -> List[str]:
+  core\scanner\scanner_engine.py:2851:
+  core\scanner\scanner_engine.py:2852:        return sorted(
+> core\scanner\scanner_engine.py:2853:            self.enabled_scanners.keys()
+  core\scanner\scanner_engine.py:2854:        )
+  core\scanner\scanner_engine.py:2855:
+  core\scanner\scanner_engine.py:2856:    @property
+  core\scanner\scanner_engine.py:2857:    def result_count(
+  core\scanner\scanner_engine.py:2858:        self,
+  core\scanner\scanner_engine.py:2859:    ) -> int:
+  core\scanner\scanner_engine.py:2860:
+  core\scanner\scanner_engine.py:2861:        return len(
+> core\scanner\scanner_engine.py:2862:            self.results
+  core\scanner\scanner_engine.py:2863:        )
+  core\scanner\scanner_engine.py:2864:
+  core\scanner\scanner_engine.py:2865:    @property
+  core\scanner\scanner_engine.py:2866:    def raw_result_count(
+  core\scanner\scanner_engine.py:2867:        self,
+  core\scanner\scanner_engine.py:2868:    ) -> int:
+  core\scanner\scanner_engine.py:2869:
+  core\scanner\scanner_engine.py:2870:        return len(
+> core\scanner\scanner_engine.py:2871:            self.raw_results
+  core\scanner\scanner_engine.py:2872:        )
+  core\scanner\scanner_engine.py:2873:
+  core\scanner\scanner_engine.py:2874:    @property
+> core\scanner\scanner_engine.py:2875:    def has_results(
+  core\scanner\scanner_engine.py:2876:        self,
+  core\scanner\scanner_engine.py:2877:    ) -> bool:
+  core\scanner\scanner_engine.py:2878:
+  core\scanner\scanner_engine.py:2879:        return bool(
+> core\scanner\scanner_engine.py:2880:            self.results
+  core\scanner\scanner_engine.py:2881:        )
+  core\scanner\scanner_engine.py:2882:
+  core\scanner\scanner_engine.py:2883:    # =====================================================
+  core\scanner\scanner_engine.py:2884:    # ITERATION
+  core\scanner\scanner_engine.py:2885:    # =====================================================
+  core\scanner\scanner_engine.py:2886:
+  core\scanner\scanner_engine.py:2887:    def __len__(
+  core\scanner\scanner_engine.py:2888:        self,
+  core\scanner\scanner_engine.py:2889:    ) -> int:
+  core\scanner\scanner_engine.py:2890:
+  core\scanner\scanner_engine.py:2891:        return len(
+> core\scanner\scanner_engine.py:2892:            self.results
+  core\scanner\scanner_engine.py:2893:        )
+  core\scanner\scanner_engine.py:2894:
+  core\scanner\scanner_engine.py:2895:    def __iter__(
+  core\scanner\scanner_engine.py:2896:        self,
+  core\scanner\scanner_engine.py:2897:    ) -> Iterator[Signal]:
+  core\scanner\scanner_engine.py:2898:
+  core\scanner\scanner_engine.py:2899:        return iter(
+> core\scanner\scanner_engine.py:2900:            self.results
+  core\scanner\scanner_engine.py:2901:        )
+  core\scanner\scanner_engine.py:2902:
+  core\scanner\scanner_engine.py:2903:    def __getitem__(
+  core\scanner\scanner_engine.py:2904:        self,
+  core\scanner\scanner_engine.py:2905:        index: int,
+  core\scanner\scanner_engine.py:2906:    ) -> Signal:
+  core\scanner\scanner_engine.py:2907:
+> core\scanner\scanner_engine.py:2908:        return self.results[
+  core\scanner\scanner_engine.py:2909:            index
+  core\scanner\scanner_engine.py:2910:        ]
+  core\scanner\scanner_engine.py:2911:
+  core\scanner\scanner_engine.py:2912:    def __contains__(
+  core\scanner\scanner_engine.py:2913:        self,
+  core\scanner\scanner_engine.py:2914:        symbol: object,
+  core\scanner\scanner_engine.py:2915:    ) -> bool:
+  core\scanner\scanner_engine.py:2916:
+  core\scanner\scanner_engine.py:2917:        if not isinstance(
+  core\scanner\scanner_engine.py:2918:            symbol,
+  core\scanner\scanner_engine.py:2919:            str,
+  core\scanner\scanner_engine.py:2920:        ):
+  core\scanner\scanner_engine.py:2921:
+  core\scanner\scanner_engine.py:2922:            return False
+  core\scanner\scanner_engine.py:2923:
+  core\scanner\scanner_engine.py:2924:        symbol = symbol.upper()
+  core\scanner\scanner_engine.py:2925:
+  core\scanner\scanner_engine.py:2926:        return any(
+  core\scanner\scanner_engine.py:2927:            signal.symbol.upper()
+  core\scanner\scanner_engine.py:2928:            == symbol
+> core\scanner\scanner_engine.py:2929:            for signal in self.results
+  core\scanner\scanner_engine.py:2930:        )
+  core\scanner\scanner_engine.py:2931:
+  core\scanner\scanner_engine.py:2932:    def __bool__(
+  core\scanner\scanner_engine.py:2933:        self,
+  core\scanner\scanner_engine.py:2934:    ) -> bool:
+  core\scanner\scanner_engine.py:2935:
+  core\scanner\scanner_engine.py:2936:        return bool(
+> core\scanner\scanner_engine.py:2937:            self.results
+  core\scanner\scanner_engine.py:2938:        )
+  core\scanner\scanner_engine.py:2939:
+  core\scanner\scanner_engine.py:2940:    # =====================================================
+  core\scanner\scanner_engine.py:2941:    # REPRESENTATION
+  core\scanner\scanner_engine.py:2942:    # =====================================================
+  core\scanner\scanner_engine.py:2943:
+  core\scanner\scanner_engine.py:2944:    def __repr__(
+  core\scanner\scanner_engine.py:2945:        self,
+  core\scanner\scanner_engine.py:2946:    ) -> str:
+  core\scanner\scanner_engine.py:2947:
+  core\scanner\scanner_engine.py:2948:        return (
+  core\scanner\scanner_engine.py:2949:            f"{self.__class__.__name__}("
+  core\scanner\scanner_engine.py:2950:            f"scanners={len(self.scanners)}, "
+> core\scanner\scanner_engine.py:2951:            f"enabled={len(self.enabled_scanners)}, "
+> core\scanner\scanner_engine.py:2952:            f"raw_results={len(self.raw_results)}, "
+> core\scanner\scanner_engine.py:2953:            f"results={len(self.results)}, "
+  core\scanner\scanner_engine.py:2954:            f"parallel={self.parallel})"
+  core\scanner\scanner_engine.py:2955:        )
+  core\scanner\scanner_engine.py:2956:
+  core\scanner\scanner_engine.py:2957:    def __str__(
+  core\scanner\scanner_engine.py:2958:        self,
+  core\scanner\scanner_engine.py:2959:    ) -> str:
+  core\scanner\scanner_engine.py:2960:
+  core\scanner\scanner_engine.py:2961:        return (
+  core\scanner\scanner_engine.py:2962:            f"{ENGINE_NAME} | "
+> core\scanner\scanner_engine.py:2963:            f"{len(self.enabled_scanners)} scanners | "
+> core\scanner\scanner_engine.py:2964:            f"{len(self.results)} signals | "
+  core\scanner\scanner_engine.py:2965:            f"{self.execution_time:.3f}s"
+  core\scanner\scanner_engine.py:2966:        )
+  core\scanner\scanner_engine.py:2967:
+  core\scanner\scanner_engine.py:2968:
+  core\scanner\scanner_engine.py:2969:# =========================================================
+  core\scanner\scanner_engine.py:2970:# FACTORY
+  core\scanner\scanner_engine.py:2971:# =========================================================
+  core\scanner\scanner_engine.py:2972:
+  core\scanner\scanner_engine.py:2973:def create_scanner_engine(
+  core\scanner\scanner_engine.py:2974:    *,
+  core\scanner\scanner_engine.py:2975:    parallel: bool = True,
+  core\scanner\scanner_engine.py:2976:    max_workers: int = 8,
+  core\scanner\scanner_engine.py:2977:    debug: bool = False,
+  core\scanner\scanner_engine.py:2978:) -> ScannerEngine:
+  core\scanner\scanner_engine.py:2979:    """
+  core\scanner\scanner_engine.py:2980:    Create a configured StockVersity ScannerEngine.
+  core\scanner\scanner_engine.py:2981:    """
+  core\scanner\scanner_engine.py:2982:
+
+
+
+
+=== APP CONTAINER ===
+
+=== CONTAINER / NSE ENGINE LOCATION ===
+
+Path                                                  LineNumber Line                                       
+----                                                  ---------- ----                                       
+D:\StockVersityScanner\core\application_controller.py        104         self.nse_engine = NSEDataEngine()  
+D:\StockVersityScanner\core\dependency_container.py           47 class DependencyContainer:                 
+D:\StockVersityScanner\core\dependency_container.py          523 def get_container() -> DependencyContainer:
+D:\StockVersityScanner\services\service_container.py          13 class ServiceContainer:                    
+D:\StockVersityScanner\services\service_container.py        1329 def get_container() -> ServiceContainer:   
+
+
+
+
+=== INTRADAY PAGE CREATION / REGISTRATION ===
+
+Path                                                                LineNumber Line                                                    
+----                                                                ---------- ----                                                    
+D:\StockVersityScanner\ui\app.backup.py                                     39 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.backup.py                                    604             IntradayScannerPage(),                      
+D:\StockVersityScanner\ui\app.before_dark_shell.py                          24 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_dark_shell.py                         278         self._add_page("scanner", IntradayScannerPage())
+D:\StockVersityScanner\ui\app.before_final_shell.py                         24 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_final_shell.py                        282         self._add_page("scanner", IntradayScannerPage())
+D:\StockVersityScanner\ui\app.before_font_normalization.py                  24 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_font_normalization.py                 282         self._add_page("scanner", IntradayScannerPage())
+D:\StockVersityScanner\ui\app.before_live_footer_20260804_160132.py         39 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_live_footer_20260804_160132.py        648             IntradayScannerPage(),                      
+D:\StockVersityScanner\ui\app.before_new_ui.py                              24 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_new_ui.py                             278         self._add_page("scanner", IntradayScannerPage())
+D:\StockVersityScanner\ui\app.before_nifty500_live.py                       39 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.before_nifty500_live.py                      604             IntradayScannerPage(),                      
+D:\StockVersityScanner\ui\app.broken_20260803.py                            21 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.broken_20260803.py                            76         self._add_page("scanner", IntradayScannerPage())
+D:\StockVersityScanner\ui\app.py                                            39 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app.py                                           648             IntradayScannerPage(),                      
+D:\StockVersityScanner\ui\app_before_nifty500_live.py                       39 from ui.pages.intraday_page import IntradayScannerPage  
+D:\StockVersityScanner\ui\app_before_nifty500_live.py                      604             IntradayScannerPage(),                      
+D:\StockVersityScanner\ui\main_window.before_premium_dashboard.py          162         self.intraday_page = IntradayPage()             
+D:\StockVersityScanner\ui\main_window.before_premium_dashboard.py          183             self.intraday_page                          
+D:\StockVersityScanner\ui\main_window.before_premium_dashboard.py          298                 self.intraday_page,                     
+D:\StockVersityScanner\ui\main_window.py                                   162         self.intraday_page = IntradayPage()             
+D:\StockVersityScanner\ui\main_window.py                                   183             self.intraday_page                          
+D:\StockVersityScanner\ui\main_window.py                                   298                 self.intraday_page,                     
+D:\StockVersityScanner\ui\pages\intraday_page.py                             6     ui/pages/intraday_page.py                           
+D:\StockVersityScanner\ui\pages\intraday_page.py                           430     scan_requested = Signal()                           
+D:\StockVersityScanner\ui\pages\intraday_page.py                           647             self.scan_requested.emit                    
+D:\StockVersityScanner\ui\pages\intraday_page.py                          3514 class IntradayScannerPage(QWidget):                     
+D:\StockVersityScanner\ui\pages\intraday_page.py                          3518     scan_requested = Signal(dict)                       
+D:\StockVersityScanner\ui\pages\intraday_page.py                          3865         self.scanner_header.scan_requested.connect(     
+D:\StockVersityScanner\ui\pages\intraday_page.py                          3922         self.scan_requested.emit(                       
+
+
+
+
+=== COMPLETE ===

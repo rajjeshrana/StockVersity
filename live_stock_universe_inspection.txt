@@ -1,0 +1,305 @@
+
+  core\market_data\live_stock_universe.py:43:
+  core\market_data\live_stock_universe.py:44:@dataclass
+> core\market_data\live_stock_universe.py:45:class LiveStockState:
+  core\market_data\live_stock_universe.py:46:    symbol: str
+  core\market_data\live_stock_universe.py:47:    instrument_key: str
+  core\market_data\live_stock_universe.py:48:    company_name: str
+  core\market_data\live_stock_universe.py:49:    industry: str
+  core\market_data\live_stock_universe.py:50:    isin_code: str = ""
+  core\market_data\live_stock_universe.py:54:    change: float = 0.0
+  core\market_data\live_stock_universe.py:55:    change_percent: float = 0.0
+> core\market_data\live_stock_universe.py:56:    volume: int = 0
+  core\market_data\live_stock_universe.py:57:    timestamp: int = 0
+  core\market_data\live_stock_universe.py:58:
+  core\market_data\live_stock_universe.py:59:    tick_count: int = 0
+  core\market_data\live_stock_universe.py:60:    last_update_monotonic: float = 0.0
+  core\market_data\live_stock_universe.py:61:
+  core\market_data\live_stock_universe.py:62:    @property
+> core\market_data\live_stock_universe.py:63:    def has_price(self) -> bool:
+  core\market_data\live_stock_universe.py:64:        return self.ltp > 0.0
+  core\market_data\live_stock_universe.py:65:
+  core\market_data\live_stock_universe.py:66:    @property
+> core\market_data\live_stock_universe.py:67:    def has_previous_close(self) -> bool:
+  core\market_data\live_stock_universe.py:68:        return self.previous_close > 0.0
+  core\market_data\live_stock_universe.py:69:
+  core\market_data\live_stock_universe.py:70:    @property
+> core\market_data\live_stock_universe.py:71:    def direction(self) -> str:
+> core\market_data\live_stock_universe.py:72:        if not self.has_price or not self.has_previous_close:
+  core\market_data\live_stock_universe.py:73:            return "unknown"
+  core\market_data\live_stock_universe.py:74:
+  core\market_data\live_stock_universe.py:75:        epsilon = 1e-9
+  core\market_data\live_stock_universe.py:76:
+  core\market_data\live_stock_universe.py:77:        if self.change > epsilon:
+  core\market_data\live_stock_universe.py:83:        return "unchanged"
+  core\market_data\live_stock_universe.py:84:
+> core\market_data\live_stock_universe.py:85:    def to_dict(self) -> Dict:
+  core\market_data\live_stock_universe.py:86:        return asdict(self)
+  core\market_data\live_stock_universe.py:87:
+  core\market_data\live_stock_universe.py:88:
+> core\market_data\live_stock_universe.py:89:class LiveStockUniverse:
+  core\market_data\live_stock_universe.py:90:    """
+  core\market_data\live_stock_universe.py:91:    Thread-safe live state engine for NIFTY 500 equities.
+  core\market_data\live_stock_universe.py:92:    """
+  core\market_data\live_stock_universe.py:93:
+> core\market_data\live_stock_universe.py:94:    def __init__(
+  core\market_data\live_stock_universe.py:95:        self,
+  core\market_data\live_stock_universe.py:96:        universe: Optional[Nifty500Universe] = None,
+  core\market_data\live_stock_universe.py:97:    ) -> None:
+  core\market_data\live_stock_universe.py:98:
+> core\market_data\live_stock_universe.py:99:        self.universe = universe or Nifty500Universe()
+  core\market_data\live_stock_universe.py:100:
+> core\market_data\live_stock_universe.py:101:        self._lock = threading.RLock()
+  core\market_data\live_stock_universe.py:102:
+> core\market_data\live_stock_universe.py:103:        self._states: Dict[str, LiveStockState] = {}
+> core\market_data\live_stock_universe.py:104:        self._symbol_to_key: Dict[str, str] = {}
+  core\market_data\live_stock_universe.py:105:
+> core\market_data\live_stock_universe.py:106:        self._loaded = False
+> core\market_data\live_stock_universe.py:107:        self._accepted_ticks = 0
+> core\market_data\live_stock_universe.py:108:        self._ignored_ticks = 0
+  core\market_data\live_stock_universe.py:109:
+  core\market_data\live_stock_universe.py:110:    # =====================================================
+  core\market_data\live_stock_universe.py:111:    # LOAD UNIVERSE
+  core\market_data\live_stock_universe.py:112:    # =====================================================
+  core\market_data\live_stock_universe.py:113:
+> core\market_data\live_stock_universe.py:114:    def load(
+  core\market_data\live_stock_universe.py:115:        self,
+  core\market_data\live_stock_universe.py:116:        force_download: bool = False,
+  core\market_data\live_stock_universe.py:117:        force_instrument_download: bool = False,
+  core\market_data\live_stock_universe.py:118:    ) -> "LiveStockUniverse":
+  core\market_data\live_stock_universe.py:119:
+  core\market_data\live_stock_universe.py:140:
+  core\market_data\live_stock_universe.py:141:        with self._lock:
+> core\market_data\live_stock_universe.py:142:            self._states = states
+> core\market_data\live_stock_universe.py:143:            self._symbol_to_key = symbol_to_key
+> core\market_data\live_stock_universe.py:144:            self._accepted_ticks = 0
+> core\market_data\live_stock_universe.py:145:            self._ignored_ticks = 0
+> core\market_data\live_stock_universe.py:146:            self._loaded = True
+  core\market_data\live_stock_universe.py:147:
+  core\market_data\live_stock_universe.py:148:        return self
+  core\market_data\live_stock_universe.py:149:
+  core\market_data\live_stock_universe.py:150:    @property
+> core\market_data\live_stock_universe.py:151:    def loaded(self) -> bool:
+  core\market_data\live_stock_universe.py:152:        return self._loaded
+  core\market_data\live_stock_universe.py:153:
+  core\market_data\live_stock_universe.py:154:    # =====================================================
+  core\market_data\live_stock_universe.py:155:    # SUBSCRIPTION HELPERS
+  core\market_data\live_stock_universe.py:156:    # =====================================================
+  core\market_data\live_stock_universe.py:157:
+> core\market_data\live_stock_universe.py:158:    def instrument_keys(self) -> List[str]:
+  core\market_data\live_stock_universe.py:159:        with self._lock:
+  core\market_data\live_stock_universe.py:160:            return list(self._states.keys())
+  core\market_data\live_stock_universe.py:161:
+> core\market_data\live_stock_universe.py:162:    def symbols(self) -> List[str]:
+  core\market_data\live_stock_universe.py:163:        with self._lock:
+  core\market_data\live_stock_universe.py:164:            return [
+  core\market_data\live_stock_universe.py:165:                state.symbol
+  core\market_data\live_stock_universe.py:166:                for state in self._states.values()
+  core\market_data\live_stock_universe.py:167:            ]
+  core\market_data\live_stock_universe.py:168:
+> core\market_data\live_stock_universe.py:169:    def subscription_count(self) -> int:
+  core\market_data\live_stock_universe.py:170:        with self._lock:
+  core\market_data\live_stock_universe.py:171:            return len(self._states)
+  core\market_data\live_stock_universe.py:172:
+  core\market_data\live_stock_universe.py:173:    # =====================================================
+  core\market_data\live_stock_universe.py:174:    # TICK INGESTION
+  core\market_data\live_stock_universe.py:176:
+  core\market_data\live_stock_universe.py:177:    @staticmethod
+> core\market_data\live_stock_universe.py:178:    def _safe_float(value) -> float:
+  core\market_data\live_stock_universe.py:179:        try:
+  core\market_data\live_stock_universe.py:180:            return float(value or 0.0)
+  core\market_data\live_stock_universe.py:181:        except (TypeError, ValueError):
+  core\market_data\live_stock_universe.py:182:            return 0.0
+  core\market_data\live_stock_universe.py:183:
+  core\market_data\live_stock_universe.py:184:    @staticmethod
+> core\market_data\live_stock_universe.py:185:    def _safe_int(value) -> int:
+  core\market_data\live_stock_universe.py:186:        try:
+  core\market_data\live_stock_universe.py:187:            return int(value or 0)
+  core\market_data\live_stock_universe.py:188:        except (TypeError, ValueError):
+  core\market_data\live_stock_universe.py:189:            return 0
+  core\market_data\live_stock_universe.py:190:
+> core\market_data\live_stock_universe.py:191:    def on_tick(self, tick: Tick) -> None:
+  core\market_data\live_stock_universe.py:192:        """
+  core\market_data\live_stock_universe.py:193:        Callback compatible with UpstoxProvider.add_tick_callback().
+  core\market_data\live_stock_universe.py:194:        """
+  core\market_data\live_stock_universe.py:195:
+  core\market_data\live_stock_universe.py:196:        if tick is None:
+  core\market_data\live_stock_universe.py:209:
+  core\market_data\live_stock_universe.py:210:            if state is None:
+> core\market_data\live_stock_universe.py:211:                self._ignored_ticks += 1
+  core\market_data\live_stock_universe.py:212:                return
+  core\market_data\live_stock_universe.py:213:
+  core\market_data\live_stock_universe.py:214:            ltp = self._safe_float(
+  core\market_data\live_stock_universe.py:215:                getattr(tick, "ltp", 0.0)
+  core\market_data\live_stock_universe.py:216:            )
+  core\market_data\live_stock_universe.py:220:            )
+  core\market_data\live_stock_universe.py:221:
+> core\market_data\live_stock_universe.py:222:            volume = self._safe_int(
+> core\market_data\live_stock_universe.py:223:                getattr(tick, "volume", 0)
+  core\market_data\live_stock_universe.py:224:            )
+  core\market_data\live_stock_universe.py:225:
+  core\market_data\live_stock_universe.py:226:            timestamp = self._safe_int(
+  core\market_data\live_stock_universe.py:227:                getattr(tick, "timestamp", 0)
+  core\market_data\live_stock_universe.py:228:            )
+  core\market_data\live_stock_universe.py:229:
+> core\market_data\live_stock_universe.py:230:            # Never replace a valid live price with an empty one.
+  core\market_data\live_stock_universe.py:231:            if ltp > 0.0:
+  core\market_data\live_stock_universe.py:232:                state.ltp = ltp
+  core\market_data\live_stock_universe.py:233:
+  core\market_data\live_stock_universe.py:234:            # cp -> previous_close is already populated by
+  core\market_data\live_stock_universe.py:235:            # StockVersity's MarketDataParser for LTPC feeds.
+  core\market_data\live_stock_universe.py:237:                state.previous_close = previous_close
+  core\market_data\live_stock_universe.py:238:
+> core\market_data\live_stock_universe.py:239:            if volume >= 0:
+> core\market_data\live_stock_universe.py:240:                state.volume = volume
+  core\market_data\live_stock_universe.py:241:
+  core\market_data\live_stock_universe.py:242:            if timestamp > 0:
+  core\market_data\live_stock_universe.py:243:                state.timestamp = timestamp
+  core\market_data\live_stock_universe.py:244:
+  core\market_data\live_stock_universe.py:245:            if (
+  core\market_data\live_stock_universe.py:263:            state.last_update_monotonic = time.monotonic()
+  core\market_data\live_stock_universe.py:264:
+> core\market_data\live_stock_universe.py:265:            self._accepted_ticks += 1
+  core\market_data\live_stock_universe.py:266:
+  core\market_data\live_stock_universe.py:267:    # =====================================================
+  core\market_data\live_stock_universe.py:268:    # LOOKUPS
+  core\market_data\live_stock_universe.py:269:    # =====================================================
+  core\market_data\live_stock_universe.py:270:
+> core\market_data\live_stock_universe.py:271:    def get_by_instrument_key(
+  core\market_data\live_stock_universe.py:272:        self,
+  core\market_data\live_stock_universe.py:273:        instrument_key: str,
+  core\market_data\live_stock_universe.py:274:    ) -> Optional[LiveStockState]:
+  core\market_data\live_stock_universe.py:275:
+  core\market_data\live_stock_universe.py:276:        with self._lock:
+  core\market_data\live_stock_universe.py:279:            )
+  core\market_data\live_stock_universe.py:280:
+> core\market_data\live_stock_universe.py:281:    def get_by_symbol(
+  core\market_data\live_stock_universe.py:282:        self,
+  core\market_data\live_stock_universe.py:283:        symbol: str,
+  core\market_data\live_stock_universe.py:284:    ) -> Optional[LiveStockState]:
+  core\market_data\live_stock_universe.py:285:
+  core\market_data\live_stock_universe.py:286:        normalized = str(symbol or "").strip().upper()
+  core\market_data\live_stock_universe.py:297:            return self._states.get(key)
+  core\market_data\live_stock_universe.py:298:
+> core\market_data\live_stock_universe.py:299:    def snapshot(self) -> List[Dict]:
+  core\market_data\live_stock_universe.py:300:        with self._lock:
+  core\market_data\live_stock_universe.py:301:            return [
+  core\market_data\live_stock_universe.py:302:                state.to_dict()
+  core\market_data\live_stock_universe.py:303:                for state in self._states.values()
+  core\market_data\live_stock_universe.py:304:            ]
+  core\market_data\live_stock_universe.py:305:
+> core\market_data\live_stock_universe.py:306:    def live_snapshot(self) -> List[Dict]:
+  core\market_data\live_stock_universe.py:307:        with self._lock:
+  core\market_data\live_stock_universe.py:308:            return [
+  core\market_data\live_stock_universe.py:309:                state.to_dict()
+  core\market_data\live_stock_universe.py:310:                for state in self._states.values()
+> core\market_data\live_stock_universe.py:311:                if state.has_price
+  core\market_data\live_stock_universe.py:312:            ]
+  core\market_data\live_stock_universe.py:313:
+  core\market_data\live_stock_universe.py:314:    # =====================================================
+  core\market_data\live_stock_universe.py:315:    # MARKET BREADTH
+  core\market_data\live_stock_universe.py:316:    # =====================================================
+  core\market_data\live_stock_universe.py:317:
+> core\market_data\live_stock_universe.py:318:    def breadth(self) -> Dict[str, int | float]:
+  core\market_data\live_stock_universe.py:319:
+  core\market_data\live_stock_universe.py:320:        advance = 0
+  core\market_data\live_stock_universe.py:321:        decline = 0
+  core\market_data\live_stock_universe.py:322:        unchanged = 0
+  core\market_data\live_stock_universe.py:323:        unknown = 0
+  core\market_data\live_stock_universe.py:385:    # =====================================================
+  core\market_data\live_stock_universe.py:386:
+> core\market_data\live_stock_universe.py:387:    def _priced_states(self) -> List[LiveStockState]:
+  core\market_data\live_stock_universe.py:388:
+  core\market_data\live_stock_universe.py:389:        with self._lock:
+  core\market_data\live_stock_universe.py:390:            return [
+  core\market_data\live_stock_universe.py:391:                state
+  core\market_data\live_stock_universe.py:392:                for state in self._states.values()
+  core\market_data\live_stock_universe.py:393:                if (
+> core\market_data\live_stock_universe.py:394:                    state.has_price
+  core\market_data\live_stock_universe.py:395:                    and state.has_previous_close
+  core\market_data\live_stock_universe.py:396:                )
+  core\market_data\live_stock_universe.py:397:            ]
+  core\market_data\live_stock_universe.py:398:
+> core\market_data\live_stock_universe.py:399:    def top_gainers(
+  core\market_data\live_stock_universe.py:400:        self,
+  core\market_data\live_stock_universe.py:401:        limit: int = 10,
+  core\market_data\live_stock_universe.py:402:    ) -> List[Dict]:
+  core\market_data\live_stock_universe.py:403:
+> core\market_data\live_stock_universe.py:404:        states = self._priced_states()
+  core\market_data\live_stock_universe.py:405:
+  core\market_data\live_stock_universe.py:406:        states.sort(
+  core\market_data\live_stock_universe.py:407:            key=lambda state: state.change_percent,
+  core\market_data\live_stock_universe.py:408:            reverse=True,
+  core\market_data\live_stock_universe.py:409:        )
+  core\market_data\live_stock_universe.py:414:        ]
+  core\market_data\live_stock_universe.py:415:
+> core\market_data\live_stock_universe.py:416:    def top_losers(
+  core\market_data\live_stock_universe.py:417:        self,
+  core\market_data\live_stock_universe.py:418:        limit: int = 10,
+  core\market_data\live_stock_universe.py:419:    ) -> List[Dict]:
+  core\market_data\live_stock_universe.py:420:
+> core\market_data\live_stock_universe.py:421:        states = self._priced_states()
+  core\market_data\live_stock_universe.py:422:
+  core\market_data\live_stock_universe.py:423:        states.sort(
+  core\market_data\live_stock_universe.py:424:            key=lambda state: state.change_percent
+  core\market_data\live_stock_universe.py:425:        )
+  core\market_data\live_stock_universe.py:426:
+  core\market_data\live_stock_universe.py:434:    # =====================================================
+  core\market_data\live_stock_universe.py:435:
+> core\market_data\live_stock_universe.py:436:    def industry_strength(self) -> List[Dict]:
+  core\market_data\live_stock_universe.py:437:
+  core\market_data\live_stock_universe.py:438:        groups: Dict[str, List[LiveStockState]] = {}
+  core\market_data\live_stock_universe.py:439:
+> core\market_data\live_stock_universe.py:440:        for state in self._priced_states():
+  core\market_data\live_stock_universe.py:441:
+  core\market_data\live_stock_universe.py:442:            industry = (
+  core\market_data\live_stock_universe.py:443:                state.industry.strip()
+  core\market_data\live_stock_universe.py:444:                or "Unknown"
+  core\market_data\live_stock_universe.py:445:            )
+  core\market_data\live_stock_universe.py:507:    # =====================================================
+  core\market_data\live_stock_universe.py:508:
+> core\market_data\live_stock_universe.py:509:    def heatmap(
+  core\market_data\live_stock_universe.py:510:        self,
+  core\market_data\live_stock_universe.py:511:        limit: Optional[int] = None,
+  core\market_data\live_stock_universe.py:512:    ) -> List[Dict]:
+  core\market_data\live_stock_universe.py:513:
+> core\market_data\live_stock_universe.py:514:        rows = self._priced_states()
+  core\market_data\live_stock_universe.py:515:
+  core\market_data\live_stock_universe.py:516:        rows.sort(
+  core\market_data\live_stock_universe.py:517:            key=lambda state:
+  core\market_data\live_stock_universe.py:518:                abs(state.change_percent),
+  core\market_data\live_stock_universe.py:519:            reverse=True,
+  core\market_data\live_stock_universe.py:533:                "change": state.change,
+  core\market_data\live_stock_universe.py:534:                "change_percent": state.change_percent,
+> core\market_data\live_stock_universe.py:535:                "volume": state.volume,
+  core\market_data\live_stock_universe.py:536:                "timestamp": state.timestamp,
+  core\market_data\live_stock_universe.py:537:            }
+  core\market_data\live_stock_universe.py:538:            for state in rows
+  core\market_data\live_stock_universe.py:539:        ]
+  core\market_data\live_stock_universe.py:540:
+  core\market_data\live_stock_universe.py:543:    # =====================================================
+  core\market_data\live_stock_universe.py:544:
+> core\market_data\live_stock_universe.py:545:    def statistics(self) -> Dict[str, int | float | bool]:
+  core\market_data\live_stock_universe.py:546:
+  core\market_data\live_stock_universe.py:547:        with self._lock:
+  core\market_data\live_stock_universe.py:548:
+  core\market_data\live_stock_universe.py:549:            total = len(self._states)
+  core\market_data\live_stock_universe.py:550:
+  core\market_data\live_stock_universe.py:552:                1
+  core\market_data\live_stock_universe.py:553:                for state in self._states.values()
+> core\market_data\live_stock_universe.py:554:                if state.has_price
+  core\market_data\live_stock_universe.py:555:            )
+  core\market_data\live_stock_universe.py:556:
+  core\market_data\live_stock_universe.py:557:            complete = sum(
+  core\market_data\live_stock_universe.py:558:                1
+  core\market_data\live_stock_universe.py:559:                for state in self._states.values()
+  core\market_data\live_stock_universe.py:560:                if (
+> core\market_data\live_stock_universe.py:561:                    state.has_price
+  core\market_data\live_stock_universe.py:562:                    and state.has_previous_close
+  core\market_data\live_stock_universe.py:563:                )
+  core\market_data\live_stock_universe.py:564:            )
+  core\market_data\live_stock_universe.py:565:
+  core\market_data\live_stock_universe.py:566:            accepted = self._accepted_ticks
+
+
+

@@ -1,0 +1,1491 @@
+"""
+=========================================================
+StockVersity Scanner Pro
+
+WebSocket Manager
+
+Uses Official Upstox SDK v2.28.0
+
+Responsibilities
+----------------
+✓ Connect Market Feed V3
+✓ Subscribe / Unsubscribe
+✓ Tick Distribution
+✓ Auto Reconnect
+✓ Health Monitoring
+✓ Thread-safe callbacks
+=========================================================
+"""
+
+from __future__ import annotations
+
+import logging
+import threading
+import queue
+import time
+
+from datetime import datetime
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Set
+
+import upstox_client
+
+from upstox_client.feeder.market_data_streamer_v3 import (
+    MarketDataStreamerV3,
+)
+
+from .models import Tick
+
+
+logger = logging.getLogger(__name__)
+
+
+class WebSocketManager:
+
+    """
+    Wrapper around the official Upstox
+    MarketDataStreamerV3.
+    """
+
+    # ---------------------------------------------------------
+
+    def __init__(
+        self,
+        api_client,
+    ):
+
+        self.api_client = api_client
+
+        #
+        # SDK Streamer
+        #
+
+        self.streamer: Optional[
+            MarketDataStreamerV3
+        ] = None
+
+        #
+        # Runtime
+        #
+
+        self.running = False
+
+        self.connected = False
+
+        self.last_message_time = None
+
+        self.connection_time = None
+
+        self.reconnect_attempts = 0
+
+        #
+        # Queues
+        #
+
+        self.message_queue = queue.Queue()
+
+        self.tick_queue = queue.Queue()
+
+        #
+        # Subscriptions
+        #
+
+        self.subscribed: Set[str] = set()
+
+        self.subscription_mode: Dict[
+            str,
+            str,
+        ] = {}
+
+        #
+        # Callbacks
+        #
+
+        self.callbacks: List[
+            Callable[[Tick], None]
+        ] = []
+
+        self.status_callbacks = []
+
+        self.error_callbacks = []
+
+        #
+        # Statistics
+        #
+
+        self.total_messages = 0
+
+        self.total_ticks = 0
+
+        #
+        # Worker Threads
+        #
+
+        self.processor_thread = None
+
+        self.health_thread = None
+
+        #
+        # Locks
+        #
+
+        self.lock = threading.RLock()
+            # ==========================================================
+    # CONNECT
+    # ==========================================================
+
+    def connect(self):
+
+        with self.lock:
+
+            if self.connected:
+                return
+
+            logger.info("Initializing Upstox MarketDataStreamerV3")
+
+            self.streamer = MarketDataStreamerV3(
+                self.api_client
+            )
+
+            #
+            # Register SDK callbacks
+            #
+
+            self.streamer.on(
+                "open",
+                self._on_open,
+            )
+
+            self.streamer.on(
+                "message",
+                self._on_message,
+            )
+
+            self.streamer.on(
+                "close",
+                self._on_close,
+            )
+
+            self.streamer.on(
+                "error",
+                self._on_error,
+            )
+
+            #
+            # Worker Threads
+            #
+
+            self.running = True
+
+            self.processor_thread = threading.Thread(
+                target=self._message_processor,
+                daemon=True,
+                name="SV-MessageProcessor",
+            )
+
+            self.health_thread = threading.Thread(
+                target=self._health_monitor,
+                daemon=True,
+                name="SV-HealthMonitor",
+            )
+
+            self.processor_thread.start()
+            self.health_thread.start()
+
+            logger.info("Connecting websocket...")
+
+            self.streamer.connect()
+
+    # ==========================================================
+    # DISCONNECT
+    # ==========================================================
+
+    def disconnect(self):
+
+        with self.lock:
+
+            self.running = False
+
+            self.connected = False
+
+            if self.streamer:
+
+                try:
+                    self.streamer.disconnect()
+                except Exception:
+                    logger.exception(
+                        "Disconnect failed."
+                    )
+
+            logger.info(
+                "Websocket disconnected."
+            )
+
+    # ==========================================================
+    # RECONNECT
+    # ==========================================================
+
+    def reconnect(self):
+
+        logger.warning(
+            "Reconnecting websocket..."
+        )
+
+        self.disconnect()
+
+        time.sleep(2)
+
+        self.reconnect_attempts += 1
+
+        self.connect()
+
+    # ==========================================================
+    # SDK EVENTS
+    # ==========================================================
+
+    def _on_open(self):
+
+        logger.info(
+            "Websocket connected."
+        )
+
+        self.connected = True
+
+        self.connection_time = datetime.now()
+
+        self.last_message_time = datetime.now()
+
+        #
+        # Restore subscriptions
+        #
+
+        if self.subscribed:
+
+            for instrument in self.subscribed:
+
+                mode = self.subscription_mode.get(
+                    instrument,
+                    "full",
+                )
+
+                self.subscribe(
+                    instrument,
+                    mode,
+                )
+
+        #
+        # Notify UI
+        #
+
+        for callback in self.status_callbacks:
+
+            try:
+                callback(True)
+            except Exception:
+                logger.exception(
+                    "Status callback failed."
+                )
+
+    # ==========================================================
+    # CLOSE
+    # ==========================================================
+
+    def _on_close(self, *args):
+
+        logger.warning(
+            "Websocket closed."
+        )
+
+        self.connected = False
+
+        for callback in self.status_callbacks:
+
+            try:
+                callback(False)
+            except Exception:
+                logger.exception(
+                    "Status callback failed."
+                )
+
+        if self.running:
+
+            self.reconnect()
+
+    # ==========================================================
+    # ERROR
+    # ==========================================================
+
+    def _on_error(self, error):
+
+        logger.exception(error)
+
+        for callback in self.error_callbacks:
+
+            try:
+                callback(error)
+            except Exception:
+                logger.exception(
+                    "Error callback failed."
+                )
+
+    # ==========================================================
+    # MESSAGE
+    # ==========================================================
+
+    def _on_message(self, message):
+
+        self.total_messages += 1
+
+        self.last_message_time = datetime.now()
+
+        self.message_queue.put(message)
+            # ==========================================================
+    # SUBSCRIBE
+    # ==========================================================
+
+    def subscribe(
+        self,
+        instrument_key: str,
+        mode: str = "full"
+    ):
+
+        with self.lock:
+
+            self.subscribed.add(
+                instrument_key
+            )
+
+            self.subscription_mode[
+                instrument_key
+            ] = mode
+
+            if (
+                not self.connected
+                or self.streamer is None
+            ):
+                return
+
+            try:
+
+                self.streamer.subscribe(
+
+                    [instrument_key],
+
+                    mode,
+
+                )
+
+                logger.info(
+
+                    "Subscribed : %s (%s)",
+
+                    instrument_key,
+
+                    mode,
+
+                )
+
+            except Exception:
+
+                logger.exception(
+
+                    "Subscription failed."
+
+                )
+
+    # ==========================================================
+    # BULK SUBSCRIBE
+    # ==========================================================
+
+    def subscribe_many(
+
+        self,
+
+        instruments: List[str],
+
+        mode: str = "full",
+
+    ):
+
+        if not instruments:
+
+            return
+
+        for instrument in instruments:
+
+            self.subscribed.add(
+                instrument
+            )
+
+            self.subscription_mode[
+                instrument
+            ] = mode
+
+        if (
+            not self.connected
+            or self.streamer is None
+        ):
+            return
+
+        try:
+
+            self.streamer.subscribe(
+
+                instruments,
+
+                mode,
+
+            )
+
+            logger.info(
+
+                "Subscribed %d instruments.",
+
+                len(instruments),
+
+            )
+
+        except Exception:
+
+            logger.exception(
+
+                "Bulk subscribe failed."
+
+            )
+
+    # ==========================================================
+    # UNSUBSCRIBE
+    # ==========================================================
+
+    def unsubscribe(
+
+        self,
+
+        instrument_key: str,
+
+    ):
+
+        with self.lock:
+
+            self.subscribed.discard(
+
+                instrument_key
+
+            )
+
+            self.subscription_mode.pop(
+
+                instrument_key,
+
+                None,
+
+            )
+
+            if (
+                not self.connected
+                or self.streamer is None
+            ):
+                return
+
+            try:
+
+                self.streamer.unsubscribe(
+
+                    [instrument_key]
+
+                )
+
+                logger.info(
+
+                    "Unsubscribed : %s",
+
+                    instrument_key,
+
+                )
+
+            except Exception:
+
+                logger.exception(
+
+                    "Unsubscribe failed."
+
+                )
+
+    # ==========================================================
+    # BULK UNSUBSCRIBE
+    # ==========================================================
+
+    def unsubscribe_many(
+
+        self,
+
+        instruments: List[str],
+
+    ):
+
+        if not instruments:
+
+            return
+
+        for instrument in instruments:
+
+            self.subscribed.discard(
+
+                instrument
+
+            )
+
+            self.subscription_mode.pop(
+
+                instrument,
+
+                None,
+
+            )
+
+        if (
+            not self.connected
+            or self.streamer is None
+        ):
+            return
+
+        try:
+
+            self.streamer.unsubscribe(
+
+                instruments
+
+            )
+
+        except Exception:
+
+            logger.exception(
+
+                "Bulk unsubscribe failed."
+
+            )
+
+    # ==========================================================
+    # CHANGE MODE
+    # ==========================================================
+
+    def change_mode(
+
+        self,
+
+        instrument_key: str,
+
+        mode: str,
+
+    ):
+
+        self.subscription_mode[
+            instrument_key
+        ] = mode
+
+        if (
+            not self.connected
+            or self.streamer is None
+        ):
+            return
+
+        try:
+
+            self.streamer.change_mode(
+
+                [instrument_key],
+
+                mode,
+
+            )
+
+        except Exception:
+
+            logger.exception(
+
+                "Unable to change mode."
+
+            )
+
+    # ==========================================================
+    # CLEAR SUBSCRIPTIONS
+    # ==========================================================
+
+    def clear_subscriptions(self):
+
+        if self.subscribed:
+
+            self.unsubscribe_many(
+
+                list(self.subscribed)
+
+            )
+
+        self.subscribed.clear()
+
+        self.subscription_mode.clear()
+
+    # ==========================================================
+    # CALLBACK REGISTRATION
+    # ==========================================================
+
+    def add_tick_callback(
+
+        self,
+
+        callback: Callable[[Tick], None],
+
+    ):
+
+        if callback not in self.callbacks:
+
+            self.callbacks.append(
+                callback
+            )
+
+    def remove_tick_callback(
+
+        self,
+
+        callback,
+
+    ):
+
+        if callback in self.callbacks:
+
+            self.callbacks.remove(
+                callback
+            )
+
+    # ==========================================================
+    # STATUS CALLBACKS
+    # ==========================================================
+
+    def add_status_callback(
+
+        self,
+
+        callback,
+
+    ):
+
+        if callback not in self.status_callbacks:
+
+            self.status_callbacks.append(
+                callback
+            )
+
+    def add_error_callback(
+
+        self,
+
+        callback,
+
+    ):
+
+        if callback not in self.error_callbacks:
+
+            self.error_callbacks.append(
+                callback
+            )
+                # ==========================================================
+    # MESSAGE PROCESSOR
+    # ==========================================================
+
+    def _message_processor(self):
+
+        logger.info(
+            "Message processor started."
+        )
+
+        while self.running:
+
+            try:
+
+                message = self.message_queue.get(
+                    timeout=1
+                )
+
+            except queue.Empty:
+
+                continue
+
+            except Exception:
+
+                logger.exception(
+                    "Queue error."
+                )
+
+                continue
+
+            try:
+
+                self._dispatch_message(
+                    message
+                )
+
+            except Exception:
+
+                logger.exception(
+                    "Dispatch failed."
+                )
+
+    # ==========================================================
+    # MESSAGE DISPATCH
+    # ==========================================================
+
+    def _dispatch_message(
+
+        self,
+
+        message,
+
+    ):
+
+        tick_data = self._parse_message(
+            message
+        )
+
+        if tick_data is None:
+
+            return
+
+        #
+        # Single Tick
+        #
+
+        if isinstance(
+            tick_data,
+            Tick,
+        ):
+
+            self.total_ticks += 1
+
+            self.tick_queue.put(
+                tick_data
+            )
+
+            self._broadcast_tick(
+                tick_data
+            )
+
+            return
+
+        #
+        # Multiple Ticks
+        #
+
+        if isinstance(
+            tick_data,
+            list,
+        ):
+
+            for tick in tick_data:
+
+                if not isinstance(
+                    tick,
+                    Tick,
+                ):
+                    continue
+
+                self.total_ticks += 1
+
+                self.tick_queue.put(
+                    tick
+                )
+
+                self._broadcast_tick(
+                    tick
+                )
+
+    # ==========================================================
+    # BROADCAST
+    # ==========================================================
+
+    def _broadcast_tick(
+
+        self,
+
+        tick: Tick,
+
+    ):
+
+        callbacks = list(
+            self.callbacks
+        )
+
+        for callback in callbacks:
+
+            try:
+
+                callback(
+                    tick
+                )
+
+            except Exception:
+
+                logger.exception(
+
+                    "Tick callback failed."
+
+                )
+
+    # ==========================================================
+    # PARSER
+    # ==========================================================
+
+    def set_message_parser(
+
+        self,
+
+        parser,
+
+    ):
+
+        """
+        Inject parser.
+
+        parser(message) ->
+
+            Tick
+
+            list[Tick]
+
+            None
+        """
+
+        self.message_parser = parser
+
+    # ==========================================================
+    # DEFAULT PARSER
+    # ==========================================================
+
+    def _parse_message(
+
+        self,
+
+        message,
+
+    ):
+
+        parser = getattr(
+
+            self,
+
+            "message_parser",
+
+            None,
+
+        )
+
+        if parser is None:
+
+            return None
+
+        return parser(
+            message
+        )
+
+    # ==========================================================
+    # GET TICK
+    # ==========================================================
+
+    def next_tick(
+
+        self,
+
+        timeout=0.1,
+
+    ) -> Optional[Tick]:
+
+        try:
+
+            return self.tick_queue.get(
+
+                timeout=timeout
+
+            )
+
+        except queue.Empty:
+
+            return None
+
+    # ==========================================================
+    # CLEAR TICK QUEUE
+    # ==========================================================
+
+    def clear_tick_queue(self):
+
+        while True:
+
+            try:
+
+                self.tick_queue.get_nowait()
+
+            except queue.Empty:
+
+                break
+
+    # ==========================================================
+    # QUEUE SIZE
+    # ==========================================================
+
+    @property
+
+    def pending_messages(self):
+
+        return self.message_queue.qsize()
+
+    @property
+
+    def pending_ticks(self):
+
+        return self.tick_queue.qsize()
+
+    # ==========================================================
+    # CALLBACK COUNT
+    # ==========================================================
+
+    @property
+
+    def callback_count(self):
+
+        return len(
+            self.callbacks
+        )
+
+    # ==========================================================
+    # SUBSCRIPTION COUNT
+    # ==========================================================
+
+    @property
+
+    def subscription_count(self):
+
+        return len(
+            self.subscribed
+        )
+        # ==========================================================
+    # HEARTBEAT
+    # ==========================================================
+
+    def heartbeat_ok(self) -> bool:
+
+        if not self.connected:
+            return False
+
+        if self.last_message_time is None:
+            return False
+
+        elapsed = (
+            datetime.now()
+            - self.last_message_time
+        ).total_seconds()
+
+        return elapsed < 30
+
+    # ==========================================================
+    # HEALTH MONITOR
+    # ==========================================================
+
+    def _health_monitor(self):
+
+        logger.info(
+            "Health monitor started."
+        )
+
+        while self.running:
+
+            try:
+
+                time.sleep(5)
+
+                if not self.connected:
+                    continue
+
+                #
+                # No data received
+                #
+
+                if not self.heartbeat_ok():
+
+                    logger.warning(
+                        "Heartbeat timeout detected."
+                    )
+
+                    self.reconnect()
+
+            except Exception:
+
+                logger.exception(
+                    "Health monitor failed."
+                )
+
+    # ==========================================================
+    # WAIT FOR CONNECTION
+    # ==========================================================
+
+    def wait_until_connected(
+
+        self,
+
+        timeout: float = 20,
+
+    ) -> bool:
+
+        start = time.time()
+
+        while (
+
+            time.time() - start
+
+        ) < timeout:
+
+            if self.connected:
+
+                return True
+
+            time.sleep(0.20)
+
+        return False
+
+    # ==========================================================
+    # WAIT FOR DISCONNECT
+    # ==========================================================
+
+    def wait_until_disconnected(
+
+        self,
+
+        timeout: float = 10,
+
+    ) -> bool:
+
+        start = time.time()
+
+        while (
+
+            time.time() - start
+
+        ) < timeout:
+
+            if not self.connected:
+
+                return True
+
+            time.sleep(0.20)
+
+        return False
+
+    # ==========================================================
+    # CONNECTION UPTIME
+    # ==========================================================
+
+    @property
+
+    def uptime(self):
+
+        if self.connection_time is None:
+
+            return 0
+
+        return int(
+
+            (
+
+                datetime.now()
+
+                - self.connection_time
+
+            ).total_seconds()
+
+        )
+
+    # ==========================================================
+    # CONNECTION STATE
+    # ==========================================================
+
+    @property
+
+    def state(self):
+
+        if self.connected:
+
+            return "CONNECTED"
+
+        if self.running:
+
+            return "CONNECTING"
+
+        return "DISCONNECTED"
+
+    # ==========================================================
+    # RESET STATISTICS
+    # ==========================================================
+
+    def reset_statistics(self):
+
+        self.total_messages = 0
+
+        self.total_ticks = 0
+
+        self.reconnect_attempts = 0
+
+    # ==========================================================
+    # STATISTICS
+    # ==========================================================
+
+    def statistics(self):
+
+        return {
+
+            "connected":
+
+                self.connected,
+
+            "running":
+
+                self.running,
+
+            "subscriptions":
+
+                len(self.subscribed),
+
+            "messages":
+
+                self.total_messages,
+
+            "ticks":
+
+                self.total_ticks,
+
+            "callbacks":
+
+                len(self.callbacks),
+
+            "reconnects":
+
+                self.reconnect_attempts,
+
+            "uptime":
+
+                self.uptime,
+
+        }
+
+    # ==========================================================
+    # DIAGNOSTICS
+    # ==========================================================
+
+    def diagnostics(self):
+
+        return {
+
+            "state":
+
+                self.state,
+
+            "heartbeat":
+
+                self.heartbeat_ok(),
+
+            "connected":
+
+                self.connected,
+
+            "running":
+
+                self.running,
+
+            "last_message":
+
+                self.last_message_time,
+
+            "subscriptions":
+
+                sorted(
+
+                    self.subscribed
+
+                ),
+
+            "subscription_count":
+
+                len(
+
+                    self.subscribed
+
+                ),
+
+            "queue_messages":
+
+                self.pending_messages,
+
+            "queue_ticks":
+
+                self.pending_ticks,
+
+            "callbacks":
+
+                self.callback_count,
+
+            "messages":
+
+                self.total_messages,
+
+            "ticks":
+
+                self.total_ticks,
+
+            "reconnects":
+
+                self.reconnect_attempts,
+
+            "uptime":
+
+                self.uptime,
+
+        }
+
+    # ==========================================================
+    # HEALTH SUMMARY
+    # ==========================================================
+
+    def health_summary(self):
+
+        return {
+
+            "status":
+
+                self.state,
+
+            "heartbeat":
+
+                self.heartbeat_ok(),
+
+            "subscriptions":
+
+                len(
+
+                    self.subscribed
+
+                ),
+
+            "messages":
+
+                self.total_messages,
+
+            "ticks":
+
+                self.total_ticks,
+
+            "uptime":
+
+                self.uptime,
+
+        }
+        # ==========================================================
+    # STOP
+    # ==========================================================
+
+    def stop(self):
+
+        logger.info(
+            "Stopping WebSocket Manager..."
+        )
+
+        self.running = False
+
+        self.connected = False
+
+        try:
+
+            if self.streamer:
+
+                self.streamer.disconnect()
+
+        except Exception:
+
+            logger.exception(
+                "Failed to disconnect streamer."
+            )
+
+        self.clear_subscriptions()
+
+        self.wait_until_stopped()
+
+    # ==========================================================
+    # WAIT UNTIL STOPPED
+    # ==========================================================
+
+    def wait_until_stopped(
+
+        self,
+
+        timeout: float = 5.0,
+
+    ):
+
+        if (
+
+            self.processor_thread
+
+            and self.processor_thread.is_alive()
+
+        ):
+
+            self.processor_thread.join(
+
+                timeout
+
+            )
+
+        if (
+
+            self.health_thread
+
+            and self.health_thread.is_alive()
+
+        ):
+
+            self.health_thread.join(
+
+                timeout
+
+            )
+
+    # ==========================================================
+    # RESET
+    # ==========================================================
+
+    def reset(self):
+
+        self.clear_tick_queue()
+
+        self.clear_subscriptions()
+
+        self.reset_statistics()
+
+        self.last_message_time = None
+
+        self.connection_time = None
+
+        self.connected = False
+
+    # ==========================================================
+    # IS RUNNING
+    # ==========================================================
+
+    def is_running(self):
+
+        return self.running
+
+    # ==========================================================
+    # IS CONNECTED
+    # ==========================================================
+
+    def is_connected(self):
+
+        return self.connected
+
+    # ==========================================================
+    # CONTEXT MANAGER
+    # ==========================================================
+
+    def __enter__(self):
+
+        self.connect()
+
+        return self
+
+    def __exit__(
+
+        self,
+
+        exc_type,
+
+        exc,
+
+        tb,
+
+    ):
+
+        self.stop()
+
+        return False
+
+    # ==========================================================
+    # STRING
+    # ==========================================================
+
+    def __str__(self):
+
+        return (
+
+            f"WebSocketManager("
+
+            f"connected={self.connected}, "
+
+            f"subscriptions={len(self.subscribed)}, "
+
+            f"ticks={self.total_ticks}"
+
+            f")"
+
+        )
+
+    # ==========================================================
+    # REPR
+    # ==========================================================
+
+    def __repr__(self):
+
+        return (
+
+            "<WebSocketManager "
+
+            f"state={self.state} "
+
+            f"subscriptions={len(self.subscribed)} "
+
+            f"messages={self.total_messages} "
+
+            f"ticks={self.total_ticks}>"
+
+        )
+
+    # ==========================================================
+    # CLEANUP
+    # ==========================================================
+
+    def close(self):
+
+        self.stop()
+
+    # ==========================================================
+    # DESTRUCTOR
+    # ==========================================================
+
+    def __del__(self):
+
+        try:
+
+            self.stop()
+
+        except Exception:
+
+            pass
+
+
+# ==========================================================
+# MODULE EXPORTS
+# ==========================================================
+
+__all__ = [
+
+    "WebSocketManager",
+
+]

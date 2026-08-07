@@ -1,0 +1,722 @@
+﻿===== DASHBOARD PAGE INIT =====
+                    1 - normalized
+                )
+            )
+
+            point = QPointF(
+                x,
+                y,
+            )
+
+            if i == 0:
+                path.moveTo(
+                    point
+                )
+            else:
+                path.lineTo(
+                    point
+                )
+
+        price_pen = QPen(
+            QColor(BLUE)
+        )
+
+        price_pen.setWidth(3)
+
+        painter.setPen(
+            price_pen
+        )
+
+        painter.drawPath(
+            path
+        )
+
+
+# =========================================================
+# END OF PART 1
+# =========================================================
+# =========================================================
+# DASHBOARD PAGE
+# =========================================================
+
+class DashboardPage(QWidget):
+
+    stock_requested = Signal(str)
+    scanner_requested = Signal(str)
+    refresh_requested = Signal()
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.setObjectName(
+            "dashboardPage"
+        )
+
+        self.setStyleSheet(
+            f"""
+            QWidget#dashboardPage {{
+                background: {BG};
+            }}
+
+            QLabel {{
+                font-family: "Segoe UI";
+            }}
+            """
+        )
+
+        # -------------------------------------------------
+        # LIVE INDEX CARDS
+        #
+        # IMPORTANT:
+        # app.py and MarketController use these directly.
+        #
+        # FINNIFTY deliberately NOT included.
+        # -------------------------------------------------
+
+        self.index_cards: Dict[str, IndexCard] = {
+            "NIFTY": IndexCard("NIFTY 50"),
+            "BANKNIFTY": IndexCard("BANK NIFTY"),
+            "INDIAVIX": IndexCard("INDIA VIX"),
+        }
+
+        # -------------------------------------------------
+        # Dynamic references
+        # -------------------------------------------------
+
+        self.advance_card = None
+        self.decline_card = None
+        self.unchanged_card = None
+
+        self.market_pulse_status = None
+        self.market_animal = None
+
+        self._build_ui()
+
+
+    # =====================================================
+    # BUILD COMPLETE DASHBOARD
+    # =====================================================
+
+    def _build_ui(self) -> None:
+
+        root = QVBoxLayout(self)
+
+        root.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        root.setSpacing(0)
+
+        # -------------------------------------------------
+        # IMPORTANT:
+        #
+        # No QScrollArea here.
+        #
+        # This prevents the unwanted horizontal scrollbar
+        # that appeared in the previous build.
+        # -------------------------------------------------
+
+        content = QWidget()
+
+        content.setObjectName(
+            "dashboardContent"
+        )
+
+        content.setStyleSheet(
+            f"""
+            QWidget#dashboardContent {{
+                background: {BG};
+            }}
+            """
+        )
+
+        self.grid = QGridLayout(
+            content
+        )
+
+        self.grid.setContentsMargins(
+            12,
+            10,
+            12,
+            10,
+        )
+
+        self.grid.setHorizontalSpacing(
+            10
+        )
+
+        self.grid.setVerticalSpacing(
+            10
+        )
+
+        # =================================================
+        # ROW 1
+        # =================================================
+
+        self.market_pulse_card = (
+            self._market_pulse()
+        )
+
+        self.sector_strength_card = (
+            self._sector_strength()
+        )
+
+        self.market_breadth_card = (
+            self._market_breadth()
+        )
+
+        self.market_heatmap_card = (
+            self._market_heatmap()
+        )
+
+        self.grid.addWidget(
+            self.market_pulse_card,
+            0,
+            0,
+            1,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.sector_strength_card,
+            0,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.market_breadth_card,
+            0,
+            3,
+        )
+
+        self.grid.addWidget(
+            self.market_heatmap_card,
+            0,
+            4,
+        )
+
+        # =================================================
+        # ROW 2
+        # =================================================
+
+        self.top_opportunities_card = (
+            self._top_opportunities()
+        )
+
+        self.scanner_summary_card = (
+            self._scanner_summary()
+        )
+
+        self.top_movers_card = (
+            self._top_movers()
+        )
+
+        self.live_alerts_card = (
+            self._live_scanner_alerts()
+        )
+
+        self.grid.addWidget(
+            self.top_opportunities_card,
+            1,
+            0,
+            1,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.scanner_summary_card,
+            1,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.top_movers_card,
+            1,
+            3,
+        )
+
+        self.grid.addWidget(
+            self.live_alerts_card,
+            1,
+            4,
+        )
+
+        # =================================================
+        # ROW 3
+        # =================================================
+
+        self.institutional_flow_card = (
+            self._institutional_flow()
+        )
+
+        self.derivatives_card = (
+            self._derivatives_pulse()
+        )
+
+        self.nifty_oi_card = (
+            self._nifty_oi_chart()
+        )
+
+        self.grid.addWidget(
+            self.institutional_flow_card,
+            2,
+            0,
+            1,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.derivatives_card,
+            2,
+            2,
+        )
+
+        self.grid.addWidget(
+            self.nifty_oi_card,
+            2,
+            3,
+            1,
+            2,
+        )
+
+        # -------------------------------------------------
+        # COLUMN PROPORTIONS
+        #
+        # 5 logical columns:
+        #
+        # 0 + 1 = wide card
+        # 2     = medium
+        # 3     = medium
+        # 4     = medium
+        # -------------------------------------------------
+
+        self.grid.setColumnStretch(
+            0,
+            1,
+        )
+
+        self.grid.setColumnStretch(
+            1,
+            1,
+        )
+
+        self.grid.setColumnStretch(
+            2,
+            1,
+        )
+
+        self.grid.setColumnStretch(
+            3,
+            1,
+        )
+
+        self.grid.setColumnStretch(
+            4,
+            1,
+        )
+
+        # -------------------------------------------------
+        # ROW PROPORTIONS
+        # -------------------------------------------------
+
+        self.grid.setRowStretch(
+            0,
+            10,
+        )
+
+        self.grid.setRowStretch(
+            1,
+            10,
+        )
+
+        self.grid.setRowStretch(
+            2,
+            9,
+        )
+
+        root.addWidget(
+            content
+        )
+
+
+    # =====================================================
+    # GENERIC ROW
+    # =====================================================
+
+    def _simple_row(
+        self,
+        left: str,
+        right: str,
+        right_color: str = TEXT,
+        left_size: int = 12,
+        right_size: int = 12,
+    ) -> QWidget:
+
+        row = QWidget()
+===== APP DASHBOARD CONTAINER =====
+
+        sidebar = QFrame()
+
+        sidebar.setObjectName(
+            "mainSidebar"
+        )
+
+        sidebar.setFixedWidth(
+            200
+        )
+
+        sidebar.setStyleSheet(
+            f"""
+            QFrame#mainSidebar {{
+                background: {SIDEBAR_BG};
+                border-right: 1px solid {BORDER};
+            }}
+
+            QPushButton {{
+                color: #c3cfdf;
+                background: transparent;
+                border: none;
+                border-left: 3px solid transparent;
+                border-radius: 7px;
+                text-align: left;
+                padding: 11px 12px;
+                font-size: 15px;
+                font-weight: 500;
+            }}
+
+            QPushButton:hover {{
+                background: #10223a;
+                color: #ffffff;
+            }}
+
+            QPushButton[active="true"] {{
+                background: #15345f;
+                color: #ffffff;
+                border-left: 3px solid #347cff;
+                font-weight: 700;
+            }}
+            """
+        )
+
+        layout = QVBoxLayout(
+            sidebar
+        )
+
+        layout.setContentsMargins(
+            12,
+            15,
+            12,
+            12,
+        )
+
+        layout.setSpacing(
+            5
+        )
+
+        # -------------------------------------------------
+        # Brand
+        # -------------------------------------------------
+
+        brand_row = QHBoxLayout()
+
+        brand_row.setContentsMargins(
+            2,
+            0,
+            2,
+            8,
+        )
+
+        brand_icon = QLabel("â—†")
+
+        brand_icon.setStyleSheet(
+            """
+            color: #397cff;
+            font-size: 20px;
+            font-weight: 900;
+            """
+        )
+
+        brand_row.addWidget(
+            brand_icon
+        )
+
+        brand_text = QLabel(
+            "StockVersity"
+        )
+
+        brand_text.setFont(
+            QFont(
+                "Segoe UI",
+                16,
+                QFont.Bold,
+            )
+        )
+
+        brand_text.setStyleSheet(
+            """
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 800;
+            """
+        )
+
+        brand_row.addWidget(
+            brand_text
+        )
+
+        pro = QLabel("PRO")
+
+        pro.setAlignment(
+            Qt.AlignCenter
+        )
+
+        pro.setFixedSize(
+            30,
+            18,
+        )
+
+        pro.setStyleSheet(
+            """
+            background: #294ea0;
+            border-radius: 4px;
+            color: #9fc8ff;
+            font-size: 9px;
+            font-weight: 800;
+            """
+        )
+
+        brand_row.addWidget(
+            pro
+        )
+
+        brand_row.addStretch()
+
+        layout.addLayout(
+            brand_row
+        )
+
+        # -------------------------------------------------
+        # Scanner Pro subtitle
+        # -------------------------------------------------
+
+        scanner_pro = QLabel(
+            "Scanner Pro"
+        )
+
+        scanner_pro.setStyleSheet(
+            """
+            color: #00c8ff;
+            font-size: 12px;
+            font-weight: 700;
+            padding-left: 36px;
+            padding-bottom: 6px;
+            """
+        )
+
+        layout.addWidget(
+            scanner_pro
+        )
+
+        # -------------------------------------------------
+        # Navigation
+        # -------------------------------------------------
+
+        for key, label in self.PAGES.items():
+
+            icon = self.NAV_ICONS.get(
+                key,
+                "â€¢",
+            )
+
+            button = QPushButton(
+                f"  {icon}     {label}"
+            )
+
+            button.setMinimumHeight(
+                43
+            )
+
+            button.setCursor(
+                Qt.PointingHandCursor
+            )
+
+            button.clicked.connect(
+                lambda checked=False, name=key:
+                self.show_page(name)
+            )
+
+            self._nav_buttons[
+                key
+            ] = button
+
+            layout.addWidget(
+                button
+            )
+
+        layout.addStretch(
+            1
+        )
+
+        # -------------------------------------------------
+        # Bottom divider
+        # -------------------------------------------------
+
+        divider = QFrame()
+
+        divider.setFixedHeight(
+            1
+        )
+
+        divider.setStyleSheet(
+            f"background:{BORDER};"
+        )
+
+        layout.addWidget(
+            divider
+        )
+
+        layout.addSpacing(
+            7
+        )
+
+        # -------------------------------------------------
+        # Market time label
+        # -------------------------------------------------
+
+        market_title = QLabel(
+            "MARKET TIME"
+        )
+
+        market_title.setStyleSheet(
+            """
+            color: #4ca8ff;
+            font-size: 10px;
+            font-weight: 800;
+            """
+        )
+
+        layout.addWidget(
+            market_title
+        )
+
+        # -------------------------------------------------
+        # Sidebar clock
+        # -------------------------------------------------
+
+        self.sidebar_clock = QLabel(
+            "--:--:--"
+        )
+
+        self.sidebar_clock.setStyleSheet(
+            """
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 800;
+            """
+        )
+
+        layout.addWidget(
+            self.sidebar_clock
+        )
+
+        # -------------------------------------------------
+        # Market status
+        # -------------------------------------------------
+
+        self.sidebar_market_status = QLabel(
+            "NSE   â— OPEN\nBSE   â— OPEN"
+        )
+
+        self.sidebar_market_status.setStyleSheet(
+            """
+            color: #25dc7b;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 150%;
+            """
+        )
+
+        layout.addSpacing(
+            4
+        )
+
+        layout.addWidget(
+            self.sidebar_market_status
+        )
+
+        return sidebar
+
+
+    # =====================================================
+    # HEADER
+    # =====================================================
+
+    def _create_header(self) -> QFrame:
+        """
+        Approved StockVersity live-market header.
+
+        Visible:
+            NIFTY 50
+            BANK NIFTY
+            INDIA VIX
+            BTC/USD
+            GOLD/USD
+            SILVER/USD
+
+        Hidden:
+            FIN NIFTY
+            Search
+            Market-open box
+        """
+
+        header = QFrame()
+
+        header.setObjectName(
+            "mainHeader"
+        )
+
+        header.setFixedHeight(
+            84
+        )
+
+        header.setStyleSheet(
+            f"""
+            QFrame#mainHeader {{
+                background: {HEADER_BG};
+                border-bottom: 1px solid {BORDER};
+            }}
+            """
+        )
+
+        layout = QHBoxLayout(
+            header
+        )
+
+        layout.setContentsMargins(
+            12,
+            7,
+            12,
+            7,
+        )
+
+        layout.setSpacing(
+            6
+        )
+
+        # -------------------------------------------------
+        # LIVE NSE INDEX CARDS
+        # -------------------------------------------------
+
+        # FINNIFTY intentionally remains in DashboardPage
+        # for MarketController compatibility but is NOT
+        # shown in this header.
+
+        for key in (
+            "NIFTY",
+            "BANKNIFTY",

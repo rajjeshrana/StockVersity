@@ -1,0 +1,1336 @@
+
+  backend\scanner\nse_data_engine.py:76:    ):
+  backend\scanner\nse_data_engine.py:77:
+  backend\scanner\nse_data_engine.py:78:        self.refresh_interval = refresh_interval
+  backend\scanner\nse_data_engine.py:79:
+> backend\scanner\nse_data_engine.py:80:        self.market_data: Dict[str, pd.DataFrame] = {}
+  backend\scanner\nse_data_engine.py:81:
+  backend\scanner\nse_data_engine.py:82:        self.indices: Dict[str, Any] = {}
+  backend\scanner\nse_data_engine.py:83:
+  backend\scanner\nse_data_engine.py:84:        self.sectors: Dict[str, Any] = {}
+  backend\scanner\nse_data_engine.py:85:
+  backend\scanner\nse_data_engine.py:86:        self.watchlist: List[str] = []
+  backend\scanner\nse_data_engine.py:87:
+  backend\scanner\nse_data_engine.py:88:        self.fno_symbols: List[str] = []
+  backend\scanner\nse_data_engine.py:89:
+  backend\scanner\nse_data_engine.py:90:        self.top_gainers = pd.DataFrame()
+  backend\scanner\nse_data_engine.py:91:
+  backend\scanner\nse_data_engine.py:92:        self.top_losers = pd.DataFrame()
+  backend\scanner\nse_data_engine.py:93:
+  backend\scanner\nse_data_engine.py:94:        self.market_breadth = {}
+  backend\scanner\nse_data_engine.py:298:        self,
+  backend\scanner\nse_data_engine.py:299:
+  backend\scanner\nse_data_engine.py:300:    ):
+  backend\scanner\nse_data_engine.py:301:
+> backend\scanner\nse_data_engine.py:302:        self.market_data.clear()
+  backend\scanner\nse_data_engine.py:303:
+  backend\scanner\nse_data_engine.py:304:        self.indices.clear()
+  backend\scanner\nse_data_engine.py:305:
+  backend\scanner\nse_data_engine.py:306:        self.sectors.clear()
+  backend\scanner\nse_data_engine.py:307:
+  backend\scanner\nse_data_engine.py:308:        self.watchlist.clear()
+  backend\scanner\nse_data_engine.py:309:
+  backend\scanner\nse_data_engine.py:310:        self.market_breadth = {}
+  backend\scanner\nse_data_engine.py:311:
+  backend\scanner\nse_data_engine.py:312:        self.top_gainers = pd.DataFrame()
+  backend\scanner\nse_data_engine.py:313:
+  backend\scanner\nse_data_engine.py:314:        self.top_losers = pd.DataFrame()
+  backend\scanner\nse_data_engine.py:315:
+  backend\scanner\nse_data_engine.py:316:        self.last_refresh = None
+  backend\scanner\nse_data_engine.py:418:# ============================================================
+  backend\scanner\nse_data_engine.py:419:# LOAD SYMBOL MASTER
+  backend\scanner\nse_data_engine.py:420:# ============================================================
+  backend\scanner\nse_data_engine.py:421:
+> backend\scanner\nse_data_engine.py:422:    def load_symbol_master(
+  backend\scanner\nse_data_engine.py:423:        self,
+  backend\scanner\nse_data_engine.py:424:    ) -> None:
+  backend\scanner\nse_data_engine.py:425:
+  backend\scanner\nse_data_engine.py:426:        self.update_status(
+  backend\scanner\nse_data_engine.py:427:            "Loading NSE symbol master..."
+  backend\scanner\nse_data_engine.py:428:        )
+  backend\scanner\nse_data_engine.py:429:
+  backend\scanner\nse_data_engine.py:430:        # TODO
+  backend\scanner\nse_data_engine.py:431:        # Load NSE stock universe
+  backend\scanner\nse_data_engine.py:432:
+  backend\scanner\nse_data_engine.py:433:        self.update_status(
+  backend\scanner\nse_data_engine.py:434:            "Symbol master loaded."
+  backend\scanner\nse_data_engine.py:435:        )
+  backend\scanner\nse_data_engine.py:436:
+  backend\scanner\nse_data_engine.py:438:# ============================================================
+  backend\scanner\nse_data_engine.py:439:# LOAD SECTOR MASTER
+  backend\scanner\nse_data_engine.py:440:# ============================================================
+  backend\scanner\nse_data_engine.py:441:
+> backend\scanner\nse_data_engine.py:442:    def load_sector_master(
+  backend\scanner\nse_data_engine.py:443:        self,
+  backend\scanner\nse_data_engine.py:444:    ) -> None:
+  backend\scanner\nse_data_engine.py:445:
+  backend\scanner\nse_data_engine.py:446:        self.update_status(
+  backend\scanner\nse_data_engine.py:447:            "Loading sector mapping..."
+  backend\scanner\nse_data_engine.py:448:        )
+  backend\scanner\nse_data_engine.py:449:
+  backend\scanner\nse_data_engine.py:450:        # TODO
+  backend\scanner\nse_data_engine.py:451:
+  backend\scanner\nse_data_engine.py:452:        self.update_status(
+  backend\scanner\nse_data_engine.py:453:            "Sector mapping loaded."
+  backend\scanner\nse_data_engine.py:454:        )
+  backend\scanner\nse_data_engine.py:455:
+  backend\scanner\nse_data_engine.py:456:
+  backend\scanner\nse_data_engine.py:457:# ============================================================
+  backend\scanner\nse_data_engine.py:458:# LOAD F&O SYMBOLS
+  backend\scanner\nse_data_engine.py:459:# ============================================================
+  backend\scanner\nse_data_engine.py:460:
+> backend\scanner\nse_data_engine.py:461:    def load_fno_symbols(
+  backend\scanner\nse_data_engine.py:462:        self,
+  backend\scanner\nse_data_engine.py:463:    ) -> None:
+  backend\scanner\nse_data_engine.py:464:
+  backend\scanner\nse_data_engine.py:465:        self.update_status(
+  backend\scanner\nse_data_engine.py:466:            "Loading F&O symbols..."
+  backend\scanner\nse_data_engine.py:467:        )
+  backend\scanner\nse_data_engine.py:468:
+  backend\scanner\nse_data_engine.py:469:        # TODO
+  backend\scanner\nse_data_engine.py:470:
+  backend\scanner\nse_data_engine.py:471:        self.update_status(
+  backend\scanner\nse_data_engine.py:472:            "F&O symbols loaded."
+  backend\scanner\nse_data_engine.py:473:        )
+  backend\scanner\nse_data_engine.py:474:
+  backend\scanner\nse_data_engine.py:475:
+  backend\scanner\nse_data_engine.py:476:# ============================================================
+  backend\scanner\nse_data_engine.py:477:# LOAD WATCHLIST
+  backend\scanner\nse_data_engine.py:478:# ============================================================
+  backend\scanner\nse_data_engine.py:479:
+> backend\scanner\nse_data_engine.py:480:    def load_watchlist(
+  backend\scanner\nse_data_engine.py:481:        self,
+  backend\scanner\nse_data_engine.py:482:        symbols: List[str],
+  backend\scanner\nse_data_engine.py:483:    ) -> None:
+  backend\scanner\nse_data_engine.py:484:
+  backend\scanner\nse_data_engine.py:485:        self.watchlist = symbols.copy()
+  backend\scanner\nse_data_engine.py:486:
+  backend\scanner\nse_data_engine.py:487:
+  backend\scanner\nse_data_engine.py:488:# ============================================================
+  backend\scanner\nse_data_engine.py:489:# PRE-MARKET INITIALIZATION
+  backend\scanner\nse_data_engine.py:490:# ============================================================
+  backend\scanner\nse_data_engine.py:491:
+> backend\scanner\nse_data_engine.py:492:    def initialize_premarket(
+  backend\scanner\nse_data_engine.py:493:        self,
+  backend\scanner\nse_data_engine.py:494:    ) -> None:
+  backend\scanner\nse_data_engine.py:495:
+  backend\scanner\nse_data_engine.py:496:        self.update_status(
+  backend\scanner\nse_data_engine.py:497:            "Initializing pre-market..."
+  backend\scanner\nse_data_engine.py:498:        )
+  backend\scanner\nse_data_engine.py:499:
+  backend\scanner\nse_data_engine.py:500:        self.load_symbol_master()
+  backend\scanner\nse_data_engine.py:501:
+  backend\scanner\nse_data_engine.py:502:        self.load_sector_master()
+  backend\scanner\nse_data_engine.py:503:
+  backend\scanner\nse_data_engine.py:504:        self.load_fno_symbols()
+  backend\scanner\nse_data_engine.py:505:
+  backend\scanner\nse_data_engine.py:506:        self.update_status(
+  backend\scanner\nse_data_engine.py:511:# ============================================================
+  backend\scanner\nse_data_engine.py:512:# INITIALIZE LIVE SESSION
+  backend\scanner\nse_data_engine.py:513:# ============================================================
+  backend\scanner\nse_data_engine.py:514:
+> backend\scanner\nse_data_engine.py:515:    def initialize_live(
+  backend\scanner\nse_data_engine.py:516:        self,
+  backend\scanner\nse_data_engine.py:517:    ) -> None:
+  backend\scanner\nse_data_engine.py:518:
+  backend\scanner\nse_data_engine.py:519:        self.update_status(
+  backend\scanner\nse_data_engine.py:520:            "Initializing live session..."
+  backend\scanner\nse_data_engine.py:521:        )
+  backend\scanner\nse_data_engine.py:522:
+  backend\scanner\nse_data_engine.py:523:        self.last_refresh = datetime.now()
+  backend\scanner\nse_data_engine.py:524:
+  backend\scanner\nse_data_engine.py:525:        self.update_status(
+  backend\scanner\nse_data_engine.py:526:            "Live session ready."
+  backend\scanner\nse_data_engine.py:527:        )
+  backend\scanner\nse_data_engine.py:528:
+  backend\scanner\nse_data_engine.py:529:
+  backend\scanner\nse_data_engine.py:648:        # ============================================================
+  backend\scanner\nse_data_engine.py:649:# LOAD PREVIOUS DAY DATA
+  backend\scanner\nse_data_engine.py:650:# ============================================================
+  backend\scanner\nse_data_engine.py:651:
+> backend\scanner\nse_data_engine.py:652:    def load_previous_day_data(
+  backend\scanner\nse_data_engine.py:653:        self,
+  backend\scanner\nse_data_engine.py:654:    ) -> None:
+  backend\scanner\nse_data_engine.py:655:
+  backend\scanner\nse_data_engine.py:656:        self.update_status(
+  backend\scanner\nse_data_engine.py:657:            "Loading previous day OHLCV..."
+  backend\scanner\nse_data_engine.py:658:        )
+  backend\scanner\nse_data_engine.py:659:
+  backend\scanner\nse_data_engine.py:660:        # TODO:
+  backend\scanner\nse_data_engine.py:661:        # Download previous trading day OHLCV
+  backend\scanner\nse_data_engine.py:662:        # for all NSE symbols.
+  backend\scanner\nse_data_engine.py:663:
+  backend\scanner\nse_data_engine.py:664:        self.update_status(
+  backend\scanner\nse_data_engine.py:665:            "Previous day data loaded."
+  backend\scanner\nse_data_engine.py:666:        )
+  backend\scanner\nse_data_engine.py:669:# ============================================================
+  backend\scanner\nse_data_engine.py:670:# LOAD LIVE MARKET DATA
+  backend\scanner\nse_data_engine.py:671:# ============================================================
+  backend\scanner\nse_data_engine.py:672:
+> backend\scanner\nse_data_engine.py:673:    def load_live_market(
+  backend\scanner\nse_data_engine.py:674:        self,
+  backend\scanner\nse_data_engine.py:675:    ) -> None:
+  backend\scanner\nse_data_engine.py:676:
+  backend\scanner\nse_data_engine.py:677:        self.update_status(
+  backend\scanner\nse_data_engine.py:678:            "Loading live market data..."
+  backend\scanner\nse_data_engine.py:679:        )
+  backend\scanner\nse_data_engine.py:680:
+  backend\scanner\nse_data_engine.py:681:        # TODO:
+  backend\scanner\nse_data_engine.py:682:        # Download latest OHLCV
+  backend\scanner\nse_data_engine.py:683:        # for all active symbols.
+  backend\scanner\nse_data_engine.py:684:
+  backend\scanner\nse_data_engine.py:685:        self.last_refresh = datetime.now()
+  backend\scanner\nse_data_engine.py:686:
+  backend\scanner\nse_data_engine.py:687:        self.update_status(
+  backend\scanner\nse_data_engine.py:700:    ) -> None:
+  backend\scanner\nse_data_engine.py:701:
+  backend\scanner\nse_data_engine.py:702:        with self.lock:
+  backend\scanner\nse_data_engine.py:703:
+> backend\scanner\nse_data_engine.py:704:            self.market_data[symbol] = dataframe
+  backend\scanner\nse_data_engine.py:705:
+  backend\scanner\nse_data_engine.py:706:
+  backend\scanner\nse_data_engine.py:707:# ============================================================
+  backend\scanner\nse_data_engine.py:708:# GET SYMBOL DATA
+  backend\scanner\nse_data_engine.py:709:# ============================================================
+  backend\scanner\nse_data_engine.py:710:
+  backend\scanner\nse_data_engine.py:711:    def get_stock(
+  backend\scanner\nse_data_engine.py:712:        self,
+  backend\scanner\nse_data_engine.py:713:        symbol: str,
+  backend\scanner\nse_data_engine.py:714:    ) -> Optional[pd.DataFrame]:
+  backend\scanner\nse_data_engine.py:715:
+> backend\scanner\nse_data_engine.py:716:        return self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:717:
+  backend\scanner\nse_data_engine.py:718:
+  backend\scanner\nse_data_engine.py:719:# ============================================================
+  backend\scanner\nse_data_engine.py:720:# SYMBOL EXISTS
+  backend\scanner\nse_data_engine.py:721:# ============================================================
+  backend\scanner\nse_data_engine.py:722:
+  backend\scanner\nse_data_engine.py:723:    def has_symbol(
+  backend\scanner\nse_data_engine.py:724:        self,
+  backend\scanner\nse_data_engine.py:725:        symbol: str,
+  backend\scanner\nse_data_engine.py:726:    ) -> bool:
+  backend\scanner\nse_data_engine.py:727:
+> backend\scanner\nse_data_engine.py:728:        return symbol in self.market_data
+  backend\scanner\nse_data_engine.py:729:
+  backend\scanner\nse_data_engine.py:730:
+  backend\scanner\nse_data_engine.py:731:# ============================================================
+  backend\scanner\nse_data_engine.py:732:# REMOVE SYMBOL
+  backend\scanner\nse_data_engine.py:733:# ============================================================
+  backend\scanner\nse_data_engine.py:734:
+  backend\scanner\nse_data_engine.py:735:    def remove_symbol(
+  backend\scanner\nse_data_engine.py:736:        self,
+  backend\scanner\nse_data_engine.py:737:        symbol: str,
+  backend\scanner\nse_data_engine.py:738:    ) -> None:
+  backend\scanner\nse_data_engine.py:739:
+> backend\scanner\nse_data_engine.py:740:        self.market_data.pop(
+  backend\scanner\nse_data_engine.py:741:            symbol,
+  backend\scanner\nse_data_engine.py:742:            None,
+  backend\scanner\nse_data_engine.py:743:        )
+  backend\scanner\nse_data_engine.py:744:
+  backend\scanner\nse_data_engine.py:745:
+  backend\scanner\nse_data_engine.py:746:# ============================================================
+  backend\scanner\nse_data_engine.py:747:# ALL SYMBOLS
+  backend\scanner\nse_data_engine.py:748:# ============================================================
+  backend\scanner\nse_data_engine.py:749:
+  backend\scanner\nse_data_engine.py:750:    def symbols(
+  backend\scanner\nse_data_engine.py:751:        self,
+  backend\scanner\nse_data_engine.py:752:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:753:
+  backend\scanner\nse_data_engine.py:754:        return sorted(
+> backend\scanner\nse_data_engine.py:755:            self.market_data.keys()
+  backend\scanner\nse_data_engine.py:756:        )
+  backend\scanner\nse_data_engine.py:757:
+  backend\scanner\nse_data_engine.py:758:
+  backend\scanner\nse_data_engine.py:759:# ============================================================
+  backend\scanner\nse_data_engine.py:760:# SYMBOL COUNT
+  backend\scanner\nse_data_engine.py:761:# ============================================================
+  backend\scanner\nse_data_engine.py:762:
+  backend\scanner\nse_data_engine.py:763:    @property
+  backend\scanner\nse_data_engine.py:764:    def symbol_count(
+  backend\scanner\nse_data_engine.py:765:        self,
+  backend\scanner\nse_data_engine.py:766:    ) -> int:
+  backend\scanner\nse_data_engine.py:767:
+  backend\scanner\nse_data_engine.py:768:        return len(
+> backend\scanner\nse_data_engine.py:769:            self.market_data
+  backend\scanner\nse_data_engine.py:770:        )
+  backend\scanner\nse_data_engine.py:771:
+  backend\scanner\nse_data_engine.py:772:
+  backend\scanner\nse_data_engine.py:773:# ============================================================
+  backend\scanner\nse_data_engine.py:774:# LOAD INDICES
+  backend\scanner\nse_data_engine.py:775:# ============================================================
+  backend\scanner\nse_data_engine.py:776:
+> backend\scanner\nse_data_engine.py:777:    def load_indices(
+  backend\scanner\nse_data_engine.py:778:        self,
+  backend\scanner\nse_data_engine.py:779:    ) -> None:
+  backend\scanner\nse_data_engine.py:780:
+  backend\scanner\nse_data_engine.py:781:        self.update_status(
+  backend\scanner\nse_data_engine.py:782:            "Loading indices..."
+  backend\scanner\nse_data_engine.py:783:        )
+  backend\scanner\nse_data_engine.py:784:
+  backend\scanner\nse_data_engine.py:785:        # TODO:
+  backend\scanner\nse_data_engine.py:786:        # Fetch:
+  backend\scanner\nse_data_engine.py:787:        # NIFTY 50
+  backend\scanner\nse_data_engine.py:788:        # BANK NIFTY
+  backend\scanner\nse_data_engine.py:789:        # FINNIFTY
+  backend\scanner\nse_data_engine.py:790:        # MIDCAP
+  backend\scanner\nse_data_engine.py:791:        # SENSEX
+  backend\scanner\nse_data_engine.py:852:# ============================================================
+  backend\scanner\nse_data_engine.py:853:# LOAD MARKET BREADTH
+  backend\scanner\nse_data_engine.py:854:# ============================================================
+  backend\scanner\nse_data_engine.py:855:
+> backend\scanner\nse_data_engine.py:856:    def load_market_breadth(
+  backend\scanner\nse_data_engine.py:857:        self,
+  backend\scanner\nse_data_engine.py:858:    ) -> None:
+  backend\scanner\nse_data_engine.py:859:
+  backend\scanner\nse_data_engine.py:860:        self.market_breadth = {
+  backend\scanner\nse_data_engine.py:861:
+  backend\scanner\nse_data_engine.py:862:            "Advances": 0,
+  backend\scanner\nse_data_engine.py:863:
+  backend\scanner\nse_data_engine.py:864:            "Declines": 0,
+  backend\scanner\nse_data_engine.py:865:
+  backend\scanner\nse_data_engine.py:866:            "Unchanged": 0,
+  backend\scanner\nse_data_engine.py:867:
+  backend\scanner\nse_data_engine.py:868:            "AdvanceRatio": 0,
+  backend\scanner\nse_data_engine.py:869:
+  backend\scanner\nse_data_engine.py:870:        }
+  backend\scanner\nse_data_engine.py:992:        self,
+  backend\scanner\nse_data_engine.py:993:        symbol: str,
+  backend\scanner\nse_data_engine.py:994:    ) -> None:
+  backend\scanner\nse_data_engine.py:995:
+> backend\scanner\nse_data_engine.py:996:        if symbol not in self.market_data:
+  backend\scanner\nse_data_engine.py:997:            return
+  backend\scanner\nse_data_engine.py:998:
+  backend\scanner\nse_data_engine.py:999:        # --------------------------------------------
+  backend\scanner\nse_data_engine.py:1000:        # Provider will replace this placeholder
+  backend\scanner\nse_data_engine.py:1001:        # --------------------------------------------
+  backend\scanner\nse_data_engine.py:1002:
+> backend\scanner\nse_data_engine.py:1003:        df = self.market_data[symbol]
+  backend\scanner\nse_data_engine.py:1004:
+> backend\scanner\nse_data_engine.py:1005:        self.market_data[symbol] = df
+  backend\scanner\nse_data_engine.py:1006:
+  backend\scanner\nse_data_engine.py:1007:
+  backend\scanner\nse_data_engine.py:1008:# ============================================================
+  backend\scanner\nse_data_engine.py:1009:# REFRESH WATCHLIST
+  backend\scanner\nse_data_engine.py:1010:# ============================================================
+  backend\scanner\nse_data_engine.py:1011:
+  backend\scanner\nse_data_engine.py:1012:    def refresh_watchlist(
+  backend\scanner\nse_data_engine.py:1013:        self,
+  backend\scanner\nse_data_engine.py:1014:    ) -> None:
+  backend\scanner\nse_data_engine.py:1015:
+  backend\scanner\nse_data_engine.py:1016:        if not self.watchlist:
+  backend\scanner\nse_data_engine.py:1017:            return
+  backend\scanner\nse_data_engine.py:1018:
+  backend\scanner\nse_data_engine.py:1019:        self.incremental_refresh(
+  backend\scanner\nse_data_engine.py:1024:# ============================================================
+  backend\scanner\nse_data_engine.py:1025:# LIVE UPDATE
+  backend\scanner\nse_data_engine.py:1026:# ============================================================
+  backend\scanner\nse_data_engine.py:1027:
+> backend\scanner\nse_data_engine.py:1028:    def live_update(
+  backend\scanner\nse_data_engine.py:1029:        self,
+  backend\scanner\nse_data_engine.py:1030:    ) -> None:
+  backend\scanner\nse_data_engine.py:1031:
+  backend\scanner\nse_data_engine.py:1032:        self.load_live_market()
+  backend\scanner\nse_data_engine.py:1033:
+  backend\scanner\nse_data_engine.py:1034:        self.load_indices()
+  backend\scanner\nse_data_engine.py:1035:
+  backend\scanner\nse_data_engine.py:1036:        self.load_market_breadth()
+  backend\scanner\nse_data_engine.py:1037:
+  backend\scanner\nse_data_engine.py:1038:        self.update_top_gainers()
+  backend\scanner\nse_data_engine.py:1039:
+  backend\scanner\nse_data_engine.py:1040:        self.update_top_losers()
+  backend\scanner\nse_data_engine.py:1041:
+  backend\scanner\nse_data_engine.py:1042:        self.last_refresh = datetime.now()
+  backend\scanner\nse_data_engine.py:1045:# ============================================================
+  backend\scanner\nse_data_engine.py:1046:# FULL MARKET REFRESH
+  backend\scanner\nse_data_engine.py:1047:# ============================================================
+  backend\scanner\nse_data_engine.py:1048:
+> backend\scanner\nse_data_engine.py:1049:    def full_refresh(
+  backend\scanner\nse_data_engine.py:1050:        self,
+  backend\scanner\nse_data_engine.py:1051:    ) -> None:
+  backend\scanner\nse_data_engine.py:1052:
+  backend\scanner\nse_data_engine.py:1053:        self.update_status(
+  backend\scanner\nse_data_engine.py:1054:            "Running full market refresh..."
+  backend\scanner\nse_data_engine.py:1055:        )
+  backend\scanner\nse_data_engine.py:1056:
+  backend\scanner\nse_data_engine.py:1057:        self.load_previous_day_data()
+  backend\scanner\nse_data_engine.py:1058:
+  backend\scanner\nse_data_engine.py:1059:        self.load_live_market()
+  backend\scanner\nse_data_engine.py:1060:
+  backend\scanner\nse_data_engine.py:1061:        self.load_indices()
+  backend\scanner\nse_data_engine.py:1062:
+  backend\scanner\nse_data_engine.py:1063:        self.load_market_breadth()
+  backend\scanner\nse_data_engine.py:1082:    ) -> None:
+  backend\scanner\nse_data_engine.py:1083:
+  backend\scanner\nse_data_engine.py:1084:        rows = []
+  backend\scanner\nse_data_engine.py:1085:
+> backend\scanner\nse_data_engine.py:1086:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1087:
+  backend\scanner\nse_data_engine.py:1088:            if df.empty:
+  backend\scanner\nse_data_engine.py:1089:                continue
+  backend\scanner\nse_data_engine.py:1090:
+  backend\scanner\nse_data_engine.py:1091:            last = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1092:
+  backend\scanner\nse_data_engine.py:1093:            rows.append(
+  backend\scanner\nse_data_engine.py:1094:
+  backend\scanner\nse_data_engine.py:1095:                {
+  backend\scanner\nse_data_engine.py:1096:
+  backend\scanner\nse_data_engine.py:1097:                    "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:1098:
+  backend\scanner\nse_data_engine.py:1099:                    "Price": last.get("Close"),
+  backend\scanner\nse_data_engine.py:1100:
+  backend\scanner\nse_data_engine.py:1132:    ) -> None:
+  backend\scanner\nse_data_engine.py:1133:
+  backend\scanner\nse_data_engine.py:1134:        rows = []
+  backend\scanner\nse_data_engine.py:1135:
+> backend\scanner\nse_data_engine.py:1136:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1137:
+  backend\scanner\nse_data_engine.py:1138:            if df.empty:
+  backend\scanner\nse_data_engine.py:1139:                continue
+  backend\scanner\nse_data_engine.py:1140:
+  backend\scanner\nse_data_engine.py:1141:            last = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1142:
+  backend\scanner\nse_data_engine.py:1143:            rows.append(
+  backend\scanner\nse_data_engine.py:1144:
+  backend\scanner\nse_data_engine.py:1145:                {
+  backend\scanner\nse_data_engine.py:1146:
+  backend\scanner\nse_data_engine.py:1147:                    "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:1148:
+  backend\scanner\nse_data_engine.py:1149:                    "Price": last.get("Close"),
+  backend\scanner\nse_data_engine.py:1150:
+  backend\scanner\nse_data_engine.py:1257:            "Status": self.market_status(),
+  backend\scanner\nse_data_engine.py:1258:
+  backend\scanner\nse_data_engine.py:1259:            "Last Update": self.last_refresh,
+  backend\scanner\nse_data_engine.py:1260:
+> backend\scanner\nse_data_engine.py:1261:            "Stocks": len(self.market_data),
+  backend\scanner\nse_data_engine.py:1262:
+  backend\scanner\nse_data_engine.py:1263:            "Indices": self.indices,
+  backend\scanner\nse_data_engine.py:1264:
+  backend\scanner\nse_data_engine.py:1265:            "Breadth": self.market_breadth,
+  backend\scanner\nse_data_engine.py:1266:
+  backend\scanner\nse_data_engine.py:1267:            "Top Gainers": self.top_gainers,
+  backend\scanner\nse_data_engine.py:1268:
+  backend\scanner\nse_data_engine.py:1269:            "Top Losers": self.top_losers,
+  backend\scanner\nse_data_engine.py:1270:
+  backend\scanner\nse_data_engine.py:1271:            # Normalized dashboard key
+  backend\scanner\nse_data_engine.py:1272:            "institutional": institutional,
+  backend\scanner\nse_data_engine.py:1273:
+  backend\scanner\nse_data_engine.py:1274:        }
+  backend\scanner\nse_data_engine.py:1275:
+  backend\scanner\nse_data_engine.py:1338:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:1339:
+  backend\scanner\nse_data_engine.py:1340:        rows = []
+  backend\scanner\nse_data_engine.py:1341:
+> backend\scanner\nse_data_engine.py:1342:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1343:
+  backend\scanner\nse_data_engine.py:1344:            if len(df) < 2:
+  backend\scanner\nse_data_engine.py:1345:
+  backend\scanner\nse_data_engine.py:1346:                continue
+  backend\scanner\nse_data_engine.py:1347:
+  backend\scanner\nse_data_engine.py:1348:            previous = df.iloc[-2]
+  backend\scanner\nse_data_engine.py:1349:
+  backend\scanner\nse_data_engine.py:1350:            current = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1351:
+  backend\scanner\nse_data_engine.py:1352:            previous_close = previous["Close"]
+  backend\scanner\nse_data_engine.py:1353:
+  backend\scanner\nse_data_engine.py:1354:            open_price = current["Open"]
+  backend\scanner\nse_data_engine.py:1355:
+  backend\scanner\nse_data_engine.py:1356:            gap = (
+  backend\scanner\nse_data_engine.py:1396:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:1397:
+  backend\scanner\nse_data_engine.py:1398:        rows = []
+  backend\scanner\nse_data_engine.py:1399:
+> backend\scanner\nse_data_engine.py:1400:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1401:
+  backend\scanner\nse_data_engine.py:1402:            if len(df) < 2:
+  backend\scanner\nse_data_engine.py:1403:
+  backend\scanner\nse_data_engine.py:1404:                continue
+  backend\scanner\nse_data_engine.py:1405:
+  backend\scanner\nse_data_engine.py:1406:            previous = df.iloc[-2]
+  backend\scanner\nse_data_engine.py:1407:
+  backend\scanner\nse_data_engine.py:1408:            current = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1409:
+  backend\scanner\nse_data_engine.py:1410:            previous_close = previous["Close"]
+  backend\scanner\nse_data_engine.py:1411:
+  backend\scanner\nse_data_engine.py:1412:            open_price = current["Open"]
+  backend\scanner\nse_data_engine.py:1413:
+  backend\scanner\nse_data_engine.py:1414:            gap = (
+  backend\scanner\nse_data_engine.py:1455:        grouped = {}
+  backend\scanner\nse_data_engine.py:1456:
+  backend\scanner\nse_data_engine.py:1457:        for symbol, sector in self.sectors.items():
+  backend\scanner\nse_data_engine.py:1458:
+> backend\scanner\nse_data_engine.py:1459:            if symbol not in self.market_data:
+  backend\scanner\nse_data_engine.py:1460:
+  backend\scanner\nse_data_engine.py:1461:                continue
+  backend\scanner\nse_data_engine.py:1462:
+> backend\scanner\nse_data_engine.py:1463:            df = self.market_data[symbol]
+  backend\scanner\nse_data_engine.py:1464:
+  backend\scanner\nse_data_engine.py:1465:            if df.empty:
+  backend\scanner\nse_data_engine.py:1466:
+  backend\scanner\nse_data_engine.py:1467:                continue
+  backend\scanner\nse_data_engine.py:1468:
+  backend\scanner\nse_data_engine.py:1469:            change = df.iloc[-1].get(
+  backend\scanner\nse_data_engine.py:1470:
+  backend\scanner\nse_data_engine.py:1471:                "ChangePercent",
+  backend\scanner\nse_data_engine.py:1472:
+  backend\scanner\nse_data_engine.py:1473:                0,
+  backend\scanner\nse_data_engine.py:1474:
+  backend\scanner\nse_data_engine.py:1475:            )
+  backend\scanner\nse_data_engine.py:1476:
+  backend\scanner\nse_data_engine.py:1477:            grouped.setdefault(
+  backend\scanner\nse_data_engine.py:1516:    def calculate_rvol(
+  backend\scanner\nse_data_engine.py:1517:        self,
+  backend\scanner\nse_data_engine.py:1518:    ) -> None:
+  backend\scanner\nse_data_engine.py:1519:
+> backend\scanner\nse_data_engine.py:1520:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1521:
+  backend\scanner\nse_data_engine.py:1522:            if len(df) < 21:
+  backend\scanner\nse_data_engine.py:1523:
+  backend\scanner\nse_data_engine.py:1524:                continue
+  backend\scanner\nse_data_engine.py:1525:
+  backend\scanner\nse_data_engine.py:1526:            avg = df["Volume"].tail(20).mean()
+  backend\scanner\nse_data_engine.py:1527:
+  backend\scanner\nse_data_engine.py:1528:            current = df.iloc[-1]["Volume"]
+  backend\scanner\nse_data_engine.py:1529:
+  backend\scanner\nse_data_engine.py:1530:            rvol = current / avg if avg else 0
+  backend\scanner\nse_data_engine.py:1531:
+> backend\scanner\nse_data_engine.py:1532:            self.market_data[symbol].loc[
+  backend\scanner\nse_data_engine.py:1533:
+  backend\scanner\nse_data_engine.py:1534:                df.index[-1],
+  backend\scanner\nse_data_engine.py:1535:
+  backend\scanner\nse_data_engine.py:1536:                "RVOL",
+  backend\scanner\nse_data_engine.py:1537:
+  backend\scanner\nse_data_engine.py:1538:            ] = round(rvol,2)
+  backend\scanner\nse_data_engine.py:1539:
+  backend\scanner\nse_data_engine.py:1540:
+  backend\scanner\nse_data_engine.py:1541:# ============================================================
+  backend\scanner\nse_data_engine.py:1542:# OPENING WATCHLIST
+  backend\scanner\nse_data_engine.py:1543:# ============================================================
+  backend\scanner\nse_data_engine.py:1544:
+  backend\scanner\nse_data_engine.py:1545:    def build_opening_watchlist(
+  backend\scanner\nse_data_engine.py:1546:        self,
+  backend\scanner\nse_data_engine.py:1547:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1548:
+  backend\scanner\nse_data_engine.py:1549:        watchlist = []
+  backend\scanner\nse_data_engine.py:1550:
+> backend\scanner\nse_data_engine.py:1551:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1552:
+  backend\scanner\nse_data_engine.py:1553:            if df.empty:
+  backend\scanner\nse_data_engine.py:1554:
+  backend\scanner\nse_data_engine.py:1555:                continue
+  backend\scanner\nse_data_engine.py:1556:
+  backend\scanner\nse_data_engine.py:1557:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1558:
+  backend\scanner\nse_data_engine.py:1559:            if (
+  backend\scanner\nse_data_engine.py:1560:
+  backend\scanner\nse_data_engine.py:1561:                row.get("RVOL",0) >= 2
+  backend\scanner\nse_data_engine.py:1562:
+  backend\scanner\nse_data_engine.py:1563:                and
+  backend\scanner\nse_data_engine.py:1564:
+  backend\scanner\nse_data_engine.py:1565:                row.get("ChangePercent",0) > 0
+  backend\scanner\nse_data_engine.py:1582:    ) -> Dict:
+  backend\scanner\nse_data_engine.py:1583:
+  backend\scanner\nse_data_engine.py:1584:        heat = {}
+  backend\scanner\nse_data_engine.py:1585:
+> backend\scanner\nse_data_engine.py:1586:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1587:
+  backend\scanner\nse_data_engine.py:1588:            if df.empty:
+  backend\scanner\nse_data_engine.py:1589:
+  backend\scanner\nse_data_engine.py:1590:                continue
+  backend\scanner\nse_data_engine.py:1591:
+  backend\scanner\nse_data_engine.py:1592:            heat[symbol] = df.iloc[-1].get(
+  backend\scanner\nse_data_engine.py:1593:
+  backend\scanner\nse_data_engine.py:1594:                "ChangePercent",
+  backend\scanner\nse_data_engine.py:1595:
+  backend\scanner\nse_data_engine.py:1596:                0,
+  backend\scanner\nse_data_engine.py:1597:
+  backend\scanner\nse_data_engine.py:1598:            )
+  backend\scanner\nse_data_engine.py:1599:
+  backend\scanner\nse_data_engine.py:1600:        self.heatmap = heat
+  backend\scanner\nse_data_engine.py:1612:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:1613:
+  backend\scanner\nse_data_engine.py:1614:        rows = []
+  backend\scanner\nse_data_engine.py:1615:
+> backend\scanner\nse_data_engine.py:1616:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1617:
+  backend\scanner\nse_data_engine.py:1618:            if df.empty:
+  backend\scanner\nse_data_engine.py:1619:
+  backend\scanner\nse_data_engine.py:1620:                continue
+  backend\scanner\nse_data_engine.py:1621:
+  backend\scanner\nse_data_engine.py:1622:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1623:
+  backend\scanner\nse_data_engine.py:1624:            if row.get("RVOL",0) < minimum_rvol:
+  backend\scanner\nse_data_engine.py:1625:
+  backend\scanner\nse_data_engine.py:1626:                continue
+  backend\scanner\nse_data_engine.py:1627:
+  backend\scanner\nse_data_engine.py:1628:            rows.append({
+  backend\scanner\nse_data_engine.py:1629:
+  backend\scanner\nse_data_engine.py:1630:                "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:1705:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:1706:
+  backend\scanner\nse_data_engine.py:1707:        candidates = []
+  backend\scanner\nse_data_engine.py:1708:
+> backend\scanner\nse_data_engine.py:1709:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1710:
+  backend\scanner\nse_data_engine.py:1711:            if len(df) < range_minutes + 2:
+  backend\scanner\nse_data_engine.py:1712:                continue
+  backend\scanner\nse_data_engine.py:1713:
+  backend\scanner\nse_data_engine.py:1714:            opening = df.iloc[:range_minutes]
+  backend\scanner\nse_data_engine.py:1715:
+  backend\scanner\nse_data_engine.py:1716:            orb_high = opening["High"].max()
+  backend\scanner\nse_data_engine.py:1717:            orb_low = opening["Low"].min()
+  backend\scanner\nse_data_engine.py:1718:
+  backend\scanner\nse_data_engine.py:1719:            latest = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1720:
+  backend\scanner\nse_data_engine.py:1721:            if latest["Close"] > orb_high:
+  backend\scanner\nse_data_engine.py:1722:
+  backend\scanner\nse_data_engine.py:1723:                candidates.append({
+  backend\scanner\nse_data_engine.py:1758:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1759:
+  backend\scanner\nse_data_engine.py:1760:        output = []
+  backend\scanner\nse_data_engine.py:1761:
+> backend\scanner\nse_data_engine.py:1762:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1763:
+  backend\scanner\nse_data_engine.py:1764:            if df.empty:
+  backend\scanner\nse_data_engine.py:1765:                continue
+  backend\scanner\nse_data_engine.py:1766:
+  backend\scanner\nse_data_engine.py:1767:            latest = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1768:
+  backend\scanner\nse_data_engine.py:1769:            if latest["Close"] > latest.get("VWAP", 0):
+  backend\scanner\nse_data_engine.py:1770:
+  backend\scanner\nse_data_engine.py:1771:                output.append(symbol)
+  backend\scanner\nse_data_engine.py:1772:
+  backend\scanner\nse_data_engine.py:1773:        return output
+  backend\scanner\nse_data_engine.py:1774:
+  backend\scanner\nse_data_engine.py:1775:
+  backend\scanner\nse_data_engine.py:1776:# ============================================================
+  backend\scanner\nse_data_engine.py:1782:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1783:
+  backend\scanner\nse_data_engine.py:1784:        trend = []
+  backend\scanner\nse_data_engine.py:1785:
+> backend\scanner\nse_data_engine.py:1786:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1787:
+  backend\scanner\nse_data_engine.py:1788:            if df.empty:
+  backend\scanner\nse_data_engine.py:1789:                continue
+  backend\scanner\nse_data_engine.py:1790:
+  backend\scanner\nse_data_engine.py:1791:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1792:
+  backend\scanner\nse_data_engine.py:1793:            if (
+  backend\scanner\nse_data_engine.py:1794:
+  backend\scanner\nse_data_engine.py:1795:                row.get("EMA21", 0)
+  backend\scanner\nse_data_engine.py:1796:
+  backend\scanner\nse_data_engine.py:1797:                >
+  backend\scanner\nse_data_engine.py:1798:
+  backend\scanner\nse_data_engine.py:1799:                row.get("EMA50", 0)
+  backend\scanner\nse_data_engine.py:1800:
+  backend\scanner\nse_data_engine.py:1814:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1815:
+  backend\scanner\nse_data_engine.py:1816:        output = []
+  backend\scanner\nse_data_engine.py:1817:
+> backend\scanner\nse_data_engine.py:1818:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1819:
+  backend\scanner\nse_data_engine.py:1820:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1821:
+  backend\scanner\nse_data_engine.py:1822:            if (
+  backend\scanner\nse_data_engine.py:1823:
+  backend\scanner\nse_data_engine.py:1824:                row.get("MACD", 0)
+  backend\scanner\nse_data_engine.py:1825:
+  backend\scanner\nse_data_engine.py:1826:                >
+  backend\scanner\nse_data_engine.py:1827:
+  backend\scanner\nse_data_engine.py:1828:                row.get("MACD_SIGNAL", 0)
+  backend\scanner\nse_data_engine.py:1829:
+  backend\scanner\nse_data_engine.py:1830:            ):
+  backend\scanner\nse_data_engine.py:1831:
+  backend\scanner\nse_data_engine.py:1832:                output.append(symbol)
+  backend\scanner\nse_data_engine.py:1844:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1845:
+  backend\scanner\nse_data_engine.py:1846:        output = []
+  backend\scanner\nse_data_engine.py:1847:
+> backend\scanner\nse_data_engine.py:1848:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1849:
+  backend\scanner\nse_data_engine.py:1850:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1851:
+  backend\scanner\nse_data_engine.py:1852:            if row.get("ADX", 0) >= minimum:
+  backend\scanner\nse_data_engine.py:1853:
+  backend\scanner\nse_data_engine.py:1854:                output.append(symbol)
+  backend\scanner\nse_data_engine.py:1855:
+  backend\scanner\nse_data_engine.py:1856:        return output
+  backend\scanner\nse_data_engine.py:1857:
+  backend\scanner\nse_data_engine.py:1858:
+  backend\scanner\nse_data_engine.py:1859:# ============================================================
+  backend\scanner\nse_data_engine.py:1860:# VOLUME BREAKOUT
+  backend\scanner\nse_data_engine.py:1861:# ============================================================
+  backend\scanner\nse_data_engine.py:1862:
+  backend\scanner\nse_data_engine.py:1866:    ) -> List[str]:
+  backend\scanner\nse_data_engine.py:1867:
+  backend\scanner\nse_data_engine.py:1868:        output = []
+  backend\scanner\nse_data_engine.py:1869:
+> backend\scanner\nse_data_engine.py:1870:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:1871:
+  backend\scanner\nse_data_engine.py:1872:            if len(df) < 21:
+  backend\scanner\nse_data_engine.py:1873:                continue
+  backend\scanner\nse_data_engine.py:1874:
+  backend\scanner\nse_data_engine.py:1875:            avg = df["Volume"].tail(20).mean()
+  backend\scanner\nse_data_engine.py:1876:
+  backend\scanner\nse_data_engine.py:1877:            current = df.iloc[-1]["Volume"]
+  backend\scanner\nse_data_engine.py:1878:
+  backend\scanner\nse_data_engine.py:1879:            if current >= avg * multiplier:
+  backend\scanner\nse_data_engine.py:1880:
+  backend\scanner\nse_data_engine.py:1881:                output.append(symbol)
+  backend\scanner\nse_data_engine.py:1882:
+  backend\scanner\nse_data_engine.py:1883:        return output
+  backend\scanner\nse_data_engine.py:1884:
+  backend\scanner\nse_data_engine.py:1914:    ) -> int:
+  backend\scanner\nse_data_engine.py:1915:
+  backend\scanner\nse_data_engine.py:1916:        score = 0
+  backend\scanner\nse_data_engine.py:1917:
+> backend\scanner\nse_data_engine.py:1918:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:1919:
+  backend\scanner\nse_data_engine.py:1920:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:1921:
+  backend\scanner\nse_data_engine.py:1922:            return score
+  backend\scanner\nse_data_engine.py:1923:
+  backend\scanner\nse_data_engine.py:1924:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:1925:
+  backend\scanner\nse_data_engine.py:1926:        if row.get("Close", 0) > row.get("VWAP", 0):
+  backend\scanner\nse_data_engine.py:1927:            score += 15
+  backend\scanner\nse_data_engine.py:1928:
+  backend\scanner\nse_data_engine.py:1929:        if row.get("EMA21", 0) > row.get("EMA50", 0):
+  backend\scanner\nse_data_engine.py:1930:            score += 15
+  backend\scanner\nse_data_engine.py:1931:
+  backend\scanner\nse_data_engine.py:1932:        if row.get("MACD", 0) > row.get("MACD_SIGNAL", 0):
+  backend\scanner\nse_data_engine.py:1957:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:1958:
+  backend\scanner\nse_data_engine.py:1959:        rows = []
+  backend\scanner\nse_data_engine.py:1960:
+> backend\scanner\nse_data_engine.py:1961:        for symbol in self.market_data.keys():
+  backend\scanner\nse_data_engine.py:1962:
+  backend\scanner\nse_data_engine.py:1963:            rows.append({
+  backend\scanner\nse_data_engine.py:1964:
+  backend\scanner\nse_data_engine.py:1965:                "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:1966:
+  backend\scanner\nse_data_engine.py:1967:                "Score": self.intraday_score(symbol),
+  backend\scanner\nse_data_engine.py:1968:
+  backend\scanner\nse_data_engine.py:1969:            })
+  backend\scanner\nse_data_engine.py:1970:
+  backend\scanner\nse_data_engine.py:1971:        return (
+  backend\scanner\nse_data_engine.py:1972:
+  backend\scanner\nse_data_engine.py:1973:            pd.DataFrame(rows)
+  backend\scanner\nse_data_engine.py:1974:
+  backend\scanner\nse_data_engine.py:1975:            .sort_values(
+  backend\scanner\nse_data_engine.py:2043:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2044:
+  backend\scanner\nse_data_engine.py:2045:        candidates = []
+  backend\scanner\nse_data_engine.py:2046:
+> backend\scanner\nse_data_engine.py:2047:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2048:
+  backend\scanner\nse_data_engine.py:2049:            if len(df) < 30:
+  backend\scanner\nse_data_engine.py:2050:                continue
+  backend\scanner\nse_data_engine.py:2051:
+  backend\scanner\nse_data_engine.py:2052:            contraction = (
+  backend\scanner\nse_data_engine.py:2053:
+  backend\scanner\nse_data_engine.py:2054:                df["High"].tail(10).max()
+  backend\scanner\nse_data_engine.py:2055:
+  backend\scanner\nse_data_engine.py:2056:                -
+  backend\scanner\nse_data_engine.py:2057:
+  backend\scanner\nse_data_engine.py:2058:                df["Low"].tail(10).min()
+  backend\scanner\nse_data_engine.py:2059:
+  backend\scanner\nse_data_engine.py:2060:            )
+  backend\scanner\nse_data_engine.py:2061:
+  backend\scanner\nse_data_engine.py:2093:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2094:
+  backend\scanner\nse_data_engine.py:2095:        rows = []
+  backend\scanner\nse_data_engine.py:2096:
+> backend\scanner\nse_data_engine.py:2097:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2098:
+  backend\scanner\nse_data_engine.py:2099:            if len(df) < 20:
+  backend\scanner\nse_data_engine.py:2100:                continue
+  backend\scanner\nse_data_engine.py:2101:
+  backend\scanner\nse_data_engine.py:2102:            change = (
+  backend\scanner\nse_data_engine.py:2103:
+  backend\scanner\nse_data_engine.py:2104:                df.iloc[-1]["Close"]
+  backend\scanner\nse_data_engine.py:2105:
+  backend\scanner\nse_data_engine.py:2106:                -
+  backend\scanner\nse_data_engine.py:2107:
+  backend\scanner\nse_data_engine.py:2108:                df.iloc[-20]["Close"]
+  backend\scanner\nse_data_engine.py:2109:
+  backend\scanner\nse_data_engine.py:2110:            ) / df.iloc[-20]["Close"] * 100
+  backend\scanner\nse_data_engine.py:2111:
+  backend\scanner\nse_data_engine.py:2133:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2134:
+  backend\scanner\nse_data_engine.py:2135:        rows = []
+  backend\scanner\nse_data_engine.py:2136:
+> backend\scanner\nse_data_engine.py:2137:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2138:
+  backend\scanner\nse_data_engine.py:2139:            if len(df) < 30:
+  backend\scanner\nse_data_engine.py:2140:                continue
+  backend\scanner\nse_data_engine.py:2141:
+  backend\scanner\nse_data_engine.py:2142:            highs = df["High"].tail(15)
+  backend\scanner\nse_data_engine.py:2143:
+  backend\scanner\nse_data_engine.py:2144:            lows = df["Low"].tail(15)
+  backend\scanner\nse_data_engine.py:2145:
+  backend\scanner\nse_data_engine.py:2146:            if (
+  backend\scanner\nse_data_engine.py:2147:
+  backend\scanner\nse_data_engine.py:2148:                highs.iloc[-1] < highs.iloc[0]
+  backend\scanner\nse_data_engine.py:2149:
+  backend\scanner\nse_data_engine.py:2150:                and
+  backend\scanner\nse_data_engine.py:2151:
+  backend\scanner\nse_data_engine.py:2175:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2176:
+  backend\scanner\nse_data_engine.py:2177:        rows = []
+  backend\scanner\nse_data_engine.py:2178:
+> backend\scanner\nse_data_engine.py:2179:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2180:
+  backend\scanner\nse_data_engine.py:2181:            if len(df) < 60:
+  backend\scanner\nse_data_engine.py:2182:                continue
+  backend\scanner\nse_data_engine.py:2183:
+  backend\scanner\nse_data_engine.py:2184:            highest = df["High"].tail(60).max()
+  backend\scanner\nse_data_engine.py:2185:
+  backend\scanner\nse_data_engine.py:2186:            latest = df.iloc[-1]["Close"]
+  backend\scanner\nse_data_engine.py:2187:
+  backend\scanner\nse_data_engine.py:2188:            if latest >= highest * 0.97:
+  backend\scanner\nse_data_engine.py:2189:
+  backend\scanner\nse_data_engine.py:2190:                rows.append({
+  backend\scanner\nse_data_engine.py:2191:
+  backend\scanner\nse_data_engine.py:2192:                    "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2193:
+  backend\scanner\nse_data_engine.py:2209:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2210:
+  backend\scanner\nse_data_engine.py:2211:        rows = []
+  backend\scanner\nse_data_engine.py:2212:
+> backend\scanner\nse_data_engine.py:2213:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2214:
+  backend\scanner\nse_data_engine.py:2215:            if len(df) < 5:
+  backend\scanner\nse_data_engine.py:2216:                continue
+  backend\scanner\nse_data_engine.py:2217:
+  backend\scanner\nse_data_engine.py:2218:            weekly_high = df["High"].tail(5).max()
+  backend\scanner\nse_data_engine.py:2219:
+  backend\scanner\nse_data_engine.py:2220:            if df.iloc[-1]["Close"] > weekly_high:
+  backend\scanner\nse_data_engine.py:2221:
+  backend\scanner\nse_data_engine.py:2222:                rows.append({
+  backend\scanner\nse_data_engine.py:2223:
+  backend\scanner\nse_data_engine.py:2224:                    "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2225:
+  backend\scanner\nse_data_engine.py:2226:                    "Breakout": "Weekly",
+  backend\scanner\nse_data_engine.py:2227:
+  backend\scanner\nse_data_engine.py:2239:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2240:
+  backend\scanner\nse_data_engine.py:2241:        rows = []
+  backend\scanner\nse_data_engine.py:2242:
+> backend\scanner\nse_data_engine.py:2243:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2244:
+  backend\scanner\nse_data_engine.py:2245:            if len(df) < 22:
+  backend\scanner\nse_data_engine.py:2246:                continue
+  backend\scanner\nse_data_engine.py:2247:
+  backend\scanner\nse_data_engine.py:2248:            monthly_high = df["High"].tail(22).max()
+  backend\scanner\nse_data_engine.py:2249:
+  backend\scanner\nse_data_engine.py:2250:            if df.iloc[-1]["Close"] > monthly_high:
+  backend\scanner\nse_data_engine.py:2251:
+  backend\scanner\nse_data_engine.py:2252:                rows.append({
+  backend\scanner\nse_data_engine.py:2253:
+  backend\scanner\nse_data_engine.py:2254:                    "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2255:
+  backend\scanner\nse_data_engine.py:2256:                    "Breakout": "Monthly",
+  backend\scanner\nse_data_engine.py:2257:
+  backend\scanner\nse_data_engine.py:2269:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2270:
+  backend\scanner\nse_data_engine.py:2271:        rows = []
+  backend\scanner\nse_data_engine.py:2272:
+> backend\scanner\nse_data_engine.py:2273:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2274:
+  backend\scanner\nse_data_engine.py:2275:            if len(df) < 252:
+  backend\scanner\nse_data_engine.py:2276:                continue
+  backend\scanner\nse_data_engine.py:2277:
+  backend\scanner\nse_data_engine.py:2278:            high = df["High"].tail(252).max()
+  backend\scanner\nse_data_engine.py:2279:
+  backend\scanner\nse_data_engine.py:2280:            latest = df.iloc[-1]["Close"]
+  backend\scanner\nse_data_engine.py:2281:
+  backend\scanner\nse_data_engine.py:2282:            distance = (
+  backend\scanner\nse_data_engine.py:2283:
+  backend\scanner\nse_data_engine.py:2284:                (high - latest)
+  backend\scanner\nse_data_engine.py:2285:
+  backend\scanner\nse_data_engine.py:2286:                / high
+  backend\scanner\nse_data_engine.py:2287:
+  backend\scanner\nse_data_engine.py:2310:    ) -> int:
+  backend\scanner\nse_data_engine.py:2311:
+  backend\scanner\nse_data_engine.py:2312:        score = 0
+  backend\scanner\nse_data_engine.py:2313:
+> backend\scanner\nse_data_engine.py:2314:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2315:
+  backend\scanner\nse_data_engine.py:2316:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:2317:            return score
+  backend\scanner\nse_data_engine.py:2318:
+  backend\scanner\nse_data_engine.py:2319:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2320:
+  backend\scanner\nse_data_engine.py:2321:        if row.get("EMA21", 0) > row.get("EMA50", 0):
+  backend\scanner\nse_data_engine.py:2322:            score += 20
+  backend\scanner\nse_data_engine.py:2323:
+  backend\scanner\nse_data_engine.py:2324:        if row.get("MACD", 0) > row.get("MACD_SIGNAL", 0):
+  backend\scanner\nse_data_engine.py:2325:            score += 20
+  backend\scanner\nse_data_engine.py:2326:
+  backend\scanner\nse_data_engine.py:2327:        if row.get("ADX", 0) > 20:
+  backend\scanner\nse_data_engine.py:2328:            score += 15
+  backend\scanner\nse_data_engine.py:2349:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2350:
+  backend\scanner\nse_data_engine.py:2351:        rows = []
+  backend\scanner\nse_data_engine.py:2352:
+> backend\scanner\nse_data_engine.py:2353:        for symbol in self.market_data.keys():
+  backend\scanner\nse_data_engine.py:2354:
+  backend\scanner\nse_data_engine.py:2355:            rows.append({
+  backend\scanner\nse_data_engine.py:2356:
+  backend\scanner\nse_data_engine.py:2357:                "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2358:
+  backend\scanner\nse_data_engine.py:2359:                "Score": self.swing_score(symbol),
+  backend\scanner\nse_data_engine.py:2360:
+  backend\scanner\nse_data_engine.py:2361:            })
+  backend\scanner\nse_data_engine.py:2362:
+  backend\scanner\nse_data_engine.py:2363:        return (
+  backend\scanner\nse_data_engine.py:2364:
+  backend\scanner\nse_data_engine.py:2365:            pd.DataFrame(rows)
+  backend\scanner\nse_data_engine.py:2366:
+  backend\scanner\nse_data_engine.py:2367:            .sort_values(
+  backend\scanner\nse_data_engine.py:2425:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2426:
+  backend\scanner\nse_data_engine.py:2427:        rows = []
+  backend\scanner\nse_data_engine.py:2428:
+> backend\scanner\nse_data_engine.py:2429:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2430:
+  backend\scanner\nse_data_engine.py:2431:            if df.empty:
+  backend\scanner\nse_data_engine.py:2432:                continue
+  backend\scanner\nse_data_engine.py:2433:
+  backend\scanner\nse_data_engine.py:2434:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2435:
+  backend\scanner\nse_data_engine.py:2436:            ema50 = row.get("EMA50", 0)
+  backend\scanner\nse_data_engine.py:2437:            ema200 = row.get("EMA200", 0)
+  backend\scanner\nse_data_engine.py:2438:            price = row.get("Close", 0)
+  backend\scanner\nse_data_engine.py:2439:
+  backend\scanner\nse_data_engine.py:2440:            if price > ema50 > ema200:
+  backend\scanner\nse_data_engine.py:2441:
+  backend\scanner\nse_data_engine.py:2442:                stage = "Stage 2 Uptrend"
+  backend\scanner\nse_data_engine.py:2443:
+  backend\scanner\nse_data_engine.py:2475:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2476:
+  backend\scanner\nse_data_engine.py:2477:        rows = []
+  backend\scanner\nse_data_engine.py:2478:
+> backend\scanner\nse_data_engine.py:2479:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2480:
+  backend\scanner\nse_data_engine.py:2481:            if df.empty:
+  backend\scanner\nse_data_engine.py:2482:                continue
+  backend\scanner\nse_data_engine.py:2483:
+  backend\scanner\nse_data_engine.py:2484:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2485:
+  backend\scanner\nse_data_engine.py:2486:            rows.append({
+  backend\scanner\nse_data_engine.py:2487:
+  backend\scanner\nse_data_engine.py:2488:                "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2489:
+  backend\scanner\nse_data_engine.py:2490:                "Above 200 EMA":
+  backend\scanner\nse_data_engine.py:2491:
+  backend\scanner\nse_data_engine.py:2492:                    row.get("Close",0)
+  backend\scanner\nse_data_engine.py:2493:
+  backend\scanner\nse_data_engine.py:2523:        )
+  backend\scanner\nse_data_engine.py:2524:
+  backend\scanner\nse_data_engine.py:2525:        rows = []
+  backend\scanner\nse_data_engine.py:2526:
+> backend\scanner\nse_data_engine.py:2527:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2528:
+  backend\scanner\nse_data_engine.py:2529:            if df.empty:
+  backend\scanner\nse_data_engine.py:2530:                continue
+  backend\scanner\nse_data_engine.py:2531:
+  backend\scanner\nse_data_engine.py:2532:            row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2533:
+  backend\scanner\nse_data_engine.py:2534:            rs = row.get(
+  backend\scanner\nse_data_engine.py:2535:
+  backend\scanner\nse_data_engine.py:2536:                "ChangePercent",
+  backend\scanner\nse_data_engine.py:2537:
+  backend\scanner\nse_data_engine.py:2538:                0,
+  backend\scanner\nse_data_engine.py:2539:
+  backend\scanner\nse_data_engine.py:2540:            ) - nifty_change
+  backend\scanner\nse_data_engine.py:2541:
+  backend\scanner\nse_data_engine.py:2606:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2607:
+  backend\scanner\nse_data_engine.py:2608:        rows = []
+  backend\scanner\nse_data_engine.py:2609:
+> backend\scanner\nse_data_engine.py:2610:        for symbol, df in self.market_data.items():
+  backend\scanner\nse_data_engine.py:2611:
+  backend\scanner\nse_data_engine.py:2612:            if len(df) < 20:
+  backend\scanner\nse_data_engine.py:2613:                continue
+  backend\scanner\nse_data_engine.py:2614:
+  backend\scanner\nse_data_engine.py:2615:            avg_volume = df["Volume"].tail(20).mean()
+  backend\scanner\nse_data_engine.py:2616:
+  backend\scanner\nse_data_engine.py:2617:            latest = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2618:
+  backend\scanner\nse_data_engine.py:2619:            if (
+  backend\scanner\nse_data_engine.py:2620:
+  backend\scanner\nse_data_engine.py:2621:                latest["Volume"]
+  backend\scanner\nse_data_engine.py:2622:
+  backend\scanner\nse_data_engine.py:2623:                >=
+  backend\scanner\nse_data_engine.py:2624:
+  backend\scanner\nse_data_engine.py:2663:        self,
+  backend\scanner\nse_data_engine.py:2664:        symbol: str,
+  backend\scanner\nse_data_engine.py:2665:    ) -> bool:
+  backend\scanner\nse_data_engine.py:2666:
+> backend\scanner\nse_data_engine.py:2667:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2668:
+  backend\scanner\nse_data_engine.py:2669:        if df is None:
+  backend\scanner\nse_data_engine.py:2670:
+  backend\scanner\nse_data_engine.py:2671:            return False
+  backend\scanner\nse_data_engine.py:2672:
+  backend\scanner\nse_data_engine.py:2673:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2674:
+  backend\scanner\nse_data_engine.py:2675:        return (
+  backend\scanner\nse_data_engine.py:2676:
+  backend\scanner\nse_data_engine.py:2677:            row.get("EMA21",0)
+  backend\scanner\nse_data_engine.py:2678:
+  backend\scanner\nse_data_engine.py:2679:            >
+  backend\scanner\nse_data_engine.py:2680:
+  backend\scanner\nse_data_engine.py:2681:            row.get("EMA50",0)
+  backend\scanner\nse_data_engine.py:2697:    ) -> int:
+  backend\scanner\nse_data_engine.py:2698:
+  backend\scanner\nse_data_engine.py:2699:        score = 0
+  backend\scanner\nse_data_engine.py:2700:
+> backend\scanner\nse_data_engine.py:2701:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2702:
+  backend\scanner\nse_data_engine.py:2703:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:2704:            return score
+  backend\scanner\nse_data_engine.py:2705:
+  backend\scanner\nse_data_engine.py:2706:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2707:
+  backend\scanner\nse_data_engine.py:2708:        if row.get("Close",0) > row.get("EMA200",0):
+  backend\scanner\nse_data_engine.py:2709:            score += 20
+  backend\scanner\nse_data_engine.py:2710:
+  backend\scanner\nse_data_engine.py:2711:        if row.get("EMA50",0) > row.get("EMA200",0):
+  backend\scanner\nse_data_engine.py:2712:            score += 20
+  backend\scanner\nse_data_engine.py:2713:
+  backend\scanner\nse_data_engine.py:2714:        if row.get("EMA21",0) > row.get("EMA50",0):
+  backend\scanner\nse_data_engine.py:2715:            score += 15
+  backend\scanner\nse_data_engine.py:2739:    ) -> pd.DataFrame:
+  backend\scanner\nse_data_engine.py:2740:
+  backend\scanner\nse_data_engine.py:2741:        rows = []
+  backend\scanner\nse_data_engine.py:2742:
+> backend\scanner\nse_data_engine.py:2743:        for symbol in self.market_data.keys():
+  backend\scanner\nse_data_engine.py:2744:
+  backend\scanner\nse_data_engine.py:2745:            rows.append({
+  backend\scanner\nse_data_engine.py:2746:
+  backend\scanner\nse_data_engine.py:2747:                "Symbol": symbol,
+  backend\scanner\nse_data_engine.py:2748:
+  backend\scanner\nse_data_engine.py:2749:                "Score": self.positional_score(symbol),
+  backend\scanner\nse_data_engine.py:2750:
+  backend\scanner\nse_data_engine.py:2751:            })
+  backend\scanner\nse_data_engine.py:2752:
+  backend\scanner\nse_data_engine.py:2753:        return (
+  backend\scanner\nse_data_engine.py:2754:
+  backend\scanner\nse_data_engine.py:2755:            pd.DataFrame(rows)
+  backend\scanner\nse_data_engine.py:2756:
+  backend\scanner\nse_data_engine.py:2757:            .sort_values(
+  backend\scanner\nse_data_engine.py:2812:    ) -> float:
+  backend\scanner\nse_data_engine.py:2813:
+  backend\scanner\nse_data_engine.py:2814:        score = 0
+  backend\scanner\nse_data_engine.py:2815:
+> backend\scanner\nse_data_engine.py:2816:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2817:
+  backend\scanner\nse_data_engine.py:2818:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:2819:            return 0.0
+  backend\scanner\nse_data_engine.py:2820:
+  backend\scanner\nse_data_engine.py:2821:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2822:
+  backend\scanner\nse_data_engine.py:2823:        if row.get("Close", 0) > row.get("VWAP", 0):
+  backend\scanner\nse_data_engine.py:2824:            score += 15
+  backend\scanner\nse_data_engine.py:2825:
+  backend\scanner\nse_data_engine.py:2826:        if row.get("EMA21", 0) > row.get("EMA50", 0):
+  backend\scanner\nse_data_engine.py:2827:            score += 15
+  backend\scanner\nse_data_engine.py:2828:
+  backend\scanner\nse_data_engine.py:2829:        if row.get("EMA50", 0) > row.get("EMA200", 0):
+  backend\scanner\nse_data_engine.py:2830:            score += 15
+  backend\scanner\nse_data_engine.py:2855:        self,
+  backend\scanner\nse_data_engine.py:2856:        symbol: str,
+  backend\scanner\nse_data_engine.py:2857:    ) -> str:
+  backend\scanner\nse_data_engine.py:2858:
+> backend\scanner\nse_data_engine.py:2859:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2860:
+  backend\scanner\nse_data_engine.py:2861:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:2862:            return "HOLD"
+  backend\scanner\nse_data_engine.py:2863:
+  backend\scanner\nse_data_engine.py:2864:        row = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2865:
+  backend\scanner\nse_data_engine.py:2866:        bullish = (
+  backend\scanner\nse_data_engine.py:2867:
+  backend\scanner\nse_data_engine.py:2868:            row.get("EMA21", 0)
+  backend\scanner\nse_data_engine.py:2869:
+  backend\scanner\nse_data_engine.py:2870:            >
+  backend\scanner\nse_data_engine.py:2871:
+  backend\scanner\nse_data_engine.py:2872:            row.get("EMA50", 0)
+  backend\scanner\nse_data_engine.py:2873:
+  backend\scanner\nse_data_engine.py:2916:        self,
+  backend\scanner\nse_data_engine.py:2917:        symbol: str,
+  backend\scanner\nse_data_engine.py:2918:    ) -> float:
+  backend\scanner\nse_data_engine.py:2919:
+> backend\scanner\nse_data_engine.py:2920:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:2921:
+  backend\scanner\nse_data_engine.py:2922:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:2923:            return 0
+  backend\scanner\nse_data_engine.py:2924:
+  backend\scanner\nse_data_engine.py:2925:        latest = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:2926:
+  backend\scanner\nse_data_engine.py:2927:        return round(
+  backend\scanner\nse_data_engine.py:2928:
+  backend\scanner\nse_data_engine.py:2929:            latest["Low"],
+  backend\scanner\nse_data_engine.py:2930:
+  backend\scanner\nse_data_engine.py:2931:            2,
+  backend\scanner\nse_data_engine.py:2932:
+  backend\scanner\nse_data_engine.py:2933:        )
+  backend\scanner\nse_data_engine.py:2934:
+  backend\scanner\nse_data_engine.py:3046:        capital: float = 100000,
+  backend\scanner\nse_data_engine.py:3047:        risk_amount: float = 1000,
+  backend\scanner\nse_data_engine.py:3048:    ) -> Dict:
+  backend\scanner\nse_data_engine.py:3049:
+> backend\scanner\nse_data_engine.py:3050:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:3051:
+  backend\scanner\nse_data_engine.py:3052:        if df is None or df.empty:
+  backend\scanner\nse_data_engine.py:3053:
+  backend\scanner\nse_data_engine.py:3054:            return {}
+  backend\scanner\nse_data_engine.py:3055:
+  backend\scanner\nse_data_engine.py:3056:        latest = df.iloc[-1]
+  backend\scanner\nse_data_engine.py:3057:
+  backend\scanner\nse_data_engine.py:3058:        entry = latest["Close"]
+  backend\scanner\nse_data_engine.py:3059:
+  backend\scanner\nse_data_engine.py:3060:        direction = self.trade_direction(symbol)
+  backend\scanner\nse_data_engine.py:3061:
+  backend\scanner\nse_data_engine.py:3062:        stoploss = self.calculate_stoploss(symbol)
+  backend\scanner\nse_data_engine.py:3063:
+  backend\scanner\nse_data_engine.py:3064:        targets = self.calculate_targets(
+  backend\scanner\nse_data_engine.py:3429:        return {
+  backend\scanner\nse_data_engine.py:3430:
+  backend\scanner\nse_data_engine.py:3431:            "Date": datetime.now().date(),
+  backend\scanner\nse_data_engine.py:3432:
+> backend\scanner\nse_data_engine.py:3433:            "Scanned Stocks": len(self.market_data),
+  backend\scanner\nse_data_engine.py:3434:
+  backend\scanner\nse_data_engine.py:3435:            "Top Intraday":
+  backend\scanner\nse_data_engine.py:3436:
+  backend\scanner\nse_data_engine.py:3437:                self.top_intraday_candidates(),
+  backend\scanner\nse_data_engine.py:3438:
+  backend\scanner\nse_data_engine.py:3439:            "Top Swing":
+  backend\scanner\nse_data_engine.py:3440:
+  backend\scanner\nse_data_engine.py:3441:                self.top_swing_candidates(),
+  backend\scanner\nse_data_engine.py:3442:
+  backend\scanner\nse_data_engine.py:3443:            "Top Positional":
+  backend\scanner\nse_data_engine.py:3444:
+  backend\scanner\nse_data_engine.py:3445:                self.top_positional_candidates(),
+  backend\scanner\nse_data_engine.py:3446:
+  backend\scanner\nse_data_engine.py:3447:            "Market Breadth":
+  backend\scanner\nse_data_engine.py:3478:                self.cache_valid(),
+  backend\scanner\nse_data_engine.py:3479:
+  backend\scanner\nse_data_engine.py:3480:            "Stocks":
+  backend\scanner\nse_data_engine.py:3481:
+> backend\scanner\nse_data_engine.py:3482:                len(self.market_data),
+  backend\scanner\nse_data_engine.py:3483:
+  backend\scanner\nse_data_engine.py:3484:            "Last Refresh":
+  backend\scanner\nse_data_engine.py:3485:
+  backend\scanner\nse_data_engine.py:3486:                self.last_refresh,
+  backend\scanner\nse_data_engine.py:3487:
+  backend\scanner\nse_data_engine.py:3488:        }
+  backend\scanner\nse_data_engine.py:3489:
+  backend\scanner\nse_data_engine.py:3490:
+  backend\scanner\nse_data_engine.py:3491:# ============================================================
+  backend\scanner\nse_data_engine.py:3492:# SHUTDOWN
+  backend\scanner\nse_data_engine.py:3493:# ============================================================
+  backend\scanner\nse_data_engine.py:3494:
+  backend\scanner\nse_data_engine.py:3495:    def shutdown(
+  backend\scanner\nse_data_engine.py:3496:        self,
+  backend\scanner\nse_data_engine.py:3505:        self.stop_scheduler()
+  backend\scanner\nse_data_engine.py:3506:
+  backend\scanner\nse_data_engine.py:3507:        self.disconnect()
+  backend\scanner\nse_data_engine.py:3508:
+> backend\scanner\nse_data_engine.py:3509:        self.market_data.clear()
+  backend\scanner\nse_data_engine.py:3510:
+  backend\scanner\nse_data_engine.py:3511:        self.indices.clear()
+  backend\scanner\nse_data_engine.py:3512:
+  backend\scanner\nse_data_engine.py:3513:        self.watchlist.clear()
+  backend\scanner\nse_data_engine.py:3514:
+  backend\scanner\nse_data_engine.py:3515:        self.update_status(
+  backend\scanner\nse_data_engine.py:3516:
+  backend\scanner\nse_data_engine.py:3517:            "NSE Data Engine Stopped."
+  backend\scanner\nse_data_engine.py:3518:
+  backend\scanner\nse_data_engine.py:3519:        )
+  backend\scanner\nse_data_engine.py:3520:
+  backend\scanner\nse_data_engine.py:3521:
+  backend\scanner\nse_data_engine.py:3522:# ============================================================
+  backend\scanner\nse_data_engine.py:3523:# STARTUP
+  backend\scanner\nse_data_engine.py:3772:        self,
+  backend\scanner\nse_data_engine.py:3773:        symbol: str,
+  backend\scanner\nse_data_engine.py:3774:    ) -> None:
+  backend\scanner\nse_data_engine.py:3775:
+> backend\scanner\nse_data_engine.py:3776:        df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:3777:
+  backend\scanner\nse_data_engine.py:3778:        if df is None:
+  backend\scanner\nse_data_engine.py:3779:
+  backend\scanner\nse_data_engine.py:3780:            return
+  backend\scanner\nse_data_engine.py:3781:
+  backend\scanner\nse_data_engine.py:3782:        df = self.clean_dataframe(df)
+  backend\scanner\nse_data_engine.py:3783:
+> backend\scanner\nse_data_engine.py:3784:        self.market_data[symbol] = df
+  backend\scanner\nse_data_engine.py:3785:
+  backend\scanner\nse_data_engine.py:3786:
+  backend\scanner\nse_data_engine.py:3787:# ============================================================
+  backend\scanner\nse_data_engine.py:3788:# PERFORMANCE METRICS
+  backend\scanner\nse_data_engine.py:3789:# ============================================================
+  backend\scanner\nse_data_engine.py:3790:
+  backend\scanner\nse_data_engine.py:3791:    def update_metrics(
+  backend\scanner\nse_data_engine.py:3792:        self,
+  backend\scanner\nse_data_engine.py:3793:        execution_time: float,
+  backend\scanner\nse_data_engine.py:3794:    ) -> None:
+  backend\scanner\nse_data_engine.py:3795:
+  backend\scanner\nse_data_engine.py:3796:        self.metrics["refreshes"] += 1
+  backend\scanner\nse_data_engine.py:3797:
+  backend\scanner\nse_data_engine.py:3798:        self.metrics["last_runtime"] = execution_time
+  backend\scanner\nse_data_engine.py:3821:        return {
+  backend\scanner\nse_data_engine.py:3822:
+  backend\scanner\nse_data_engine.py:3823:            "Stocks":
+  backend\scanner\nse_data_engine.py:3824:
+> backend\scanner\nse_data_engine.py:3825:                len(self.market_data),
+  backend\scanner\nse_data_engine.py:3826:
+  backend\scanner\nse_data_engine.py:3827:            "Refreshes":
+  backend\scanner\nse_data_engine.py:3828:
+  backend\scanner\nse_data_engine.py:3829:                self.metrics["refreshes"],
+  backend\scanner\nse_data_engine.py:3830:
+  backend\scanner\nse_data_engine.py:3831:            "Average Runtime":
+  backend\scanner\nse_data_engine.py:3832:
+  backend\scanner\nse_data_engine.py:3833:                round(
+  backend\scanner\nse_data_engine.py:3834:
+  backend\scanner\nse_data_engine.py:3835:                    self.metrics["average_runtime"],
+  backend\scanner\nse_data_engine.py:3836:
+  backend\scanner\nse_data_engine.py:3837:                    2,
+  backend\scanner\nse_data_engine.py:3838:
+  backend\scanner\nse_data_engine.py:3839:                ),
+  backend\scanner\nse_data_engine.py:3950:        # -----------------------------------------
+  backend\scanner\nse_data_engine.py:3951:        # 3. Remaining Stocks
+  backend\scanner\nse_data_engine.py:3952:        # -----------------------------------------
+  backend\scanner\nse_data_engine.py:3953:
+> backend\scanner\nse_data_engine.py:3954:        for symbol in self.market_data.keys():
+  backend\scanner\nse_data_engine.py:3955:
+  backend\scanner\nse_data_engine.py:3956:            if symbol not in priority:
+  backend\scanner\nse_data_engine.py:3957:
+  backend\scanner\nse_data_engine.py:3958:                priority.append(symbol)
+  backend\scanner\nse_data_engine.py:3959:
+  backend\scanner\nse_data_engine.py:3960:        return priority
+  backend\scanner\nse_data_engine.py:3961:
+  backend\scanner\nse_data_engine.py:3962:
+  backend\scanner\nse_data_engine.py:3963:# ============================================================
+  backend\scanner\nse_data_engine.py:3964:# BATCH INDICATOR UPDATE
+  backend\scanner\nse_data_engine.py:3965:# ============================================================
+  backend\scanner\nse_data_engine.py:3966:
+  backend\scanner\nse_data_engine.py:3967:    def update_indicators_batch(
+  backend\scanner\nse_data_engine.py:3968:        self,
+  backend\scanner\nse_data_engine.py:3969:    ) -> None:
+  backend\scanner\nse_data_engine.py:3970:
+  backend\scanner\nse_data_engine.py:3971:        for symbol in self.priority_symbols():
+  backend\scanner\nse_data_engine.py:3972:
+> backend\scanner\nse_data_engine.py:3973:            df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:3974:
+  backend\scanner\nse_data_engine.py:3975:            if df is None:
+  backend\scanner\nse_data_engine.py:3976:
+  backend\scanner\nse_data_engine.py:3977:                continue
+  backend\scanner\nse_data_engine.py:3978:
+  backend\scanner\nse_data_engine.py:3979:            if df.empty:
+  backend\scanner\nse_data_engine.py:3980:
+  backend\scanner\nse_data_engine.py:3981:                continue
+  backend\scanner\nse_data_engine.py:3982:
+  backend\scanner\nse_data_engine.py:3983:            # -------------------------------------
+  backend\scanner\nse_data_engine.py:3984:            # Indicator Engine Integration
+  backend\scanner\nse_data_engine.py:3985:            # -------------------------------------
+  backend\scanner\nse_data_engine.py:3986:
+> backend\scanner\nse_data_engine.py:3987:            self.market_data[symbol] = (
+  backend\scanner\nse_data_engine.py:3988:
+  backend\scanner\nse_data_engine.py:3989:                self.indicator_engine.calculate(df)
+  backend\scanner\nse_data_engine.py:3990:
+  backend\scanner\nse_data_engine.py:3991:            )
+  backend\scanner\nse_data_engine.py:3992:
+  backend\scanner\nse_data_engine.py:3993:
+  backend\scanner\nse_data_engine.py:3994:# ============================================================
+  backend\scanner\nse_data_engine.py:3995:# INCREMENTAL UPDATE
+  backend\scanner\nse_data_engine.py:3996:# ============================================================
+  backend\scanner\nse_data_engine.py:3997:
+  backend\scanner\nse_data_engine.py:3998:    def incremental_indicator_update(
+  backend\scanner\nse_data_engine.py:3999:        self,
+  backend\scanner\nse_data_engine.py:4000:        symbols: List[str],
+  backend\scanner\nse_data_engine.py:4001:    ) -> None:
+  backend\scanner\nse_data_engine.py:4002:
+  backend\scanner\nse_data_engine.py:4003:        for symbol in symbols:
+  backend\scanner\nse_data_engine.py:4004:
+> backend\scanner\nse_data_engine.py:4005:            df = self.market_data.get(symbol)
+  backend\scanner\nse_data_engine.py:4006:
+  backend\scanner\nse_data_engine.py:4007:            if df is None:
+  backend\scanner\nse_data_engine.py:4008:
+  backend\scanner\nse_data_engine.py:4009:                continue
+  backend\scanner\nse_data_engine.py:4010:
+> backend\scanner\nse_data_engine.py:4011:            self.market_data[symbol] = (
+  backend\scanner\nse_data_engine.py:4012:
+  backend\scanner\nse_data_engine.py:4013:                self.indicator_engine.update_last_bar(df)
+  backend\scanner\nse_data_engine.py:4014:
+  backend\scanner\nse_data_engine.py:4015:            )
+  backend\scanner\nse_data_engine.py:4016:
+  backend\scanner\nse_data_engine.py:4017:
+  backend\scanner\nse_data_engine.py:4018:# ============================================================
+  backend\scanner\nse_data_engine.py:4019:# SCANNER EXECUTOR
+  backend\scanner\nse_data_engine.py:4020:# ============================================================
+  backend\scanner\nse_data_engine.py:4021:
+  backend\scanner\nse_data_engine.py:4022:    def execute_scanners(
+  backend\scanner\nse_data_engine.py:4023:        self,
+  backend\scanner\nse_data_engine.py:4024:    ) -> Dict:
+  backend\scanner\nse_data_engine.py:4025:
+  backend\scanner\nse_data_engine.py:4026:        return self.scanner_executor.execute(
+  backend\scanner\nse_data_engine.py:4027:
+> backend\scanner\nse_data_engine.py:4028:            self.market_data
+  backend\scanner\nse_data_engine.py:4029:
+  backend\scanner\nse_data_engine.py:4030:        )
+  backend\scanner\nse_data_engine.py:4031:
+  backend\scanner\nse_data_engine.py:4032:
+  backend\scanner\nse_data_engine.py:4033:# ============================================================
+  backend\scanner\nse_data_engine.py:4034:# OPPORTUNITY RANKER
+  backend\scanner\nse_data_engine.py:4035:# ============================================================
+  backend\scanner\nse_data_engine.py:4036:
+  backend\scanner\nse_data_engine.py:4037:    def rank_opportunities(
+  backend\scanner\nse_data_engine.py:4038:        self,
+  backend\scanner\nse_data_engine.py:4039:        opportunities: Dict,
+  backend\scanner\nse_data_engine.py:4040:    ):
+  backend\scanner\nse_data_engine.py:4041:
+  backend\scanner\nse_data_engine.py:4042:        return self.opportunity_ranker.rank(
+  backend\scanner\nse_data_engine.py:4172:# ============================================================
+  backend\scanner\nse_data_engine.py:4173:# LOAD CONFIGURATION
+  backend\scanner\nse_data_engine.py:4174:# ============================================================
+  backend\scanner\nse_data_engine.py:4175:
+> backend\scanner\nse_data_engine.py:4176:    def load_configuration(
+  backend\scanner\nse_data_engine.py:4177:        self,
+  backend\scanner\nse_data_engine.py:4178:        filename: str,
+  backend\scanner\nse_data_engine.py:4179:    ) -> None:
+  backend\scanner\nse_data_engine.py:4180:
+  backend\scanner\nse_data_engine.py:4181:        if not os.path.exists(
+  backend\scanner\nse_data_engine.py:4182:
+  backend\scanner\nse_data_engine.py:4183:            filename,
+  backend\scanner\nse_data_engine.py:4184:
+  backend\scanner\nse_data_engine.py:4185:        ):
+  backend\scanner\nse_data_engine.py:4186:
+  backend\scanner\nse_data_engine.py:4187:            return
+  backend\scanner\nse_data_engine.py:4188:
+  backend\scanner\nse_data_engine.py:4189:        with open(
+  backend\scanner\nse_data_engine.py:4190:
+  backend\scanner\nse_data_engine.py:4263:# ============================================================
+  backend\scanner\nse_data_engine.py:4264:# FINAL INITIALIZATION
+  backend\scanner\nse_data_engine.py:4265:# ============================================================
+  backend\scanner\nse_data_engine.py:4266:
+> backend\scanner\nse_data_engine.py:4267:    def initialize(
+  backend\scanner\nse_data_engine.py:4268:        self,
+  backend\scanner\nse_data_engine.py:4269:    ) -> None:
+  backend\scanner\nse_data_engine.py:4270:
+  backend\scanner\nse_data_engine.py:4271:        self.update_status(
+  backend\scanner\nse_data_engine.py:4272:
+  backend\scanner\nse_data_engine.py:4273:            "Initializing StockVersity Scanner Pro..."
+  backend\scanner\nse_data_engine.py:4274:
+  backend\scanner\nse_data_engine.py:4275:        )
+  backend\scanner\nse_data_engine.py:4276:
+  backend\scanner\nse_data_engine.py:4277:        self.load_configuration(
+  backend\scanner\nse_data_engine.py:4278:
+  backend\scanner\nse_data_engine.py:4279:            "config.json",
+  backend\scanner\nse_data_engine.py:4280:
+  backend\scanner\nse_data_engine.py:4281:        )
+
+
+

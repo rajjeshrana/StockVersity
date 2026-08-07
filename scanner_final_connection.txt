@@ -1,0 +1,1880 @@
+=== UI APP INIT / PAGE CREATION ===
+        "settings": "Settings",
+    }
+
+    NAV_ICONS = {
+        "dashboard": "▦",
+        "scanner": "⌁",
+        "market": "〽",
+        "watchlist": "☆",
+        "alerts": "♧",
+        "portfolio": "▣",
+        "news": "▤",
+        "reports": "▥",
+        "settings": "⚙",
+    }
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ) -> None:
+
+        super().__init__(parent)
+
+        # -------------------------------------------------
+        # Internal UI containers
+        # -------------------------------------------------
+
+        self._pages: Dict[str, QWidget] = {}
+        self._nav_buttons: Dict[str, QPushButton] = {}
+
+        # -------------------------------------------------
+        # Live market objects
+        # -------------------------------------------------
+
+        self.upstox_provider = None
+        self.upstox_api_client = None
+
+        self.market_controller = None
+        self.live_market_bridge = None
+
+        self.auth_manager = None
+        self.upstox_auth = None
+
+        # -------------------------------------------------
+        # Window
+        # -------------------------------------------------
+
+        self.setWindowTitle(
+            "StockVersity Scanner Pro"
+        )
+
+        self.setMinimumSize(
+            1280,
+            760,
+        )
+
+        self.resize(
+            1600,
+            920,
+        )
+
+        # -------------------------------------------------
+        # Build UI FIRST
+        # -------------------------------------------------
+
+        self._build_ui()
+
+        # -------------------------------------------------
+        # Start live market pipeline
+        # -------------------------------------------------
+
+        self._initialize_live_market()
+
+        # -------------------------------------------------
+        # Default page
+        # -------------------------------------------------
+
+        self.show_page(
+            "dashboard"
+        )
+
+
+    # =====================================================
+    # LIVE MARKET INITIALIZATION
+    # =====================================================
+
+    def _initialize_live_market(self) -> None:
+        """
+        Initialize production Upstox live-market pipeline.
+
+        Upstox
+            ->
+        UpstoxProvider
+            ->
+        WebSocketManager V3
+            ->
+        MarketDataParser
+            ->
+        LiveMarketBridge
+            ->
+        MarketController
+            ->
+        Dashboard
+        """
+
+        self.upstox_provider = None
+        self.market_controller = None
+        self.live_market_bridge = None
+
+        try:
+
+            # ---------------------------------------------
+            # Upstox configuration
+            # ---------------------------------------------
+
+            api_key = UPSTOX_API_KEY
+            api_secret = UPSTOX_API_SECRET
+            redirect_uri = UPSTOX_REDIRECT_URI
+
+            # ---------------------------------------------
+            # Validate Upstox configuration
+            # ---------------------------------------------
+
+            if not api_key:
+
+                print(
+                    "[LIVE MARKET] "
+                    "UPSTOX_API_KEY missing."
+                )
+
+                return
+
+=== UI APP BUILD PAGES ===
+        # Page stack
+        # -------------------------------------------------
+
+        self.stack = QStackedWidget()
+
+        self.stack.setStyleSheet(
+            f"""
+            QStackedWidget {{
+                background: {BG};
+                border: none;
+            }}
+            """
+        )
+
+        right_layout.addWidget(
+            self.stack,
+            1,
+        )
+
+        # -------------------------------------------------
+        # Footer
+        # -------------------------------------------------
+
+        right_layout.addWidget(
+            self._create_footer()
+        )
+
+        root_layout.addWidget(
+            right,
+            1,
+        )
+
+        self.setCentralWidget(
+            root
+        )
+
+        # -------------------------------------------------
+        # Pages
+        # -------------------------------------------------
+
+        self._add_page(
+            "dashboard",
+            self.dashboard_page,
+        )
+
+        self._add_page(
+            "scanner",
+            IntradayScannerPage(),
+        )
+
+
+    # =====================================================
+    # SIDEBAR
+    # =====================================================
+
+    def _create_sidebar(self) -> QFrame:
+        """
+        Create approved larger StockVersity sidebar.
+        """
+
+        sidebar = QFrame()
+
+        sidebar.setObjectName(
+            "mainSidebar"
+        )
+
+        sidebar.setFixedWidth(
+            200
+        )
+
+        sidebar.setStyleSheet(
+            f"""
+            QFrame#mainSidebar {{
+                background: {SIDEBAR_BG};
+                border-right: 1px solid {BORDER};
+            }}
+
+            QPushButton {{
+                color: #c3cfdf;
+                background: transparent;
+
+=== INTRADAY SCANNER PAGE MAIN CLASS ===
+            str(
+                data.get(
+                    "runtime",
+                    "--",
+                )
+            )
+        )
+
+
+# ==========================================================
+# INTRADAY SCANNER PAGE
+# ==========================================================
+
+class IntradayScannerPage(QWidget):
+
+    stock_requested = Signal(str)
+
+    scan_requested = Signal(dict)
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ) -> None:
+
+        super().__init__(parent)
+
+        self.logger = logger
+
+        self._current_filters: Dict = {}
+
+        self.setObjectName(
+            "IntradayScannerPage"
+        )
+
+        self.setStyleSheet(
+            f"""
+            QWidget#IntradayScannerPage {{
+                background: {BACKGROUND};
+            }}
+            """
+        )
+
+        self._build_ui()
+
+        self._connect_signals()
+
+        self._load_demo_data()
+
+    # ======================================================
+    # BUILD UI
+    # ======================================================
+
+    def _build_ui(
+        self,
+    ) -> None:
+
+        root = QVBoxLayout(
+            self
+        )
+
+        root.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        root.setSpacing(
+            0
+        )
+
+        self.scroll_area = QScrollArea()
+
+        self.scroll_area.setWidgetResizable(
+            True
+        )
+
+        self.scroll_area.setFrameShape(
+            QFrame.NoFrame
+        )
+
+        self.scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff
+        )
+
+        self.scroll_area.setStyleSheet(
+            f"""
+            QScrollArea {{
+                background: {BACKGROUND};
+                border: none;
+            }}
+
+            QScrollBar:vertical {{
+                background: {BACKGROUND};
+                width: 9px;
+            }}
+
+            QScrollBar::handle:vertical {{
+                background: #263A57;
+                border-radius: 4px;
+                min-height: 35px;
+            }}
+
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0;
+            }}
+            """
+        )
+
+        content = QWidget()
+
+        content.setStyleSheet(
+            f"""
+            background: {BACKGROUND};
+            """
+        )
+
+        layout = QVBoxLayout(
+            content
+        )
+
+        layout.setContentsMargins(
+            20,
+            18,
+            20,
+            24,
+        )
+
+        layout.setSpacing(
+            12
+        )
+
+        # --------------------------------------------------
+        # HEADER
+        # --------------------------------------------------
+
+        self.scanner_header = (
+            IntradayScannerHeader()
+        )
+
+        layout.addWidget(
+            self.scanner_header
+        )
+
+        # --------------------------------------------------
+        # SUMMARY CARDS
+        # --------------------------------------------------
+
+        summary = QWidget()
+
+        summary_layout = QGridLayout(
+            summary
+        )
+
+        summary_layout.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        summary_layout.setSpacing(
+            10
+        )
+
+        self.qualified_metric = (
+            ScannerSummaryMetric(
+                "QUALIFIED",
+                "0",
+                "Opportunities",
+                CYAN,
+            )
+        )
+
+        self.buy_metric = (
+            ScannerSummaryMetric(
+                "BUY SETUPS",
+                "0",
+                "Long candidates",
+                GREEN,
+            )
+        )
+
+        self.sell_metric = (
+            ScannerSummaryMetric(
+                "SELL SETUPS",
+                "0",
+                "Short candidates",
+                RED,
+            )
+        )
+
+        self.best_score_metric = (
+            ScannerSummaryMetric(
+                "BEST SCORE",
+                "0",
+                "Setup quality",
+                PURPLE,
+            )
+        )
+
+        self.avg_rvol_metric = (
+            ScannerSummaryMetric(
+                "AVG RVOL",
+                "0.00×",
+                "Participation",
+                ORANGE,
+            )
+        )
+
+        self.market_bias_metric = (
+            ScannerSummaryMetric(
+                "MARKET BIAS",
+                "--",
+                "NIFTY alignment",
+                GREEN,
+            )
+        )
+
+        summary_cards = (
+            self.qualified_metric,
+            self.buy_metric,
+            self.sell_metric,
+            self.best_score_metric,
+            self.avg_rvol_metric,
+            self.market_bias_metric,
+        )
+
+        for column, card in enumerate(
+            summary_cards
+        ):
+
+            summary_layout.addWidget(
+                card,
+                0,
+                column,
+            )
+
+            summary_layout.setColumnStretch(
+                column,
+                1,
+            )
+
+        layout.addWidget(
+            summary
+        )
+
+        # --------------------------------------------------
+        # FILTERS
+        # --------------------------------------------------
+
+        self.filter_panel = (
+            IntradayFilterPanel()
+        )
+
+        layout.addWidget(
+            self.filter_panel
+        )
+
+        # --------------------------------------------------
+        # OPPORTUNITY TABLE
+        # --------------------------------------------------
+
+        self.opportunity_table = (
+            IntradayOpportunityTable()
+        )
+
+        layout.addWidget(
+            self.opportunity_table
+        )
+
+        # --------------------------------------------------
+        # LOWER INTELLIGENCE
+        # --------------------------------------------------
+
+        intelligence = QWidget()
+
+        intelligence_layout = QGridLayout(
+            intelligence
+        )
+
+        intelligence_layout.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        intelligence_layout.setHorizontalSpacing(
+            12
+        )
+
+        intelligence_layout.setVerticalSpacing(
+            12
+        )
+
+        self.market_alignment = (
+            MarketAlignmentCard()
+        )
+
+        self.scan_quality = (
+            ScanQualityCard()
+        )
+
+        self.scanner_status = (
+            ScannerStatusCard()
+        )
+
+        intelligence_layout.addWidget(
+            self.market_alignment,
+            0,
+            0,
+        )
+
+        intelligence_layout.addWidget(
+            self.scan_quality,
+            0,
+            1,
+        )
+
+        intelligence_layout.addWidget(
+            self.scanner_status,
+            0,
+            2,
+        )
+
+        intelligence_layout.setColumnStretch(
+            0,
+            1,
+        )
+
+        intelligence_layout.setColumnStretch(
+            1,
+            1,
+        )
+
+        intelligence_layout.setColumnStretch(
+            2,
+            1,
+        )
+
+        layout.addWidget(
+            intelligence
+        )
+
+        layout.addStretch(1)
+
+        self.scroll_area.setWidget(
+            content
+        )
+
+        root.addWidget(
+            self.scroll_area
+        )
+
+    # ======================================================
+    # SIGNALS
+    # ======================================================
+
+    def _connect_signals(
+        self,
+    ) -> None:
+
+        self.scanner_header.scan_requested.connect(
+            self.run_scan
+        )
+
+        self.filter_panel.filters_changed.connect(
+            self._handle_filters_changed
+        )
+
+        self.opportunity_table.stock_requested.connect(
+            self.stock_requested.emit
+        )
+
+    # ======================================================
+    # FILTER CHANGE
+    # ======================================================
+
+    def _handle_filters_changed(
+        self,
+        filters: Dict,
+    ) -> None:
+
+        self._current_filters = filters
+
+    # ======================================================
+    # RUN SCAN
+    # ======================================================
+
+    def run_scan(
+        self,
+    ) -> None:
+
+        self._current_filters = (
+            self.filter_panel.get_filters()
+        )
+
+        self.scanner_header.scan_button.setEnabled(
+            False
+        )
+
+        self.scanner_header.scan_button.setText(
+            "SCANNING..."
+        )
+
+        self.scanner_status.set_status(
+            {
+                "status": "SCANNING",
+                "scanned": 0,
+                "passed": 0,
+                "buys": 0,
+                "sells": 0,
+                "best_score": 0,
+                "runtime": "...",
+            }
+        )
+
+        # Signal for the future scanner service.
+
+        self.scan_requested.emit(
+            self._current_filters
+        )
+
+        # Development mode only:
+        # simulate a short scan cycle.
+
+        QTimer.singleShot(
+            700,
+            self._finish_demo_scan,
+        )
+
+    def _finish_demo_scan(
+        self,
+    ) -> None:
+
+        self.scanner_header.scan_button.setEnabled(
+            True
+        )
+
+        self.scanner_header.scan_button.setText(
+            "⚡  RUN SCANNER"
+        )
+
+        from PySide6.QtCore import (
+            QDateTime,
+        )
+
+        self.scanner_header.set_last_scan(
+            QDateTime.currentDateTime().toString(
+                "hh:mm:ss AP"
+            )
+        )
+
+        self._load_demo_data()
+
+    # ======================================================
+    # EXTERNAL DATA API
+    # ======================================================
+
+=== APPLICATION CONTROLLER INIT ===
+
+    # ------------------------------------------------------
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.logger = logging.getLogger("ApplicationController")
+
+        self.running = False
+
+        self.market_open = False
+
+        self.last_scan_time = None
+
+        self.refresh_interval = 60
+
+        self.scan_counter = 0
+
+        self.best_opportunities = []
+
+        self.dashboard_data = {}
+
+        self.scheduler_thread = None
+
+        self.stop_event = threading.Event()
+
+        self.initialize_engines()
+
+        self.initialize_callbacks()
+
+        self.initialize_timer()
+
+    # ======================================================
+    # INITIALIZE ENGINES
+    # ======================================================
+
+    def initialize_engines(self):
+
+        self.statusChanged.emit(
+            "Loading Trading Engines..."
+        )
+
+        self.nse_engine = NSEDataEngine()
+
+        self.scanner = ScannerExecutor()
+
+        self.market_prediction = MarketPredictionEngine()
+
+        self.market_sentiment = MarketSentimentEngine()
+
+        self.market_regime = MarketRegimeEngine()
+
+        self.pattern_engine = PatternRecognitionEngine()
+
+        self.ranker = OpportunityRanker()
+
+        self.risk_engine = RiskManagementEngine()
+
+        self.structure_engine = MarketStructureEngine()
+
+        self.volume_engine = VolumeAnalysisEngine()
+
+        self.rotation_engine = SectorRotationEngine()
+
+        self.statusChanged.emit(
+            "Trading Engines Loaded"
+        )
+
+    # ======================================================
+    # CALLBACKS
+    # ======================================================
+
+    def initialize_callbacks(self):
+
+        self.nse_engine.dashboard_callback = (
+            self.update_dashboard
+        )
+
+        self.nse_engine.notification_callback = (
+            self.receive_notification
+        )
+
+    # ======================================================
+    # TIMER
+    # ======================================================
+
+    def initialize_timer(self):
+
+        self.timer = QTimer()
+
+        self.timer.timeout.connect(
+            self.countdown_tick
+        )
+
+        self.remaining_seconds = self.refresh_interval
+
+    # ======================================================
+    # START APPLICATION
+    # ======================================================
+
+    def start(self):
+
+        if self.running:
+
+            return
+
+        self.running = True
+
+        self.stop_event.clear()
+
+        self.statusChanged.emit(
+            "Starting StockVersity Scanner..."
+        )
+
+        self.nse_engine.initialize()
+
+        self.scheduler_thread = threading.Thread(
+            target=self.scheduler_loop,
+            daemon=True
+        )
+
+        self.scheduler_thread.start()
+
+        self.timer.start(1000)
+
+        self.statusChanged.emit(
+            "Application Started"
+        )
+
+    # ======================================================
+    # STOP APPLICATION
+    # ======================================================
+
+    def stop(self):
+
+        self.running = False
+
+        self.stop_event.set()
+
+
+=== APPLICATION CONTROLLER SCAN PIPELINE ===
+        self.logger.info("Scheduler Stopped")
+
+
+# ==========================================================
+# COMPLETE MARKET CYCLE
+# ==========================================================
+
+    def run_market_cycle(self):
+
+        self.scan_counter += 1
+
+        self.last_scan_time = datetime.now()
+
+        self.statusChanged.emit(
+            f"Running Scan #{self.scan_counter}"
+        )
+
+        start = time.perf_counter()
+
+        self.fetch_market_data()
+
+        self.calculate_indicators()
+
+        opportunities = self.execute_scanner()
+
+        ranked = self.rank_opportunities(
+            opportunities
+        )
+
+        trades = self.generate_trade_cards(
+            ranked
+        )
+
+        self.best_opportunities = trades
+
+        self.dashboard_data = {
+
+            "scan_number": self.scan_counter,
+
+            "scan_time": self.last_scan_time,
+
+            "market_open": self.market_open,
+
+            "opportunities": trades
+
+        }
+
+        self.dashboardUpdated.emit(
+            self.dashboard_data
+        )
+
+        self.scannerCompleted.emit(
+            trades
+        )
+
+        runtime = round(
+
+            time.perf_counter() - start,
+
+            2
+
+        )
+
+        self.statusChanged.emit(
+
+            f"Completed in {runtime} sec"
+
+        )
+
+
+# ==========================================================
+# FETCH MARKET DATA
+# ==========================================================
+
+    def fetch_market_data(self):
+
+        self.statusChanged.emit(
+
+            "Downloading Market Data..."
+
+        )
+
+        self.nse_engine.live_update()
+
+
+# ==========================================================
+# CALCULATE INDICATORS
+# ==========================================================
+
+    def calculate_indicators(self):
+
+        self.statusChanged.emit(
+
+            "Calculating Indicators..."
+
+        )
+
+        self.nse_engine.update_indicators_batch()
+
+
+# ==========================================================
+# EXECUTE SCANNER
+# ==========================================================
+
+    def execute_scanner(self):
+
+        self.statusChanged.emit(
+
+            "Executing Scanner..."
+
+        )
+
+        return self.scanner.execute(
+
+            self.nse_engine.market_data
+
+        )
+
+
+# ==========================================================
+# RANK OPPORTUNITIES
+# ==========================================================
+
+    def rank_opportunities(
+
+        self,
+
+        opportunities
+
+    ):
+
+        self.statusChanged.emit(
+
+            "Ranking Opportunities..."
+
+        )
+
+        return self.ranker.rank(
+
+            opportunities
+
+        )
+
+
+# ==========================================================
+# TRADE CARD GENERATOR
+# ==========================================================
+
+    def generate_trade_cards(
+
+        self,
+
+        ranked_list
+
+    ):
+
+        cards = []
+
+        for stock in ranked_list:
+
+            try:
+
+                decision = self.market_prediction.predict(
+
+                    stock
+
+                )
+
+                risk = self.risk_engine.evaluate(
+
+                    stock
+
+                )
+
+                structure = self.structure_engine.evaluate(
+
+                    stock
+
+                )
+
+                volume = self.volume_engine.evaluate(
+
+                    stock
+
+                )
+
+                sector = self.rotation_engine.evaluate(
+
+                    stock
+
+                )
+
+                pattern = self.pattern_engine.detect(
+
+                    stock
+
+                )
+
+                card = {
+
+                    "symbol":
+
+                        stock.get("symbol"),
+
+                    "score":
+
+                        stock.get("score"),
+
+                    "signal":
+
+                        decision.get("signal"),
+
+                    "confidence":
+
+                        decision.get("confidence"),
+
+                    "entry":
+
+                        decision.get("entry"),
+
+                    "stoploss":
+
+                        decision.get("stoploss"),
+
+                    "target":
+
+                        decision.get("target"),
+
+                    "rr":
+
+                        risk.get("rr"),
+
+                    "risk":
+
+                        risk,
+
+                    "structure":
+
+                        structure,
+
+                    "volume":
+
+                        volume,
+
+                    "sector":
+
+                        sector,
+
+                    "pattern":
+
+                        pattern
+
+                }
+
+                cards.append(card)
+
+            except Exception as e:
+
+                self.logger.exception(e)
+
+
+=== DEPENDENCY CONTAINER ===
+"""
+==========================================================
+StockVersity Scanner Pro
+Dependency Container
+Version : 4.0
+Powered By : AI
+==========================================================
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import Any, Dict
+
+from core.service_manager import ServiceManager
+from backend.scanner.nse_data_engine import NSEDataEngine
+from backend.scanner.scanner_executor import ScannerExecutor
+from backend.ai.market_prediction_engine import MarketPredictionEngine
+from backend.ai.market_sentiment_engine import MarketSentimentEngine
+from backend.ai.market_regime_engine import MarketRegimeEngine
+
+from backend.ai.pattern_recognition_engine import (
+    PatternRecognitionEngine
+)
+
+from backend.ai.opportunity_ranker import (
+    OpportunityRanker
+)
+
+from backend.ai.risk_management_engine import (
+    RiskManagementEngine
+)
+
+from backend.ai.market_structure_engine import (
+    MarketStructureEngine
+)
+
+from backend.ai.sector_rotation_engine import (
+    SectorRotationEngine
+)
+
+from backend.ai.volume_analysis_engine import (
+    VolumeAnalysisEngine
+)
+
+
+class DependencyContainer:
+
+    """
+    Singleton Dependency Container
+
+    One instance of every engine
+    throughout the application.
+    """
+
+    def __init__(self):
+
+        self.logger = logging.getLogger(
+            "DependencyContainer"
+        )
+
+        self._instances: Dict[str, Any] = {}
+
+        self._build()
+
+    # ===================================================
+    # BUILD CONTAINER
+    # ===================================================
+
+    def _build(self):
+
+        self.logger.info(
+            "Creating Dependency Container..."
+        )
+
+        self.register(
+            "service_manager",
+            ServiceManager()
+        )
+
+        service = self.get(
+            "service_manager"
+        )
+
+        controller = service.application
+
+        self.register(
+            "application_controller",
+            controller
+        )
+
+        self.register(
+            "nse_engine",
+            controller.nse_engine
+        )
+
+        self.register(
+            "scanner_executor",
+            controller.scanner
+        )
+
+        self.register(
+            "market_prediction",
+            controller.market_prediction
+        )
+
+        self.register(
+            "market_sentiment",
+            controller.market_sentiment
+        )
+
+        self.register(
+            "market_regime",
+            controller.market_regime
+        )
+
+        self.register(
+            "pattern_engine",
+            controller.pattern_engine
+        )
+
+        self.register(
+            "opportunity_ranker",
+            controller.ranker
+        )
+
+        self.register(
+            "risk_engine",
+            controller.risk_engine
+        )
+
+        self.register(
+            "market_structure",
+            controller.structure_engine
+        )
+
+        self.register(
+            "sector_rotation",
+            controller.rotation_engine
+        )
+
+        self.register(
+            "volume_engine",
+            controller.volume_engine
+        )
+
+        self.logger.info(
+            "Dependency Container Ready."
+        )
+
+    # ===================================================
+    # REGISTER
+    # ===================================================
+
+    def register(
+
+        self,
+
+        name: str,
+
+        instance: object
+
+    ):
+
+        self._instances[name] = instance
+
+    # ===================================================
+    # GET
+    # ===================================================
+
+    def get(
+
+        self,
+
+        name: str
+
+    ):
+
+        if name not in self._instances:
+
+            raise KeyError(
+
+                f"{name} not registered."
+
+            )
+
+        return self._instances[name]
+
+    # ===================================================
+    # EXISTS
+    # ===================================================
+
+    def exists(
+
+        self,
+
+        name: str
+
+    ):
+
+        return name in self._instances
+
+    # ===================================================
+    # REMOVE
+    # ===================================================
+
+    def remove(
+
+        self,
+
+        name: str
+
+    ):
+
+        if self.exists(name):
+
+            del self._instances[name]
+
+    # ===================================================
+    # REGISTER INSTANCE
+    # ===================================================
+
+    def replace(
+
+        self,
+
+        name,
+
+        instance
+
+    ):
+
+        self._instances[name] = instance
+
+    # ===================================================
+    # REGISTER MULTIPLE
+    # ===================================================
+
+    def register_many(
+        self,
+        instances: Dict[str, object]
+    ):
+
+        for name, instance in instances.items():
+
+            self.register(name, instance)
+
+        return True
+
+
+    # ===================================================
+    # GET ALL
+    # ===================================================
+
+    def all_instances(self):
+
+        return self._instances
+
+
+    # ===================================================
+    # GET ALL NAMES
+    # ===================================================
+
+    def names(self):
+
+        return list(
+
+            self._instances.keys()
+
+        )
+
+
+    # ===================================================
+    # TOTAL SERVICES
+    # ===================================================
+
+    def total(self):
+
+        return len(
+
+            self._instances
+
+        )
+
+
+    # ===================================================
+    # APPLICATION
+    # ===================================================
+
+    @property
+    def application(self):
+
+        return self.get(
+
+            "application_controller"
+
+        )
+
+
+    # ===================================================
+    # SERVICE MANAGER
+    # ===================================================
+
+    @property
+    def service_manager(self):
+
+        return self.get(
+
+            "service_manager"
+
+        )
+
+
+    # ===================================================
+    # NSE ENGINE
+    # ===================================================
+
+    @property
+    def nse_engine(self):
+
+        return self.get(
+
+            "nse_engine"
+
+        )
+
+
+    # ===================================================
+    # SCANNER
+    # ===================================================
+
+    @property
+    def scanner(self):
+
+        return self.get(
+
+            "scanner_executor"
+
+        )
+
+
+    # ===================================================
+    # OPPORTUNITY RANKER
+    # ===================================================
+
+    @property
+    def ranker(self):
+
+        return self.get(
+
+            "opportunity_ranker"
+
+        )
+
+
+    # ===================================================
+    # VERIFY CONTAINER
+    # ===================================================
+
+    def verify(self):
+
+        report = {}
+
+        for name, instance in self._instances.items():
+
+            report[name] = instance is not None
+
+        return report
+
+
+    # ===================================================
+    # READY
+    # ===================================================
+
+    def ready(self):
+
+        return all(
+
+            self.verify().values()
+
+        )
+
+
+    # ===================================================
+    # HEALTH REPORT
+    # ===================================================
+
+    def health(self):
+
+        report = {}
+
+        for name, instance in self._instances.items():
+
+            try:
+
+                if hasattr(instance, "health"):
+
+                    report[name] = instance.health()
+
+                elif hasattr(instance, "health_status"):
+
+                    report[name] = instance.health_status()
+
+                else:
+
+                    report[name] = {
+
+                        "status": "OK"
+
+                    }
+
+            except Exception as e:
+
+                report[name] = {
+
+                    "status": "ERROR",
+
+                    "message": str(e)
+
+                }
+
+        return report
+
+
+    # ===================================================
+    # DIAGNOSTICS
+    # ===================================================
+
+    def diagnostics(self):
+
+        return {
+
+            "total_instances":
+
+                self.total(),
+
+            "registered":
+
+                self.names(),
+
+            "verification":
+
+                self.verify(),
+
+            "health":
+
+                self.health()
+
+        }
+
+
+    # ===================================================
+    # START APPLICATION
+    # ===================================================
+
+    def start(self):
+
+        self.logger.info(
+
+            "Starting Service Manager..."
+
+        )
+
+        self.service_manager.start_all()
+
+
+    # ===================================================
+    # STOP APPLICATION
+    # ===================================================
+
+    def stop(self):
+
+        self.logger.info(
+
+            "Stopping Service Manager..."
+
+        )
+
+        self.service_manager.stop_all()
+
+
+    # ===================================================
+    # RESTART APPLICATION
+    # ===================================================
+
+    def restart(self):
+
+        self.logger.info(
+
+            "Restarting Application..."
+
+        )
+
+        self.stop()
+
+        self.start()
+
+
+    # ===================================================
+    # RESET
+    # ===================================================
+
+    def reset(self):
+
+        self.service_manager.reset()
+
+
+    # ===================================================
+    # CLEAR CACHE
+    # ===================================================
+
+    def clear_cache(self):
+
+        self.service_manager.clear_cache()
+
+
+# ==========================================================
+# GLOBAL DEPENDENCY CONTAINER
+# ==========================================================
+_container = None
+
+
+def get_container() -> DependencyContainer:
+    """
+    Return the global DependencyContainer instance.
+
+    The container is created lazily on first access so that
+    importing this module does not immediately initialize
+    the complete StockVersity backend.
+    """
+
+    global _container
+
+    if _container is None:
+        _container = DependencyContainer()
+
+    return _container
+
+=== MAIN STARTUP ===
+"""
+=========================================================
+StockVersity Scanner Pro v3
+Main Entry Point
+=========================================================
+"""
+
+import sys
+import os
+import traceback
+import logging
+from pathlib import Path
+
+from PySide6.QtCore import (
+    Qt,
+    QSharedMemory,
+    QTimer,
+)
+
+from PySide6.QtGui import (
+    QPixmap,
+    QFont,
+)
+
+from PySide6.QtWidgets import (
+    QApplication,
+    QSplashScreen,
+    QMessageBox,
+)
+
+from ui.app import MainWindow
+
+
+# =========================================================
+# APPLICATION INFORMATION
+# =========================================================
+
+APP_NAME = "StockVersity Scanner Pro"
+
+APP_VERSION = "3.0"
+
+ORGANIZATION = "StockVersity"
+
+LOG_FOLDER = "logs"
+
+LOG_FILE = "application.log"
+
+
+# =========================================================
+# CREATE LOG DIRECTORY
+# =========================================================
+
+Path(LOG_FOLDER).mkdir(
+
+    exist_ok=True
+
+)
+
+logging.basicConfig(
+
+    filename=os.path.join(
+
+        LOG_FOLDER,
+
+        LOG_FILE,
+
+    ),
+
+    level=logging.INFO,
+
+    format="%(asctime)s | %(levelname)s | %(message)s",
+
+)
+
+
+logger = logging.getLogger(APP_NAME)
+
+
+# =========================================================
+# GLOBAL EXCEPTION HANDLER
+# =========================================================
+
+def exception_handler(
+
+    exc_type,
+
+    exc_value,
+
+    exc_traceback,
+
+):
+
+    if issubclass(
+
+        exc_type,
+
+        KeyboardInterrupt,
+
+    ):
+
+        sys.__excepthook__(
+
+            exc_type,
+
+            exc_value,
+
+            exc_traceback,
+
+        )
+
+        return
+
+    error = "".join(
+
+        traceback.format_exception(
+
+            exc_type,
+
+            exc_value,
+
+            exc_traceback,
+
+        )
+
+    )
+
+    logger.exception(error)
+
+    QMessageBox.critical(
+
+        None,
+
+        "Unexpected Error",
+
+        error,
+
+    )
+
+
+sys.excepthook = exception_handler
+
+
+# =========================================================
+# SINGLE INSTANCE
+# =========================================================
+
+shared_memory = QSharedMemory(
+
+    APP_NAME
+
+)
+
+if shared_memory.attach():
+
+    app = QApplication(sys.argv)
+
+    QMessageBox.information(
+
+        None,
+
+        APP_NAME,
+
+        "Application is already running.",
+
+    )
+
+    sys.exit()
+
+shared_memory.create(1)
+
+
+# =========================================================
+# APPLICATION
+# =========================================================
+
+app = QApplication(sys.argv)
+
+app.setApplicationName(APP_NAME)
+
+app.setApplicationVersion(APP_VERSION)
+
+app.setOrganizationName(
+
+    ORGANIZATION
+
+)
+
+app.setAttribute(
+
+    Qt.AA_EnableHighDpiScaling,
+
+    True,
+
+)
+
+app.setAttribute(
+
+    Qt.AA_UseHighDpiPixmaps,
+
+    True,
+
+)
+
+font = QFont(
+
+    "Segoe UI",
+
+    10,
+
+)
+
+app.setFont(font)
+# =========================================================
+# SPLASH SCREEN
+# =========================================================
+
+pixmap = QPixmap(600, 350)
+
+pixmap.fill(Qt.black)
+
+splash = QSplashScreen(pixmap)
+
+splash.setStyleSheet("""
+
+QLabel{
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    background:#111111;
+
+    padding:20px;
+
+}
+
+""")
+
+splash.show()
+
+app.processEvents()
+
+# =========================================================
+# STARTUP MESSAGES
+# =========================================================
+
+startup_messages = [
+
+    "Initializing application...",
+
+    "Loading UI components...",
+
+    "Loading Dashboard module...",
+
+    "Loading Intraday Scanner...",
+
+    "Loading Swing Scanner...",
+

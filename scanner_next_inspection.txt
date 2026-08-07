@@ -1,0 +1,1472 @@
+============================================================
+UPSTOX CLIENT METHODS
+============================================================
+
+  core\upstox_client.py:12:? OAuth Authentication
+  core\upstox_client.py:13:? Access Token Management
+  core\upstox_client.py:14:? Instrument Master
+> core\upstox_client.py:15:? Historical Data
+  core\upstox_client.py:16:? Live Quotes
+  core\upstox_client.py:17:? WebSocket Streaming
+  core\upstox_client.py:18:? Option Chain
+  core\upstox_client.py:19:? Market Depth
+  core\upstox_client.py:20:? Batch Requests
+  core\upstox_client.py:21:? Rate Limiter
+  core\upstox_client.py:22:? Automatic Retry
+  core\upstox_client.py:23:? Session Management
+  core\upstox_client.py:24:? Error Handling
+  core\upstox_client.py:25:"""
+  core\upstox_client.py:50:
+  core\upstox_client.py:51:    VERSION = "2.0"
+  core\upstox_client.py:52:
+> core\upstox_client.py:53:    def __init__(
+  core\upstox_client.py:54:
+  core\upstox_client.py:55:        self,
+  core\upstox_client.py:56:
+  core\upstox_client.py:57:        api_key: str,
+  core\upstox_client.py:58:
+  core\upstox_client.py:59:        access_token: str,
+  core\upstox_client.py:60:
+  core\upstox_client.py:61:        sandbox: bool = False,
+  core\upstox_client.py:62:
+  core\upstox_client.py:63:    ) -> None:
+  core\upstox_client.py:209:    # CONNECT
+  core\upstox_client.py:210:    # =====================================================
+  core\upstox_client.py:211:
+> core\upstox_client.py:212:    def connect(
+  core\upstox_client.py:213:        self,
+  core\upstox_client.py:214:    ) -> bool:
+  core\upstox_client.py:215:        """
+  core\upstox_client.py:216:        Initialize API session.
+  core\upstox_client.py:217:        """
+  core\upstox_client.py:218:
+  core\upstox_client.py:219:        try:
+  core\upstox_client.py:220:
+  core\upstox_client.py:221:            profile = (
+  core\upstox_client.py:222:
+  core\upstox_client.py:249:    # =====================================================
+  core\upstox_client.py:250:
+  core\upstox_client.py:251:    @property
+> core\upstox_client.py:252:    def is_connected(
+  core\upstox_client.py:253:        self,
+  core\upstox_client.py:254:    ) -> bool:
+  core\upstox_client.py:255:
+  core\upstox_client.py:256:        return self.connected
+  core\upstox_client.py:257:        # =====================================================
+  core\upstox_client.py:258:    # DISCONNECT
+  core\upstox_client.py:259:    # =====================================================
+  core\upstox_client.py:260:
+> core\upstox_client.py:261:    def disconnect(
+  core\upstox_client.py:262:        self,
+  core\upstox_client.py:263:    ) -> None:
+  core\upstox_client.py:264:        """
+  core\upstox_client.py:265:        Close API session.
+  core\upstox_client.py:266:        """
+  core\upstox_client.py:267:
+  core\upstox_client.py:268:        self.connected = False
+  core\upstox_client.py:269:
+  core\upstox_client.py:270:        self.logger.info(
+  core\upstox_client.py:271:            "Disconnected from Upstox."
+  core\upstox_client.py:275:    # RECONNECT
+  core\upstox_client.py:276:    # =====================================================
+  core\upstox_client.py:277:
+> core\upstox_client.py:278:    def reconnect(
+  core\upstox_client.py:279:        self,
+  core\upstox_client.py:280:    ) -> bool:
+  core\upstox_client.py:281:        """
+  core\upstox_client.py:282:        Reconnect using existing credentials.
+  core\upstox_client.py:283:        """
+  core\upstox_client.py:284:
+  core\upstox_client.py:285:        self.disconnect()
+  core\upstox_client.py:286:
+  core\upstox_client.py:287:        return self.connect()
+  core\upstox_client.py:288:
+  core\upstox_client.py:290:    # VALIDATE SESSION
+  core\upstox_client.py:291:    # =====================================================
+  core\upstox_client.py:292:
+> core\upstox_client.py:293:    def validate_session(
+  core\upstox_client.py:294:        self,
+  core\upstox_client.py:295:    ) -> bool:
+  core\upstox_client.py:296:        """
+  core\upstox_client.py:297:        Validate current access token.
+  core\upstox_client.py:298:        """
+  core\upstox_client.py:299:
+  core\upstox_client.py:300:        try:
+  core\upstox_client.py:301:
+  core\upstox_client.py:302:            self.user_api.get_profile("2.0")
+  core\upstox_client.py:303:
+  core\upstox_client.py:315:    # REQUEST WRAPPER
+  core\upstox_client.py:316:    # =====================================================
+  core\upstox_client.py:317:
+> core\upstox_client.py:318:    def _request(
+  core\upstox_client.py:319:        self,
+  core\upstox_client.py:320:        callback,
+  core\upstox_client.py:321:        *args,
+  core\upstox_client.py:322:        **kwargs,
+  core\upstox_client.py:323:    ):
+  core\upstox_client.py:324:        """
+  core\upstox_client.py:325:        Common API request wrapper.
+  core\upstox_client.py:326:        """
+  core\upstox_client.py:327:
+  core\upstox_client.py:328:        self._rate_limit()
+  core\upstox_client.py:358:    # REQUEST WITH RETRY
+  core\upstox_client.py:359:    # =====================================================
+  core\upstox_client.py:360:
+> core\upstox_client.py:361:    def _request_retry(
+  core\upstox_client.py:362:        self,
+  core\upstox_client.py:363:        callback,
+  core\upstox_client.py:364:        *args,
+  core\upstox_client.py:365:        retries: int = 3,
+  core\upstox_client.py:366:        delay: float = 1.0,
+  core\upstox_client.py:367:        **kwargs,
+  core\upstox_client.py:368:    ):
+  core\upstox_client.py:369:        """
+  core\upstox_client.py:370:        Execute API request with retry support.
+  core\upstox_client.py:371:        """
+  core\upstox_client.py:400:    # RATE LIMIT
+  core\upstox_client.py:401:    # =====================================================
+  core\upstox_client.py:402:
+> core\upstox_client.py:403:    def _rate_limit(
+  core\upstox_client.py:404:        self,
+  core\upstox_client.py:405:        minimum_interval: float = 0.20,
+  core\upstox_client.py:406:    ) -> None:
+  core\upstox_client.py:407:        """
+  core\upstox_client.py:408:        Simple client-side rate limiter.
+  core\upstox_client.py:409:        """
+  core\upstox_client.py:410:
+  core\upstox_client.py:411:        if self.last_request is None:
+  core\upstox_client.py:412:
+  core\upstox_client.py:413:            return
+  core\upstox_client.py:432:    # UPDATE ACCESS TOKEN
+  core\upstox_client.py:433:    # =====================================================
+  core\upstox_client.py:434:
+> core\upstox_client.py:435:    def update_access_token(
+  core\upstox_client.py:436:        self,
+  core\upstox_client.py:437:        access_token: str,
+  core\upstox_client.py:438:    ) -> bool:
+  core\upstox_client.py:439:        """
+  core\upstox_client.py:440:        Replace the current access token.
+  core\upstox_client.py:441:        """
+  core\upstox_client.py:442:
+  core\upstox_client.py:443:        self.access_token = access_token
+  core\upstox_client.py:444:
+  core\upstox_client.py:445:        self.configuration.access_token = access_token
+  core\upstox_client.py:456:    # API STATISTICS
+  core\upstox_client.py:457:    # =====================================================
+  core\upstox_client.py:458:
+> core\upstox_client.py:459:    def statistics(
+  core\upstox_client.py:460:        self,
+  core\upstox_client.py:461:    ) -> Dict[str, Any]:
+  core\upstox_client.py:462:        """
+  core\upstox_client.py:463:        Runtime statistics.
+  core\upstox_client.py:464:        """
+  core\upstox_client.py:465:
+  core\upstox_client.py:466:        uptime = (
+  core\upstox_client.py:467:
+  core\upstox_client.py:468:            datetime.now()
+  core\upstox_client.py:469:
+  core\upstox_client.py:517:    # RESET STATISTICS
+  core\upstox_client.py:518:    # =====================================================
+  core\upstox_client.py:519:
+> core\upstox_client.py:520:    def reset_statistics(
+  core\upstox_client.py:521:        self,
+  core\upstox_client.py:522:    ) -> None:
+  core\upstox_client.py:523:        """
+  core\upstox_client.py:524:        Reset runtime counters.
+  core\upstox_client.py:525:        """
+  core\upstox_client.py:526:
+  core\upstox_client.py:527:        self.requests = 0
+  core\upstox_client.py:528:
+  core\upstox_client.py:529:        self.errors = 0
+  core\upstox_client.py:530:
+  core\upstox_client.py:533:    # LOAD INSTRUMENTS
+  core\upstox_client.py:534:    # =====================================================
+  core\upstox_client.py:535:
+> core\upstox_client.py:536:    def load_instruments(
+  core\upstox_client.py:537:        self,
+  core\upstox_client.py:538:    ) -> Dict[str, Any]:
+  core\upstox_client.py:539:        """
+  core\upstox_client.py:540:        Download and cache instrument master.
+  core\upstox_client.py:541:        """
+  core\upstox_client.py:542:
+  core\upstox_client.py:543:        instruments = self._request_retry(
+  core\upstox_client.py:544:
+  core\upstox_client.py:545:            self.market_api.get_full_market_quote,
+  core\upstox_client.py:546:
+  core\upstox_client.py:564:    # SET INSTRUMENT CACHE
+  core\upstox_client.py:565:    # =====================================================
+  core\upstox_client.py:566:
+> core\upstox_client.py:567:    def set_instrument_cache(
+  core\upstox_client.py:568:        self,
+  core\upstox_client.py:569:        instruments: Dict[str, Any],
+  core\upstox_client.py:570:    ) -> None:
+  core\upstox_client.py:571:        """
+  core\upstox_client.py:572:        Replace the instrument cache.
+  core\upstox_client.py:573:        """
+  core\upstox_client.py:574:
+  core\upstox_client.py:575:        self.instrument_cache = instruments
+  core\upstox_client.py:576:
+  core\upstox_client.py:577:    # =====================================================
+  core\upstox_client.py:578:    # GET INSTRUMENT CACHE
+  core\upstox_client.py:579:    # =====================================================
+  core\upstox_client.py:580:
+> core\upstox_client.py:581:    def get_instrument_cache(
+  core\upstox_client.py:582:        self,
+  core\upstox_client.py:583:    ) -> Dict[str, Any]:
+  core\upstox_client.py:584:
+  core\upstox_client.py:585:        return self.instrument_cache
+  core\upstox_client.py:586:
+  core\upstox_client.py:587:    # =====================================================
+  core\upstox_client.py:588:    # CLEAR INSTRUMENT CACHE
+  core\upstox_client.py:589:    # =====================================================
+  core\upstox_client.py:590:
+> core\upstox_client.py:591:    def clear_instrument_cache(
+  core\upstox_client.py:592:        self,
+  core\upstox_client.py:593:    ) -> None:
+  core\upstox_client.py:594:
+  core\upstox_client.py:595:        self.instrument_cache.clear()
+  core\upstox_client.py:596:
+  core\upstox_client.py:597:    # =====================================================
+  core\upstox_client.py:598:    # FIND INSTRUMENT
+  core\upstox_client.py:599:    # =====================================================
+  core\upstox_client.py:600:
+> core\upstox_client.py:601:    def find_instrument(
+  core\upstox_client.py:602:        self,
+  core\upstox_client.py:603:        trading_symbol: str,
+  core\upstox_client.py:604:    ) -> Optional[Dict[str, Any]]:
+  core\upstox_client.py:605:        """
+  core\upstox_client.py:606:        Find an instrument by trading symbol.
+  core\upstox_client.py:607:
+  core\upstox_client.py:608:        Requires the instrument cache to contain
+  core\upstox_client.py:609:        a mapping of trading symbols.
+  core\upstox_client.py:610:        """
+  core\upstox_client.py:611:
+  core\upstox_client.py:624:    # GET INSTRUMENT KEY
+  core\upstox_client.py:625:    # =====================================================
+  core\upstox_client.py:626:
+> core\upstox_client.py:627:    def get_instrument_key(
+  core\upstox_client.py:628:        self,
+  core\upstox_client.py:629:        trading_symbol: str,
+  core\upstox_client.py:630:    ) -> Optional[str]:
+  core\upstox_client.py:631:        """
+  core\upstox_client.py:632:        Return Upstox instrument key.
+  core\upstox_client.py:633:        """
+  core\upstox_client.py:634:
+  core\upstox_client.py:635:        instrument = self.find_instrument(
+  core\upstox_client.py:636:            trading_symbol
+  core\upstox_client.py:637:        )
+  core\upstox_client.py:648:    # HAS INSTRUMENT
+  core\upstox_client.py:649:    # =====================================================
+  core\upstox_client.py:650:
+> core\upstox_client.py:651:    def has_instrument(
+  core\upstox_client.py:652:        self,
+  core\upstox_client.py:653:        trading_symbol: str,
+  core\upstox_client.py:654:    ) -> bool:
+  core\upstox_client.py:655:
+  core\upstox_client.py:656:        return (
+  core\upstox_client.py:657:
+  core\upstox_client.py:658:            self.find_instrument(
+  core\upstox_client.py:659:                trading_symbol
+  core\upstox_client.py:660:            )
+  core\upstox_client.py:661:
+  core\upstox_client.py:667:    # SEARCH SYMBOLS
+  core\upstox_client.py:668:    # =====================================================
+  core\upstox_client.py:669:
+> core\upstox_client.py:670:    def search_symbols(
+  core\upstox_client.py:671:        self,
+  core\upstox_client.py:672:        text: str,
+  core\upstox_client.py:673:    ) -> List[Dict[str, Any]]:
+  core\upstox_client.py:674:        """
+  core\upstox_client.py:675:        Search instruments by trading symbol.
+  core\upstox_client.py:676:        """
+  core\upstox_client.py:677:
+  core\upstox_client.py:678:        text = text.upper()
+  core\upstox_client.py:679:
+  core\upstox_client.py:680:        matches: List[
+  core\upstox_client.py:709:    # FILTER EXCHANGE
+  core\upstox_client.py:710:    # =====================================================
+  core\upstox_client.py:711:
+> core\upstox_client.py:712:    def instruments_by_exchange(
+  core\upstox_client.py:713:        self,
+  core\upstox_client.py:714:        exchange: str,
+  core\upstox_client.py:715:    ) -> List[Dict[str, Any]]:
+  core\upstox_client.py:716:        """
+  core\upstox_client.py:717:        Filter cached instruments by exchange.
+  core\upstox_client.py:718:        """
+  core\upstox_client.py:719:
+  core\upstox_client.py:720:        exchange = exchange.upper()
+  core\upstox_client.py:721:
+  core\upstox_client.py:722:        instruments = self.instrument_cache.get(
+  core\upstox_client.py:741:    # ALL SYMBOLS
+  core\upstox_client.py:742:    # =====================================================
+  core\upstox_client.py:743:
+> core\upstox_client.py:744:    def trading_symbols(
+  core\upstox_client.py:745:        self,
+  core\upstox_client.py:746:    ) -> List[str]:
+  core\upstox_client.py:747:        """
+  core\upstox_client.py:748:        Return all cached trading symbols.
+  core\upstox_client.py:749:        """
+  core\upstox_client.py:750:
+  core\upstox_client.py:751:        return sorted(
+  core\upstox_client.py:752:
+  core\upstox_client.py:753:            self.instrument_cache.get(
+  core\upstox_client.py:754:
+  core\upstox_client.py:760:
+  core\upstox_client.py:761:        )
+  core\upstox_client.py:762:        # =====================================================
+> core\upstox_client.py:763:    # HISTORICAL DATA
+  core\upstox_client.py:764:    # =====================================================
+  core\upstox_client.py:765:
+> core\upstox_client.py:766:    def historical_data(
+  core\upstox_client.py:767:        self,
+  core\upstox_client.py:768:        instrument_key: str,
+  core\upstox_client.py:769:        interval: str,
+  core\upstox_client.py:770:        from_date: str,
+  core\upstox_client.py:771:        to_date: str,
+  core\upstox_client.py:772:    ) -> pd.DataFrame:
+  core\upstox_client.py:773:        """
+> core\upstox_client.py:774:        Fetch historical OHLCV data.
+  core\upstox_client.py:775:
+  core\upstox_client.py:776:        Returns
+  core\upstox_client.py:777:        -------
+  core\upstox_client.py:778:        DataFrame
+  core\upstox_client.py:779:        """
+  core\upstox_client.py:780:
+  core\upstox_client.py:781:        cache_key = "|".join(
+  core\upstox_client.py:782:
+  core\upstox_client.py:783:            [
+  core\upstox_client.py:784:
+  core\upstox_client.py:806:
+  core\upstox_client.py:807:        response = self._request_retry(
+  core\upstox_client.py:808:
+> core\upstox_client.py:809:            self.history_api.get_historical_candle_data1,
+  core\upstox_client.py:810:
+  core\upstox_client.py:811:            instrument_key,
+  core\upstox_client.py:812:
+  core\upstox_client.py:813:            interval,
+  core\upstox_client.py:814:
+  core\upstox_client.py:815:            to_date,
+  core\upstox_client.py:816:
+  core\upstox_client.py:817:            from_date,
+  core\upstox_client.py:818:
+  core\upstox_client.py:819:        )
+  core\upstox_client.py:836:    # TODAY DATA
+  core\upstox_client.py:837:    # =====================================================
+  core\upstox_client.py:838:
+> core\upstox_client.py:839:    def intraday_data(
+  core\upstox_client.py:840:        self,
+  core\upstox_client.py:841:        instrument_key: str,
+  core\upstox_client.py:842:        interval: str = "1minute",
+  core\upstox_client.py:843:    ) -> pd.DataFrame:
+  core\upstox_client.py:844:        """
+> core\upstox_client.py:845:        Fetch today's intraday candles.
+  core\upstox_client.py:846:        """
+  core\upstox_client.py:847:
+  core\upstox_client.py:848:        response = self._request_retry(
+  core\upstox_client.py:849:
+> core\upstox_client.py:850:            self.history_api.get_intra_day_candle_data,
+  core\upstox_client.py:851:
+  core\upstox_client.py:852:            instrument_key,
+  core\upstox_client.py:853:
+  core\upstox_client.py:854:            interval,
+  core\upstox_client.py:855:
+  core\upstox_client.py:856:        )
+  core\upstox_client.py:857:
+  core\upstox_client.py:858:        return self._history_to_dataframe(
+  core\upstox_client.py:859:
+  core\upstox_client.py:860:            response
+  core\upstox_client.py:865:    # MULTIPLE SYMBOLS
+  core\upstox_client.py:866:    # =====================================================
+  core\upstox_client.py:867:
+> core\upstox_client.py:868:    def historical_batch(
+  core\upstox_client.py:869:        self,
+  core\upstox_client.py:870:        requests: List[Dict[str, str]],
+  core\upstox_client.py:871:    ) -> Dict[str, pd.DataFrame]:
+  core\upstox_client.py:872:        """
+> core\upstox_client.py:873:        Download historical data for multiple symbols.
+  core\upstox_client.py:874:
+  core\upstox_client.py:875:        Example
+  core\upstox_client.py:876:        -------
+  core\upstox_client.py:877:        [
+  core\upstox_client.py:878:            {
+  core\upstox_client.py:879:                "instrument_key": "...",
+  core\upstox_client.py:880:                "interval": "15minute",
+  core\upstox_client.py:881:                "from": "...",
+  core\upstox_client.py:882:                "to": "..."
+  core\upstox_client.py:883:            }
+  core\upstox_client.py:895:
+  core\upstox_client.py:896:            output[instrument] = (
+  core\upstox_client.py:897:
+> core\upstox_client.py:898:                self.historical_data(
+  core\upstox_client.py:899:
+  core\upstox_client.py:900:                    instrument,
+  core\upstox_client.py:901:
+  core\upstox_client.py:902:                    item["interval"],
+  core\upstox_client.py:903:
+  core\upstox_client.py:904:                    item["from"],
+  core\upstox_client.py:905:
+  core\upstox_client.py:906:                    item["to"],
+  core\upstox_client.py:907:
+  core\upstox_client.py:908:                )
+  core\upstox_client.py:915:    # HISTORY CACHE
+  core\upstox_client.py:916:    # =====================================================
+  core\upstox_client.py:917:
+> core\upstox_client.py:918:    def clear_history_cache(
+  core\upstox_client.py:919:        self,
+  core\upstox_client.py:920:    ) -> None:
+  core\upstox_client.py:921:
+  core\upstox_client.py:922:        self.history_cache.clear()
+  core\upstox_client.py:923:
+  core\upstox_client.py:924:    # =====================================================
+  core\upstox_client.py:925:    # HAS HISTORY
+  core\upstox_client.py:926:    # =====================================================
+  core\upstox_client.py:927:
+> core\upstox_client.py:928:    def has_history(
+  core\upstox_client.py:929:        self,
+  core\upstox_client.py:930:        cache_key: str,
+  core\upstox_client.py:931:    ) -> bool:
+  core\upstox_client.py:932:
+  core\upstox_client.py:933:        return cache_key in self.history_cache
+  core\upstox_client.py:934:
+  core\upstox_client.py:935:    # =====================================================
+  core\upstox_client.py:936:    # HISTORY CACHE SIZE
+  core\upstox_client.py:937:    # =====================================================
+  core\upstox_client.py:938:
+  core\upstox_client.py:939:    @property
+> core\upstox_client.py:940:    def history_cache_size(
+  core\upstox_client.py:941:        self,
+  core\upstox_client.py:942:    ) -> int:
+  core\upstox_client.py:943:
+  core\upstox_client.py:944:        return len(
+  core\upstox_client.py:945:
+  core\upstox_client.py:946:            self.history_cache
+  core\upstox_client.py:947:
+  core\upstox_client.py:948:        )
+  core\upstox_client.py:949:
+  core\upstox_client.py:950:    # =====================================================
+  core\upstox_client.py:951:    # DATAFRAME CONVERSION
+  core\upstox_client.py:952:    # =====================================================
+  core\upstox_client.py:953:
+> core\upstox_client.py:954:    def _history_to_dataframe(
+  core\upstox_client.py:955:        self,
+  core\upstox_client.py:956:        response: Any,
+  core\upstox_client.py:957:    ) -> pd.DataFrame:
+  core\upstox_client.py:958:        """
+> core\upstox_client.py:959:        Convert Upstox candle response
+  core\upstox_client.py:960:        into a pandas DataFrame.
+  core\upstox_client.py:961:        """
+  core\upstox_client.py:962:
+> core\upstox_client.py:963:        candles = getattr(
+  core\upstox_client.py:964:
+  core\upstox_client.py:965:            response.data,
+  core\upstox_client.py:966:
+> core\upstox_client.py:967:            "candles",
+  core\upstox_client.py:968:
+  core\upstox_client.py:969:            [],
+  core\upstox_client.py:970:
+  core\upstox_client.py:971:        )
+  core\upstox_client.py:972:
+  core\upstox_client.py:973:        dataframe = pd.DataFrame(
+  core\upstox_client.py:974:
+> core\upstox_client.py:975:            candles,
+  core\upstox_client.py:976:
+  core\upstox_client.py:977:            columns=[
+  core\upstox_client.py:978:
+  core\upstox_client.py:979:                "datetime",
+  core\upstox_client.py:980:
+  core\upstox_client.py:981:                "open",
+  core\upstox_client.py:982:
+  core\upstox_client.py:983:                "high",
+  core\upstox_client.py:984:
+  core\upstox_client.py:985:                "low",
+  core\upstox_client.py:1055:    # LIVE QUOTE
+  core\upstox_client.py:1056:    # =====================================================
+  core\upstox_client.py:1057:
+> core\upstox_client.py:1058:    def get_quote(
+  core\upstox_client.py:1059:        self,
+  core\upstox_client.py:1060:        instrument_key: str,
+  core\upstox_client.py:1061:        refresh: bool = False,
+  core\upstox_client.py:1062:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1063:        """
+  core\upstox_client.py:1064:        Get live market quote.
+  core\upstox_client.py:1065:        """
+  core\upstox_client.py:1066:
+  core\upstox_client.py:1067:        if (
+  core\upstox_client.py:1068:
+  core\upstox_client.py:1114:    # MULTIPLE QUOTES
+  core\upstox_client.py:1115:    # =====================================================
+  core\upstox_client.py:1116:
+> core\upstox_client.py:1117:    def get_quotes(
+  core\upstox_client.py:1118:        self,
+  core\upstox_client.py:1119:        instrument_keys: List[str],
+  core\upstox_client.py:1120:        refresh: bool = False,
+  core\upstox_client.py:1121:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1122:        """
+  core\upstox_client.py:1123:        Fetch multiple live quotes.
+  core\upstox_client.py:1124:        """
+  core\upstox_client.py:1125:
+  core\upstox_client.py:1126:        output: Dict[
+  core\upstox_client.py:1127:            str,
+  core\upstox_client.py:1182:    # LAST TRADED PRICE
+  core\upstox_client.py:1183:    # =====================================================
+  core\upstox_client.py:1184:
+> core\upstox_client.py:1185:    def ltp(
+  core\upstox_client.py:1186:        self,
+  core\upstox_client.py:1187:        instrument_key: str,
+  core\upstox_client.py:1188:        refresh: bool = False,
+  core\upstox_client.py:1189:    ) -> Optional[float]:
+  core\upstox_client.py:1190:        """
+  core\upstox_client.py:1191:        Return Last Traded Price.
+  core\upstox_client.py:1192:        """
+  core\upstox_client.py:1193:
+  core\upstox_client.py:1194:        quote = self.get_quote(
+  core\upstox_client.py:1195:
+  core\upstox_client.py:1209:    # OHLC
+  core\upstox_client.py:1210:    # =====================================================
+  core\upstox_client.py:1211:
+> core\upstox_client.py:1212:    def ohlc(
+  core\upstox_client.py:1213:        self,
+  core\upstox_client.py:1214:        instrument_key: str,
+  core\upstox_client.py:1215:        refresh: bool = False,
+  core\upstox_client.py:1216:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1217:        """
+  core\upstox_client.py:1218:        Return OHLC values.
+  core\upstox_client.py:1219:        """
+  core\upstox_client.py:1220:
+  core\upstox_client.py:1221:        quote = self.get_quote(
+  core\upstox_client.py:1222:
+  core\upstox_client.py:1238:    # MARKET DEPTH
+  core\upstox_client.py:1239:    # =====================================================
+  core\upstox_client.py:1240:
+> core\upstox_client.py:1241:    def market_depth(
+  core\upstox_client.py:1242:        self,
+  core\upstox_client.py:1243:        instrument_key: str,
+  core\upstox_client.py:1244:        refresh: bool = False,
+  core\upstox_client.py:1245:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1246:        """
+  core\upstox_client.py:1247:        Return bid/ask market depth.
+  core\upstox_client.py:1248:        """
+  core\upstox_client.py:1249:
+  core\upstox_client.py:1250:        quote = self.get_quote(
+  core\upstox_client.py:1251:
+  core\upstox_client.py:1267:    # OPEN INTEREST
+  core\upstox_client.py:1268:    # =====================================================
+  core\upstox_client.py:1269:
+> core\upstox_client.py:1270:    def open_interest(
+  core\upstox_client.py:1271:        self,
+  core\upstox_client.py:1272:        instrument_key: str,
+  core\upstox_client.py:1273:        refresh: bool = False,
+  core\upstox_client.py:1274:    ) -> Optional[int]:
+  core\upstox_client.py:1275:        """
+  core\upstox_client.py:1276:        Return Open Interest.
+  core\upstox_client.py:1277:        """
+  core\upstox_client.py:1278:
+  core\upstox_client.py:1279:        quote = self.get_quote(
+  core\upstox_client.py:1280:
+  core\upstox_client.py:1294:    # VOLUME
+  core\upstox_client.py:1295:    # =====================================================
+  core\upstox_client.py:1296:
+> core\upstox_client.py:1297:    def volume(
+  core\upstox_client.py:1298:        self,
+  core\upstox_client.py:1299:        instrument_key: str,
+  core\upstox_client.py:1300:        refresh: bool = False,
+  core\upstox_client.py:1301:    ) -> Optional[int]:
+  core\upstox_client.py:1302:        """
+  core\upstox_client.py:1303:        Return traded volume.
+  core\upstox_client.py:1304:        """
+  core\upstox_client.py:1305:
+  core\upstox_client.py:1306:        quote = self.get_quote(
+  core\upstox_client.py:1307:
+  core\upstox_client.py:1321:    # CLEAR QUOTE CACHE
+  core\upstox_client.py:1322:    # =====================================================
+  core\upstox_client.py:1323:
+> core\upstox_client.py:1324:    def clear_quote_cache(
+  core\upstox_client.py:1325:        self,
+  core\upstox_client.py:1326:    ) -> None:
+  core\upstox_client.py:1327:        """
+  core\upstox_client.py:1328:        Clear cached market quotes.
+  core\upstox_client.py:1329:        """
+  core\upstox_client.py:1330:
+  core\upstox_client.py:1331:        self.quote_cache.clear()
+  core\upstox_client.py:1332:
+  core\upstox_client.py:1333:    # =====================================================
+  core\upstox_client.py:1334:    # REFRESH QUOTE CACHE
+  core\upstox_client.py:1335:    # =====================================================
+  core\upstox_client.py:1336:
+> core\upstox_client.py:1337:    def refresh_quotes(
+  core\upstox_client.py:1338:        self,
+  core\upstox_client.py:1339:        instrument_keys: List[str],
+  core\upstox_client.py:1340:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1341:        """
+  core\upstox_client.py:1342:        Force refresh quote cache.
+  core\upstox_client.py:1343:        """
+  core\upstox_client.py:1344:
+  core\upstox_client.py:1345:        return self.get_quotes(
+  core\upstox_client.py:1346:
+  core\upstox_client.py:1347:            instrument_keys,
+  core\upstox_client.py:1353:    # OPTION CHAIN
+  core\upstox_client.py:1354:    # =====================================================
+  core\upstox_client.py:1355:
+> core\upstox_client.py:1356:    def option_chain(
+  core\upstox_client.py:1357:        self,
+  core\upstox_client.py:1358:        instrument_key: str,
+  core\upstox_client.py:1359:        expiry_date: str,
+  core\upstox_client.py:1360:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1361:        """
+  core\upstox_client.py:1362:        Fetch option chain for an underlying.
+  core\upstox_client.py:1363:        """
+  core\upstox_client.py:1364:
+  core\upstox_client.py:1365:        response = self._request_retry(
+  core\upstox_client.py:1366:
+  core\upstox_client.py:1386:    # AVAILABLE EXPIRIES
+  core\upstox_client.py:1387:    # =====================================================
+  core\upstox_client.py:1388:
+> core\upstox_client.py:1389:    def option_expiries(
+  core\upstox_client.py:1390:        self,
+  core\upstox_client.py:1391:        instrument_key: str,
+  core\upstox_client.py:1392:    ) -> List[str]:
+  core\upstox_client.py:1393:        """
+  core\upstox_client.py:1394:        Get available expiry dates.
+  core\upstox_client.py:1395:        """
+  core\upstox_client.py:1396:
+  core\upstox_client.py:1397:        response = self._request_retry(
+  core\upstox_client.py:1398:
+  core\upstox_client.py:1399:            self.option_api.get_option_contracts,
+  core\upstox_client.py:1438:    # OPTION CONTRACTS
+  core\upstox_client.py:1439:    # =====================================================
+  core\upstox_client.py:1440:
+> core\upstox_client.py:1441:    def option_contracts(
+  core\upstox_client.py:1442:        self,
+  core\upstox_client.py:1443:        instrument_key: str,
+  core\upstox_client.py:1444:    ) -> List[Dict[str, Any]]:
+  core\upstox_client.py:1445:        """
+  core\upstox_client.py:1446:        Return all option contracts.
+  core\upstox_client.py:1447:        """
+  core\upstox_client.py:1448:
+  core\upstox_client.py:1449:        response = self._request_retry(
+  core\upstox_client.py:1450:
+  core\upstox_client.py:1451:            self.option_api.get_option_contracts,
+  core\upstox_client.py:1468:    # STRIKE FILTER
+  core\upstox_client.py:1469:    # =====================================================
+  core\upstox_client.py:1470:
+> core\upstox_client.py:1471:    def strikes(
+  core\upstox_client.py:1472:        self,
+  core\upstox_client.py:1473:        instrument_key: str,
+  core\upstox_client.py:1474:        expiry_date: str,
+  core\upstox_client.py:1475:    ) -> List[float]:
+  core\upstox_client.py:1476:        """
+  core\upstox_client.py:1477:        Return available strike prices.
+  core\upstox_client.py:1478:        """
+  core\upstox_client.py:1479:
+  core\upstox_client.py:1480:        chain = self.option_chain(
+  core\upstox_client.py:1481:
+  core\upstox_client.py:1513:    # ATM STRIKE
+  core\upstox_client.py:1514:    # =====================================================
+  core\upstox_client.py:1515:
+> core\upstox_client.py:1516:    def atm_strike(
+  core\upstox_client.py:1517:        self,
+  core\upstox_client.py:1518:        instrument_key: str,
+  core\upstox_client.py:1519:        expiry_date: str,
+  core\upstox_client.py:1520:    ) -> Optional[float]:
+  core\upstox_client.py:1521:        """
+  core\upstox_client.py:1522:        Find nearest ATM strike.
+  core\upstox_client.py:1523:        """
+  core\upstox_client.py:1524:
+  core\upstox_client.py:1525:        ltp = self.ltp(
+  core\upstox_client.py:1526:
+  core\upstox_client.py:1562:    # ITM STRIKES
+  core\upstox_client.py:1563:    # =====================================================
+  core\upstox_client.py:1564:
+> core\upstox_client.py:1565:    def itm_strikes(
+  core\upstox_client.py:1566:        self,
+  core\upstox_client.py:1567:        instrument_key: str,
+  core\upstox_client.py:1568:        expiry_date: str,
+  core\upstox_client.py:1569:    ) -> List[float]:
+  core\upstox_client.py:1570:        """
+  core\upstox_client.py:1571:        Return ITM strikes.
+  core\upstox_client.py:1572:        """
+  core\upstox_client.py:1573:
+  core\upstox_client.py:1574:        atm = self.atm_strike(
+  core\upstox_client.py:1575:
+  core\upstox_client.py:1603:    # OTM STRIKES
+  core\upstox_client.py:1604:    # =====================================================
+  core\upstox_client.py:1605:
+> core\upstox_client.py:1606:    def otm_strikes(
+  core\upstox_client.py:1607:        self,
+  core\upstox_client.py:1608:        instrument_key: str,
+  core\upstox_client.py:1609:        expiry_date: str,
+  core\upstox_client.py:1610:    ) -> List[float]:
+  core\upstox_client.py:1611:        """
+  core\upstox_client.py:1612:        Return OTM strikes.
+  core\upstox_client.py:1613:        """
+  core\upstox_client.py:1614:
+  core\upstox_client.py:1615:        atm = self.atm_strike(
+  core\upstox_client.py:1616:
+  core\upstox_client.py:1644:    # OPTION GREEKS
+  core\upstox_client.py:1645:    # =====================================================
+  core\upstox_client.py:1646:
+> core\upstox_client.py:1647:    def greeks(
+  core\upstox_client.py:1648:        self,
+  core\upstox_client.py:1649:        option_quote: Dict[str, Any],
+  core\upstox_client.py:1650:    ) -> Dict[str, Any]:
+  core\upstox_client.py:1651:        """
+  core\upstox_client.py:1652:        Extract option Greeks.
+  core\upstox_client.py:1653:        """
+  core\upstox_client.py:1654:
+  core\upstox_client.py:1655:        return {
+  core\upstox_client.py:1656:
+  core\upstox_client.py:1657:            "delta": option_quote.get(
+  core\upstox_client.py:1696:    # FUTURE CONTRACTS
+  core\upstox_client.py:1697:    # =====================================================
+  core\upstox_client.py:1698:
+> core\upstox_client.py:1699:    def future_contracts(
+  core\upstox_client.py:1700:        self,
+  core\upstox_client.py:1701:        instrument_key: str,
+  core\upstox_client.py:1702:    ) -> List[Dict[str, Any]]:
+  core\upstox_client.py:1703:        """
+  core\upstox_client.py:1704:        Return available futures contracts.
+  core\upstox_client.py:1705:        """
+  core\upstox_client.py:1706:
+  core\upstox_client.py:1707:        contracts = self.option_contracts(
+  core\upstox_client.py:1708:
+  core\upstox_client.py:1709:            instrument_key,
+  core\upstox_client.py:1729:    # WEBSOCKET CONNECT
+  core\upstox_client.py:1730:    # =====================================================
+  core\upstox_client.py:1731:
+> core\upstox_client.py:1732:    def connect_websocket(
+  core\upstox_client.py:1733:        self,
+  core\upstox_client.py:1734:    ) -> bool:
+  core\upstox_client.py:1735:        """
+  core\upstox_client.py:1736:        Initialize market data WebSocket.
+  core\upstox_client.py:1737:
+  core\upstox_client.py:1738:        Actual connection logic depends on the official
+  core\upstox_client.py:1739:        Upstox SDK WebSocket implementation.
+  core\upstox_client.py:1740:        """
+  core\upstox_client.py:1741:
+  core\upstox_client.py:1742:        try:
+  core\upstox_client.py:1775:    # WEBSOCKET DISCONNECT
+  core\upstox_client.py:1776:    # =====================================================
+  core\upstox_client.py:1777:
+> core\upstox_client.py:1778:    def disconnect_websocket(
+  core\upstox_client.py:1779:        self,
+  core\upstox_client.py:1780:    ) -> None:
+  core\upstox_client.py:1781:        """
+  core\upstox_client.py:1782:        Disconnect market WebSocket.
+  core\upstox_client.py:1783:        """
+  core\upstox_client.py:1784:
+  core\upstox_client.py:1785:        try:
+  core\upstox_client.py:1786:
+  core\upstox_client.py:1787:            if getattr(
+  core\upstox_client.py:1788:
+  core\upstox_client.py:1818:    # SUBSCRIBE
+  core\upstox_client.py:1819:    # =====================================================
+  core\upstox_client.py:1820:
+> core\upstox_client.py:1821:    def subscribe(
+  core\upstox_client.py:1822:        self,
+  core\upstox_client.py:1823:        instrument_keys: List[str],
+  core\upstox_client.py:1824:    ) -> bool:
+  core\upstox_client.py:1825:        """
+  core\upstox_client.py:1826:        Subscribe to live market feed.
+  core\upstox_client.py:1827:        """
+  core\upstox_client.py:1828:
+  core\upstox_client.py:1829:        if not getattr(
+  core\upstox_client.py:1830:
+  core\upstox_client.py:1831:            self,
+  core\upstox_client.py:1856:    # UNSUBSCRIBE
+  core\upstox_client.py:1857:    # =====================================================
+  core\upstox_client.py:1858:
+> core\upstox_client.py:1859:    def unsubscribe(
+  core\upstox_client.py:1860:        self,
+  core\upstox_client.py:1861:        instrument_keys: List[str],
+  core\upstox_client.py:1862:    ) -> bool:
+  core\upstox_client.py:1863:        """
+  core\upstox_client.py:1864:        Remove market feed subscriptions.
+  core\upstox_client.py:1865:        """
+  core\upstox_client.py:1866:
+  core\upstox_client.py:1867:        for key in instrument_keys:
+  core\upstox_client.py:1868:
+  core\upstox_client.py:1869:            self.subscriptions.discard(
+  core\upstox_client.py:1886:    # REGISTER CALLBACK
+  core\upstox_client.py:1887:    # =====================================================
+  core\upstox_client.py:1888:
+> core\upstox_client.py:1889:    def register_tick_callback(
+  core\upstox_client.py:1890:        self,
+  core\upstox_client.py:1891:        callback,
+  core\upstox_client.py:1892:    ) -> None:
+  core\upstox_client.py:1893:        """
+  core\upstox_client.py:1894:        Register callback for live ticks.
+  core\upstox_client.py:1895:
+  core\upstox_client.py:1896:        Callback signature:
+  core\upstox_client.py:1897:
+  core\upstox_client.py:1898:            callback(
+  core\upstox_client.py:1899:                instrument_key,
+  core\upstox_client.py:1913:    # REMOVE CALLBACK
+  core\upstox_client.py:1914:    # =====================================================
+  core\upstox_client.py:1915:
+> core\upstox_client.py:1916:    def unregister_tick_callback(
+  core\upstox_client.py:1917:        self,
+  core\upstox_client.py:1918:        callback,
+  core\upstox_client.py:1919:    ) -> None:
+  core\upstox_client.py:1920:        """
+  core\upstox_client.py:1921:        Remove tick callback.
+  core\upstox_client.py:1922:        """
+  core\upstox_client.py:1923:
+  core\upstox_client.py:1924:        if callback in self.tick_callbacks:
+  core\upstox_client.py:1925:
+  core\upstox_client.py:1926:            self.tick_callbacks.remove(
+  core\upstox_client.py:1933:    # PROCESS TICK
+  core\upstox_client.py:1934:    # =====================================================
+  core\upstox_client.py:1935:
+> core\upstox_client.py:1936:    def _process_tick(
+  core\upstox_client.py:1937:        self,
+  core\upstox_client.py:1938:        instrument_key: str,
+  core\upstox_client.py:1939:        tick: Dict[str, Any],
+  core\upstox_client.py:1940:    ) -> None:
+  core\upstox_client.py:1941:        """
+  core\upstox_client.py:1942:        Update cache and notify listeners.
+  core\upstox_client.py:1943:        """
+  core\upstox_client.py:1944:
+  core\upstox_client.py:1945:        self.quote_cache[
+  core\upstox_client.py:1946:
+  core\upstox_client.py:1972:    # RECONNECT WEBSOCKET
+  core\upstox_client.py:1973:    # =====================================================
+  core\upstox_client.py:1974:
+> core\upstox_client.py:1975:    def reconnect_websocket(
+  core\upstox_client.py:1976:        self,
+  core\upstox_client.py:1977:    ) -> bool:
+  core\upstox_client.py:1978:        """
+  core\upstox_client.py:1979:        Reconnect WebSocket and restore
+  core\upstox_client.py:1980:        subscriptions.
+  core\upstox_client.py:1981:        """
+  core\upstox_client.py:1982:
+  core\upstox_client.py:1983:        previous = list(
+  core\upstox_client.py:1984:
+  core\upstox_client.py:1985:            getattr(
+  core\upstox_client.py:2013:    # =====================================================
+  core\upstox_client.py:2014:
+  core\upstox_client.py:2015:    @property
+> core\upstox_client.py:2016:    def websocket_status(
+  core\upstox_client.py:2017:        self,
+  core\upstox_client.py:2018:    ) -> Dict[str, Any]:
+  core\upstox_client.py:2019:        """
+  core\upstox_client.py:2020:        Current streaming status.
+  core\upstox_client.py:2021:        """
+  core\upstox_client.py:2022:
+  core\upstox_client.py:2023:        return {
+  core\upstox_client.py:2024:
+  core\upstox_client.py:2025:            "connected": getattr(
+  core\upstox_client.py:2026:
+  core\upstox_client.py:2066:    # ACTIVE SUBSCRIPTIONS
+  core\upstox_client.py:2067:    # =====================================================
+  core\upstox_client.py:2068:
+> core\upstox_client.py:2069:    def active_subscriptions(
+  core\upstox_client.py:2070:        self,
+  core\upstox_client.py:2071:    ) -> List[str]:
+  core\upstox_client.py:2072:        """
+  core\upstox_client.py:2073:        Return subscribed instrument keys.
+  core\upstox_client.py:2074:        """
+  core\upstox_client.py:2075:
+  core\upstox_client.py:2076:        return sorted(
+  core\upstox_client.py:2077:
+  core\upstox_client.py:2078:            list(
+  core\upstox_client.py:2079:
+  core\upstox_client.py:2094:    # PLACE ORDER
+  core\upstox_client.py:2095:    # =====================================================
+  core\upstox_client.py:2096:
+> core\upstox_client.py:2097:    def place_order(
+  core\upstox_client.py:2098:        self,
+  core\upstox_client.py:2099:        order_request: Any,
+  core\upstox_client.py:2100:    ) -> Any:
+  core\upstox_client.py:2101:        """
+  core\upstox_client.py:2102:        Place an order using the official Upstox SDK.
+  core\upstox_client.py:2103:
+  core\upstox_client.py:2104:        Parameters
+  core\upstox_client.py:2105:        ----------
+  core\upstox_client.py:2106:        order_request : PlaceOrderRequest
+  core\upstox_client.py:2107:            SDK order request object.
+  core\upstox_client.py:2119:    # MODIFY ORDER
+  core\upstox_client.py:2120:    # =====================================================
+  core\upstox_client.py:2121:
+> core\upstox_client.py:2122:    def modify_order(
+  core\upstox_client.py:2123:        self,
+  core\upstox_client.py:2124:        modify_request: Any,
+  core\upstox_client.py:2125:    ) -> Any:
+  core\upstox_client.py:2126:        """
+  core\upstox_client.py:2127:        Modify an existing order.
+  core\upstox_client.py:2128:        """
+  core\upstox_client.py:2129:
+  core\upstox_client.py:2130:        return self._request_retry(
+  core\upstox_client.py:2131:
+  core\upstox_client.py:2132:            self.order_api.modify_order,
+  core\upstox_client.py:2139:    # CANCEL ORDER
+  core\upstox_client.py:2140:    # =====================================================
+  core\upstox_client.py:2141:
+> core\upstox_client.py:2142:    def cancel_order(
+  core\upstox_client.py:2143:        self,
+  core\upstox_client.py:2144:        order_id: str,
+  core\upstox_client.py:2145:    ) -> Any:
+  core\upstox_client.py:2146:        """
+  core\upstox_client.py:2147:        Cancel an existing order.
+  core\upstox_client.py:2148:        """
+  core\upstox_client.py:2149:
+  core\upstox_client.py:2150:        return self._request_retry(
+  core\upstox_client.py:2151:
+  core\upstox_client.py:2152:            self.order_api.cancel_order,
+  core\upstox_client.py:2159:    # ORDER DETAILS
+  core\upstox_client.py:2160:    # =====================================================
+  core\upstox_client.py:2161:
+> core\upstox_client.py:2162:    def order_details(
+  core\upstox_client.py:2163:        self,
+  core\upstox_client.py:2164:        order_id: str,
+  core\upstox_client.py:2165:    ) -> Any:
+  core\upstox_client.py:2166:        """
+  core\upstox_client.py:2167:        Get order details.
+  core\upstox_client.py:2168:        """
+  core\upstox_client.py:2169:
+  core\upstox_client.py:2170:        return self._request_retry(
+  core\upstox_client.py:2171:
+  core\upstox_client.py:2172:            self.order_api.get_order_details,
+  core\upstox_client.py:2179:    # ORDER BOOK
+  core\upstox_client.py:2180:    # =====================================================
+  core\upstox_client.py:2181:
+> core\upstox_client.py:2182:    def order_book(
+  core\upstox_client.py:2183:        self,
+  core\upstox_client.py:2184:    ) -> List[Any]:
+  core\upstox_client.py:2185:        """
+  core\upstox_client.py:2186:        Fetch complete order book.
+  core\upstox_client.py:2187:        """
+  core\upstox_client.py:2188:
+  core\upstox_client.py:2189:        response = self._request_retry(
+  core\upstox_client.py:2190:
+  core\upstox_client.py:2191:            self.order_api.get_order_book,
+  core\upstox_client.py:2192:
+  core\upstox_client.py:2206:    # TRADE BOOK
+  core\upstox_client.py:2207:    # =====================================================
+  core\upstox_client.py:2208:
+> core\upstox_client.py:2209:    def trade_book(
+  core\upstox_client.py:2210:        self,
+  core\upstox_client.py:2211:    ) -> List[Any]:
+  core\upstox_client.py:2212:        """
+  core\upstox_client.py:2213:        Fetch trade book.
+  core\upstox_client.py:2214:        """
+  core\upstox_client.py:2215:
+  core\upstox_client.py:2216:        response = self._request_retry(
+  core\upstox_client.py:2217:
+  core\upstox_client.py:2218:            self.order_api.get_trade_history,
+  core\upstox_client.py:2219:
+  core\upstox_client.py:2233:    # POSITIONS
+  core\upstox_client.py:2234:    # =====================================================
+  core\upstox_client.py:2235:
+> core\upstox_client.py:2236:    def positions(
+  core\upstox_client.py:2237:        self,
+  core\upstox_client.py:2238:    ) -> List[Any]:
+  core\upstox_client.py:2239:        """
+  core\upstox_client.py:2240:        Fetch current positions.
+  core\upstox_client.py:2241:        """
+  core\upstox_client.py:2242:
+  core\upstox_client.py:2243:        response = self._request_retry(
+  core\upstox_client.py:2244:
+  core\upstox_client.py:2245:            self.order_api.get_positions,
+  core\upstox_client.py:2246:
+  core\upstox_client.py:2260:    # HOLDINGS
+  core\upstox_client.py:2261:    # =====================================================
+  core\upstox_client.py:2262:
+> core\upstox_client.py:2263:    def holdings(
+  core\upstox_client.py:2264:        self,
+  core\upstox_client.py:2265:    ) -> List[Any]:
+  core\upstox_client.py:2266:        """
+  core\upstox_client.py:2267:        Fetch holdings.
+  core\upstox_client.py:2268:        """
+  core\upstox_client.py:2269:
+  core\upstox_client.py:2270:        response = self._request_retry(
+  core\upstox_client.py:2271:
+  core\upstox_client.py:2272:            self.order_api.get_holdings,
+  core\upstox_client.py:2273:
+  core\upstox_client.py:2287:    # FUNDS / MARGIN
+  core\upstox_client.py:2288:    # =====================================================
+  core\upstox_client.py:2289:
+> core\upstox_client.py:2290:    def funds(
+  core\upstox_client.py:2291:        self,
+  core\upstox_client.py:2292:    ) -> Dict[str, Any]:
+  core\upstox_client.py:2293:        """
+  core\upstox_client.py:2294:        Fetch available funds & margins.
+  core\upstox_client.py:2295:        """
+  core\upstox_client.py:2296:
+  core\upstox_client.py:2297:        response = self._request_retry(
+  core\upstox_client.py:2298:
+  core\upstox_client.py:2299:            self.user_api.get_fund_and_margin,
+  core\upstox_client.py:2300:
+  core\upstox_client.py:2314:    # USER PROFILE
+  core\upstox_client.py:2315:    # =====================================================
+  core\upstox_client.py:2316:
+> core\upstox_client.py:2317:    def profile(
+  core\upstox_client.py:2318:        self,
+  core\upstox_client.py:2319:    ) -> Dict[str, Any]:
+  core\upstox_client.py:2320:        """
+  core\upstox_client.py:2321:        Return logged-in user profile.
+  core\upstox_client.py:2322:        """
+  core\upstox_client.py:2323:
+  core\upstox_client.py:2324:        response = self._request_retry(
+  core\upstox_client.py:2325:
+  core\upstox_client.py:2326:            self.user_api.get_profile,
+  core\upstox_client.py:2327:
+  core\upstox_client.py:2341:    # LOGOUT
+  core\upstox_client.py:2342:    # =====================================================
+  core\upstox_client.py:2343:
+> core\upstox_client.py:2344:    def logout(
+  core\upstox_client.py:2345:        self,
+  core\upstox_client.py:2346:    ) -> None:
+  core\upstox_client.py:2347:        """
+  core\upstox_client.py:2348:        Gracefully close all active sessions.
+  core\upstox_client.py:2349:        """
+  core\upstox_client.py:2350:
+  core\upstox_client.py:2351:        self.disconnect_websocket()
+  core\upstox_client.py:2352:
+  core\upstox_client.py:2353:        self.disconnect()
+  core\upstox_client.py:2354:
+  core\upstox_client.py:2356:    # ACCOUNT SUMMARY
+  core\upstox_client.py:2357:    # =====================================================
+  core\upstox_client.py:2358:
+> core\upstox_client.py:2359:    def account_summary(
+  core\upstox_client.py:2360:        self,
+  core\upstox_client.py:2361:    ) -> Dict[str, Any]:
+  core\upstox_client.py:2362:        """
+  core\upstox_client.py:2363:        Consolidated account snapshot.
+  core\upstox_client.py:2364:        """
+  core\upstox_client.py:2365:
+  core\upstox_client.py:2366:        return {
+  core\upstox_client.py:2367:
+  core\upstox_client.py:2368:            "profile": self.profile(),
+  core\upstox_client.py:2369:
+  core\upstox_client.py:2380:    # SHUTDOWN
+  core\upstox_client.py:2381:    # =====================================================
+  core\upstox_client.py:2382:
+> core\upstox_client.py:2383:    def shutdown(
+  core\upstox_client.py:2384:        self,
+  core\upstox_client.py:2385:    ) -> None:
+  core\upstox_client.py:2386:        """
+  core\upstox_client.py:2387:        Gracefully shutdown the client.
+  core\upstox_client.py:2388:        """
+  core\upstox_client.py:2389:
+  core\upstox_client.py:2390:        try:
+  core\upstox_client.py:2391:
+  core\upstox_client.py:2392:            self.disconnect_websocket()
+  core\upstox_client.py:2393:
+  core\upstox_client.py:2419:    # RESET
+  core\upstox_client.py:2420:    # =====================================================
+  core\upstox_client.py:2421:
+> core\upstox_client.py:2422:    def reset(
+  core\upstox_client.py:2423:        self,
+  core\upstox_client.py:2424:    ) -> None:
+  core\upstox_client.py:2425:        """
+  core\upstox_client.py:2426:        Reset runtime state while preserving credentials.
+  core\upstox_client.py:2427:        """
+  core\upstox_client.py:2428:
+  core\upstox_client.py:2429:        self.clear_quote_cache()
+  core\upstox_client.py:2430:
+  core\upstox_client.py:2431:        self.clear_history_cache()
+  core\upstox_client.py:2432:
+  core\upstox_client.py:2442:    # PING
+  core\upstox_client.py:2443:    # =====================================================
+  core\upstox_client.py:2444:
+> core\upstox_client.py:2445:    def ping(
+  core\upstox_client.py:2446:        self,
+  core\upstox_client.py:2447:    ) -> bool:
+  core\upstox_client.py:2448:        """
+  core\upstox_client.py:2449:        Verify API connectivity.
+  core\upstox_client.py:2450:        """
+  core\upstox_client.py:2451:
+  core\upstox_client.py:2452:        try:
+  core\upstox_client.py:2453:
+  core\upstox_client.py:2454:            self.validate_session()
+  core\upstox_client.py:2455:
+
+
+
+
+============================================================
+SCANNER BOOTSTRAP BRIDGE WIRING
+============================================================
+
+  core\scanner\scanner_bootstrap.py:9:
+  core\scanner\scanner_bootstrap.py:10:Responsibilities
+  core\scanner\scanner_bootstrap.py:11:----------------
+  core\scanner\scanner_bootstrap.py:12:• Create ScannerEngine
+  core\scanner\scanner_bootstrap.py:13:• Create ScannerManager
+> core\scanner\scanner_bootstrap.py:14:• Create MarketDataBridge
+  core\scanner\scanner_bootstrap.py:15:• Create ScannerScheduler
+  core\scanner\scanner_bootstrap.py:16:• Register available scanners
+  core\scanner\scanner_bootstrap.py:17:• Start / stop scanner services
+  core\scanner\scanner_bootstrap.py:18:• Provide one clean interface for main.py
+  core\scanner\scanner_bootstrap.py:19:
+  core\scanner\scanner_bootstrap.py:20:Architecture
+  core\scanner\scanner_bootstrap.py:21:------------
+  core\scanner\scanner_bootstrap.py:22:ScannerBootstrap
+  core\scanner\scanner_bootstrap.py:23:    ?
+  core\scanner\scanner_bootstrap.py:24:ScannerEngine
+  core\scanner\scanner_bootstrap.py:25:    ?
+  core\scanner\scanner_bootstrap.py:26:ScannerManager
+  core\scanner\scanner_bootstrap.py:27:    ?
+> core\scanner\scanner_bootstrap.py:28:MarketDataBridge
+  core\scanner\scanner_bootstrap.py:29:    ?
+  core\scanner\scanner_bootstrap.py:30:ScannerScheduler
+  core\scanner\scanner_bootstrap.py:31:
+  core\scanner\scanner_bootstrap.py:32:=========================================================
+  core\scanner\scanner_bootstrap.py:33:"""
+  core\scanner\scanner_bootstrap.py:34:
+  core\scanner\scanner_bootstrap.py:35:from __future__ import annotations
+  core\scanner\scanner_bootstrap.py:36:
+  core\scanner\scanner_bootstrap.py:37:from typing import Any
+  core\scanner\scanner_bootstrap.py:38:from typing import Dict
+  core\scanner\scanner_bootstrap.py:39:from typing import List
+  core\scanner\scanner_bootstrap.py:40:from typing import Optional
+  core\scanner\scanner_bootstrap.py:41:from typing import Type
+  core\scanner\scanner_bootstrap.py:42:
+  core\scanner\scanner_bootstrap.py:50:
+  core\scanner\scanner_bootstrap.py:51:from core.scanner.scanner_manager import (
+  core\scanner\scanner_bootstrap.py:52:    ScannerManager,
+  core\scanner\scanner_bootstrap.py:53:)
+  core\scanner\scanner_bootstrap.py:54:
+> core\scanner\scanner_bootstrap.py:55:from core.scanner.market_data_bridge import (
+> core\scanner\scanner_bootstrap.py:56:    MarketDataBridge,
+  core\scanner\scanner_bootstrap.py:57:)
+  core\scanner\scanner_bootstrap.py:58:
+  core\scanner\scanner_bootstrap.py:59:from core.scanner.scanner_scheduler import (
+  core\scanner\scanner_bootstrap.py:60:    ScannerScheduler,
+  core\scanner\scanner_bootstrap.py:61:    create_scanner_scheduler,
+  core\scanner\scanner_bootstrap.py:62:)
+  core\scanner\scanner_bootstrap.py:63:
+  core\scanner\scanner_bootstrap.py:64:
+  core\scanner\scanner_bootstrap.py:65:# =========================================================
+  core\scanner\scanner_bootstrap.py:66:# OPTIONAL SCANNER IMPORTS
+  core\scanner\scanner_bootstrap.py:67:# =========================================================
+  core\scanner\scanner_bootstrap.py:68:
+  core\scanner\scanner_bootstrap.py:69:try:
+  core\scanner\scanner_bootstrap.py:70:    from core.scanner.momentum_scanner import (
+  core\scanner\scanner_bootstrap.py:183:
+  core\scanner\scanner_bootstrap.py:184:    The bootstrap then creates and connects:
+  core\scanner\scanner_bootstrap.py:185:
+  core\scanner\scanner_bootstrap.py:186:        ScannerEngine
+  core\scanner\scanner_bootstrap.py:187:        ScannerManager
+> core\scanner\scanner_bootstrap.py:188:        MarketDataBridge
+  core\scanner\scanner_bootstrap.py:189:        ScannerScheduler
+  core\scanner\scanner_bootstrap.py:190:        Individual scanners
+  core\scanner\scanner_bootstrap.py:191:    """
+  core\scanner\scanner_bootstrap.py:192:
+  core\scanner\scanner_bootstrap.py:193:    def __init__(
+  core\scanner\scanner_bootstrap.py:194:        self,
+  core\scanner\scanner_bootstrap.py:195:        config: Optional[
+  core\scanner\scanner_bootstrap.py:196:            Dict[str, Any]
+  core\scanner\scanner_bootstrap.py:197:        ] = None,
+  core\scanner\scanner_bootstrap.py:198:    ) -> None:
+  core\scanner\scanner_bootstrap.py:199:
+  core\scanner\scanner_bootstrap.py:200:        # -------------------------------------------------
+  core\scanner\scanner_bootstrap.py:201:        # CONFIGURATION
+  core\scanner\scanner_bootstrap.py:202:        # -------------------------------------------------
+  core\scanner\scanner_bootstrap.py:231:
+  core\scanner\scanner_bootstrap.py:232:        self.manager: Optional[
+  core\scanner\scanner_bootstrap.py:233:            ScannerManager
+  core\scanner\scanner_bootstrap.py:234:        ] = None
+  core\scanner\scanner_bootstrap.py:235:
+> core\scanner\scanner_bootstrap.py:236:        self.bridge: Optional[
+> core\scanner\scanner_bootstrap.py:237:            MarketDataBridge
+  core\scanner\scanner_bootstrap.py:238:        ] = None
+  core\scanner\scanner_bootstrap.py:239:
+  core\scanner\scanner_bootstrap.py:240:        self.scheduler: Optional[
+  core\scanner\scanner_bootstrap.py:241:            ScannerScheduler
+  core\scanner\scanner_bootstrap.py:242:        ] = None
+  core\scanner\scanner_bootstrap.py:243:
+  core\scanner\scanner_bootstrap.py:244:        # -------------------------------------------------
+  core\scanner\scanner_bootstrap.py:245:        # STATE
+  core\scanner\scanner_bootstrap.py:246:        # -------------------------------------------------
+  core\scanner\scanner_bootstrap.py:247:
+  core\scanner\scanner_bootstrap.py:248:        self.initialized = False
+  core\scanner\scanner_bootstrap.py:249:
+  core\scanner\scanner_bootstrap.py:250:        self.started = False
+  core\scanner\scanner_bootstrap.py:251:
+  core\scanner\scanner_bootstrap.py:259:
+  core\scanner\scanner_bootstrap.py:260:    # =====================================================
+  core\scanner\scanner_bootstrap.py:261:    # INITIALIZE
+  core\scanner\scanner_bootstrap.py:262:    # =====================================================
+  core\scanner\scanner_bootstrap.py:263:
+> core\scanner\scanner_bootstrap.py:264:    def initialize(
+  core\scanner\scanner_bootstrap.py:265:        self,
+  core\scanner\scanner_bootstrap.py:266:    ) -> "ScannerBootstrap":
+  core\scanner\scanner_bootstrap.py:267:        """
+  core\scanner\scanner_bootstrap.py:268:        Build and connect complete scanner infrastructure.
+  core\scanner\scanner_bootstrap.py:269:        """
+  core\scanner\scanner_bootstrap.py:270:
+  core\scanner\scanner_bootstrap.py:271:        if self.initialized:
+  core\scanner\scanner_bootstrap.py:272:
+  core\scanner\scanner_bootstrap.py:273:            return self
+  core\scanner\scanner_bootstrap.py:274:
+  core\scanner\scanner_bootstrap.py:275:        self.last_error = None
+  core\scanner\scanner_bootstrap.py:276:
+  core\scanner\scanner_bootstrap.py:277:        try:
+  core\scanner\scanner_bootstrap.py:278:
+  core\scanner\scanner_bootstrap.py:329:
+  core\scanner\scanner_bootstrap.py:330:            # =============================================
+  core\scanner\scanner_bootstrap.py:331:            # MARKET DATA BRIDGE
+  core\scanner\scanner_bootstrap.py:332:            # =============================================
+  core\scanner\scanner_bootstrap.py:333:
+> core\scanner\scanner_bootstrap.py:334:            self.bridge = MarketDataBridge(
+  core\scanner\scanner_bootstrap.py:335:
+  core\scanner\scanner_bootstrap.py:336:                manager=self.manager,
+  core\scanner\scanner_bootstrap.py:337:
+  core\scanner\scanner_bootstrap.py:338:                debug=self.debug,
+  core\scanner\scanner_bootstrap.py:339:
+  core\scanner\scanner_bootstrap.py:340:                auto_scan=bool(
+  core\scanner\scanner_bootstrap.py:341:                    self.config.get(
+  core\scanner\scanner_bootstrap.py:342:                        "auto_scan",
+  core\scanner\scanner_bootstrap.py:343:                        False,
+  core\scanner\scanner_bootstrap.py:344:                    )
+  core\scanner\scanner_bootstrap.py:345:                ),
+  core\scanner\scanner_bootstrap.py:346:            )
+  core\scanner\scanner_bootstrap.py:347:
+  core\scanner\scanner_bootstrap.py:348:            # =============================================
+  core\scanner\scanner_bootstrap.py:351:
+  core\scanner\scanner_bootstrap.py:352:            self.scheduler = create_scanner_scheduler(
+  core\scanner\scanner_bootstrap.py:353:
+  core\scanner\scanner_bootstrap.py:354:                manager=self.manager,
+  core\scanner\scanner_bootstrap.py:355:
+> core\scanner\scanner_bootstrap.py:356:                bridge=self.bridge,
+  core\scanner\scanner_bootstrap.py:357:
+  core\scanner\scanner_bootstrap.py:358:                intraday_interval=int(
+  core\scanner\scanner_bootstrap.py:359:                    self.config.get(
+  core\scanner\scanner_bootstrap.py:360:                        "intraday_interval",
+  core\scanner\scanner_bootstrap.py:361:                        60,
+  core\scanner\scanner_bootstrap.py:362:                    )
+  core\scanner\scanner_bootstrap.py:363:                ),
+  core\scanner\scanner_bootstrap.py:364:
+  core\scanner\scanner_bootstrap.py:365:                swing_interval=int(
+  core\scanner\scanner_bootstrap.py:366:                    self.config.get(
+  core\scanner\scanner_bootstrap.py:367:                        "swing_interval",
+  core\scanner\scanner_bootstrap.py:368:                        900,
+  core\scanner\scanner_bootstrap.py:369:                    )
+  core\scanner\scanner_bootstrap.py:370:                ),
+  core\scanner\scanner_bootstrap.py:751:
+  core\scanner\scanner_bootstrap.py:752:        self.initialized = False
+  core\scanner\scanner_bootstrap.py:753:
+  core\scanner\scanner_bootstrap.py:754:        self.scheduler = None
+  core\scanner\scanner_bootstrap.py:755:
+> core\scanner\scanner_bootstrap.py:756:        self.bridge = None
+  core\scanner\scanner_bootstrap.py:757:
+  core\scanner\scanner_bootstrap.py:758:        self.manager = None
+  core\scanner\scanner_bootstrap.py:759:
+  core\scanner\scanner_bootstrap.py:760:        self.engine = None
+  core\scanner\scanner_bootstrap.py:761:
+  core\scanner\scanner_bootstrap.py:762:        self.registered_scanner_names = []
+  core\scanner\scanner_bootstrap.py:763:
+  core\scanner\scanner_bootstrap.py:764:        self.log(
+  core\scanner\scanner_bootstrap.py:765:            "Scanner system shutdown completed."
+  core\scanner\scanner_bootstrap.py:766:        )
+  core\scanner\scanner_bootstrap.py:767:
+  core\scanner\scanner_bootstrap.py:768:    # =====================================================
+  core\scanner\scanner_bootstrap.py:769:    # PAUSE
+  core\scanner\scanner_bootstrap.py:770:    # =====================================================
+  core\scanner\scanner_bootstrap.py:809:        into the quote before normalization.
+  core\scanner\scanner_bootstrap.py:810:        """
+  core\scanner\scanner_bootstrap.py:811:
+  core\scanner\scanner_bootstrap.py:812:        self._require_initialized()
+  core\scanner\scanner_bootstrap.py:813:
+> core\scanner\scanner_bootstrap.py:814:        if self.bridge is None:
+  core\scanner\scanner_bootstrap.py:815:
+  core\scanner\scanner_bootstrap.py:816:            raise RuntimeError(
+> core\scanner\scanner_bootstrap.py:817:                "MarketDataBridge unavailable."
+  core\scanner\scanner_bootstrap.py:818:            )
+  core\scanner\scanner_bootstrap.py:819:
+  core\scanner\scanner_bootstrap.py:820:        if not isinstance(
+  core\scanner\scanner_bootstrap.py:821:            data,
+  core\scanner\scanner_bootstrap.py:822:            dict,
+  core\scanner\scanner_bootstrap.py:823:        ):
+  core\scanner\scanner_bootstrap.py:824:
+  core\scanner\scanner_bootstrap.py:825:            raise TypeError(
+  core\scanner\scanner_bootstrap.py:826:                "data must be a dictionary."
+  core\scanner\scanner_bootstrap.py:827:            )
+  core\scanner\scanner_bootstrap.py:828:
+  core\scanner\scanner_bootstrap.py:829:        quote = dict(
+  core\scanner\scanner_bootstrap.py:830:            data
+  core\scanner\scanner_bootstrap.py:831:        )
+  core\scanner\scanner_bootstrap.py:834:
+  core\scanner\scanner_bootstrap.py:835:            quote[
+  core\scanner\scanner_bootstrap.py:836:                "instrument_key"
+  core\scanner\scanner_bootstrap.py:837:            ] = instrument_key
+  core\scanner\scanner_bootstrap.py:838:
+> core\scanner\scanner_bootstrap.py:839:        self.bridge.update_quote(
+  core\scanner\scanner_bootstrap.py:840:            quote
+  core\scanner\scanner_bootstrap.py:841:        )
+  core\scanner\scanner_bootstrap.py:842:
+  core\scanner\scanner_bootstrap.py:843:    # =====================================================
+  core\scanner\scanner_bootstrap.py:844:    # UPDATE MANY MARKET QUOTES
+  core\scanner\scanner_bootstrap.py:845:    # =====================================================
+  core\scanner\scanner_bootstrap.py:846:
+  core\scanner\scanner_bootstrap.py:847:    def update_market_quotes(
+  core\scanner\scanner_bootstrap.py:848:        self,
+  core\scanner\scanner_bootstrap.py:849:        quotes: List[
+  core\scanner\scanner_bootstrap.py:850:            Dict[str, Any]
+  core\scanner\scanner_bootstrap.py:851:        ],
+  core\scanner\scanner_bootstrap.py:852:        *,
+  core\scanner\scanner_bootstrap.py:853:        trigger_scan: bool = False,
+  core\scanner\scanner_bootstrap.py:854:    ) -> int:
+  core\scanner\scanner_bootstrap.py:855:        """
+> core\scanner\scanner_bootstrap.py:856:        Send multiple quotes into MarketDataBridge.
+  core\scanner\scanner_bootstrap.py:857:        """
+  core\scanner\scanner_bootstrap.py:858:
+  core\scanner\scanner_bootstrap.py:859:        self._require_initialized()
+  core\scanner\scanner_bootstrap.py:860:
+> core\scanner\scanner_bootstrap.py:861:        if self.bridge is None:
+  core\scanner\scanner_bootstrap.py:862:
+  core\scanner\scanner_bootstrap.py:863:            raise RuntimeError(
+> core\scanner\scanner_bootstrap.py:864:                "MarketDataBridge unavailable."
+  core\scanner\scanner_bootstrap.py:865:            )
+  core\scanner\scanner_bootstrap.py:866:
+> core\scanner\scanner_bootstrap.py:867:        return self.bridge.update_quotes(
+  core\scanner\scanner_bootstrap.py:868:            quotes,
+  core\scanner\scanner_bootstrap.py:869:            trigger_scan=trigger_scan,
+  core\scanner\scanner_bootstrap.py:870:        )
+  core\scanner\scanner_bootstrap.py:871:
+  core\scanner\scanner_bootstrap.py:872:    # =====================================================
+  core\scanner\scanner_bootstrap.py:873:    # ADD CANDLE
+  core\scanner\scanner_bootstrap.py:874:    # =====================================================
+  core\scanner\scanner_bootstrap.py:875:
+> core\scanner\scanner_bootstrap.py:876:    def add_candle(
+  core\scanner\scanner_bootstrap.py:877:        self,
+  core\scanner\scanner_bootstrap.py:878:        instrument_key: str,
+  core\scanner\scanner_bootstrap.py:879:        timeframe: str,
+  core\scanner\scanner_bootstrap.py:880:        candle: Dict[str, Any],
+  core\scanner\scanner_bootstrap.py:881:        *,
+  core\scanner\scanner_bootstrap.py:882:        symbol: str = "",
+  core\scanner\scanner_bootstrap.py:883:        max_candles: int = 500,
+  core\scanner\scanner_bootstrap.py:884:    ) -> None:
+  core\scanner\scanner_bootstrap.py:885:        """
+> core\scanner\scanner_bootstrap.py:886:        Add one OHLCV candle to MarketDataBridge.
+  core\scanner\scanner_bootstrap.py:887:        """
+  core\scanner\scanner_bootstrap.py:888:
+  core\scanner\scanner_bootstrap.py:889:        self._require_initialized()
+  core\scanner\scanner_bootstrap.py:890:
+> core\scanner\scanner_bootstrap.py:891:        if self.bridge is None:
+  core\scanner\scanner_bootstrap.py:892:
+  core\scanner\scanner_bootstrap.py:893:            raise RuntimeError(
+> core\scanner\scanner_bootstrap.py:894:                "MarketDataBridge unavailable."
+  core\scanner\scanner_bootstrap.py:895:            )
+  core\scanner\scanner_bootstrap.py:896:
+> core\scanner\scanner_bootstrap.py:897:        self.bridge.add_candle(
+  core\scanner\scanner_bootstrap.py:898:
+  core\scanner\scanner_bootstrap.py:899:            instrument_key,
+  core\scanner\scanner_bootstrap.py:900:
+  core\scanner\scanner_bootstrap.py:901:            timeframe,
+  core\scanner\scanner_bootstrap.py:902:
+  core\scanner\scanner_bootstrap.py:903:            candle,
+  core\scanner\scanner_bootstrap.py:904:
+  core\scanner\scanner_bootstrap.py:905:            symbol=symbol,
+  core\scanner\scanner_bootstrap.py:906:
+  core\scanner\scanner_bootstrap.py:907:            max_candles=max_candles,
+  core\scanner\scanner_bootstrap.py:908:        )
+  core\scanner\scanner_bootstrap.py:909:
+  core\scanner\scanner_bootstrap.py:910:    # =====================================================
+  core\scanner\scanner_bootstrap.py:911:    # MANUAL SCAN
+  core\scanner\scanner_bootstrap.py:912:    # =====================================================
+  core\scanner\scanner_bootstrap.py:913:
+> core\scanner\scanner_bootstrap.py:914:    def scan_now(
+  core\scanner\scanner_bootstrap.py:915:        self,
+  core\scanner\scanner_bootstrap.py:916:    ) -> List[Signal]:
+  core\scanner\scanner_bootstrap.py:917:        """
+  core\scanner\scanner_bootstrap.py:918:        Force immediate complete scan.
+  core\scanner\scanner_bootstrap.py:919:        """
+  core\scanner\scanner_bootstrap.py:920:
+  core\scanner\scanner_bootstrap.py:921:        self._require_initialized()
+  core\scanner\scanner_bootstrap.py:922:
+  core\scanner\scanner_bootstrap.py:923:        if self.scheduler is None:
+  core\scanner\scanner_bootstrap.py:924:
+  core\scanner\scanner_bootstrap.py:925:            raise RuntimeError(
+  core\scanner\scanner_bootstrap.py:926:                "ScannerScheduler unavailable."
+  core\scanner\scanner_bootstrap.py:927:            )
+  core\scanner\scanner_bootstrap.py:928:
+  core\scanner\scanner_bootstrap.py:1115:
+  core\scanner\scanner_bootstrap.py:1116:            manager_status = (
+  core\scanner\scanner_bootstrap.py:1117:                self.manager.status()
+  core\scanner\scanner_bootstrap.py:1118:            )
+  core\scanner\scanner_bootstrap.py:1119:
+> core\scanner\scanner_bootstrap.py:1120:        if self.bridge is not None:
+  core\scanner\scanner_bootstrap.py:1121:
+  core\scanner\scanner_bootstrap.py:1122:            bridge_status = (
+> core\scanner\scanner_bootstrap.py:1123:                self.bridge.status()
+  core\scanner\scanner_bootstrap.py:1124:            )
+  core\scanner\scanner_bootstrap.py:1125:
+  core\scanner\scanner_bootstrap.py:1126:        if self.scheduler is not None:
+  core\scanner\scanner_bootstrap.py:1127:
+  core\scanner\scanner_bootstrap.py:1128:            scheduler_status = (
+  core\scanner\scanner_bootstrap.py:1129:                self.scheduler.status()
+  core\scanner\scanner_bootstrap.py:1130:            )
+  core\scanner\scanner_bootstrap.py:1131:
+  core\scanner\scanner_bootstrap.py:1132:        return {
+  core\scanner\scanner_bootstrap.py:1133:
+  core\scanner\scanner_bootstrap.py:1134:            "initialized":
+  core\scanner\scanner_bootstrap.py:1135:                self.initialized,
+  core\scanner\scanner_bootstrap.py:1136:
+  core\scanner\scanner_bootstrap.py:1137:            "started":
+  core\scanner\scanner_bootstrap.py:1184:
+  core\scanner\scanner_bootstrap.py:1185:            issues.append(
+  core\scanner\scanner_bootstrap.py:1186:                "ScannerManager missing."
+  core\scanner\scanner_bootstrap.py:1187:            )
+  core\scanner\scanner_bootstrap.py:1188:
+> core\scanner\scanner_bootstrap.py:1189:        if self.bridge is None:
+  core\scanner\scanner_bootstrap.py:1190:
+  core\scanner\scanner_bootstrap.py:1191:            issues.append(
+> core\scanner\scanner_bootstrap.py:1192:                "MarketDataBridge missing."
+  core\scanner\scanner_bootstrap.py:1193:            )
+  core\scanner\scanner_bootstrap.py:1194:
+  core\scanner\scanner_bootstrap.py:1195:        if self.scheduler is None:
+  core\scanner\scanner_bootstrap.py:1196:
+  core\scanner\scanner_bootstrap.py:1197:            issues.append(
+  core\scanner\scanner_bootstrap.py:1198:                "ScannerScheduler missing."
+  core\scanner\scanner_bootstrap.py:1199:            )
+  core\scanner\scanner_bootstrap.py:1200:
+  core\scanner\scanner_bootstrap.py:1201:        if self.last_error:
+  core\scanner\scanner_bootstrap.py:1202:
+  core\scanner\scanner_bootstrap.py:1203:            issues.append(
+  core\scanner\scanner_bootstrap.py:1204:                self.last_error
+  core\scanner\scanner_bootstrap.py:1205:            )
+  core\scanner\scanner_bootstrap.py:1206:
+  core\scanner\scanner_bootstrap.py:1244:                issues.append(
+  core\scanner\scanner_bootstrap.py:1245:                    "Engine health check failed: "
+  core\scanner\scanner_bootstrap.py:1246:                    f"{type(exc).__name__}: {exc}"
+  core\scanner\scanner_bootstrap.py:1247:                )
+  core\scanner\scanner_bootstrap.py:1248:
+> core\scanner\scanner_bootstrap.py:1249:        if self.bridge is not None:
+  core\scanner\scanner_bootstrap.py:1250:
+  core\scanner\scanner_bootstrap.py:1251:            bridge_health = (
+> core\scanner\scanner_bootstrap.py:1252:                self.bridge.health_check()
+  core\scanner\scanner_bootstrap.py:1253:            )
+  core\scanner\scanner_bootstrap.py:1254:
+  core\scanner\scanner_bootstrap.py:1255:            if not bridge_health.get(
+  core\scanner\scanner_bootstrap.py:1256:                "healthy",
+  core\scanner\scanner_bootstrap.py:1257:                True,
+  core\scanner\scanner_bootstrap.py:1258:            ):
+  core\scanner\scanner_bootstrap.py:1259:
+  core\scanner\scanner_bootstrap.py:1260:                issues.extend(
+  core\scanner\scanner_bootstrap.py:1261:                    bridge_health.get(
+  core\scanner\scanner_bootstrap.py:1262:                        "issues",
+  core\scanner\scanner_bootstrap.py:1263:                        [],
+  core\scanner\scanner_bootstrap.py:1264:                    )
+  core\scanner\scanner_bootstrap.py:1265:                )
+  core\scanner\scanner_bootstrap.py:1266:
+
+
+
+
+============================================================
+UPSTOX CLIENT SIGNATURES
+============================================================
+CLASS: (api_key: 'str', access_token: 'str', sandbox: 'bool' = False) -> 'None'
+_history_to_dataframe (self, response: 'Any') -> 'pd.DataFrame'
+clear_history_cache (self) -> 'None'
+clear_quote_cache (self) -> 'None'
+get_quote (self, instrument_key: 'str', refresh: 'bool' = False) -> 'Dict[str, Any]'
+get_quotes (self, instrument_keys: 'List[str]', refresh: 'bool' = False) -> 'Dict[str, Any]'
+has_history (self, cache_key: 'str') -> 'bool'
+historical_batch (self, requests: 'List[Dict[str, str]]') -> 'Dict[str, pd.DataFrame]'
+historical_data (self, instrument_key: 'str', interval: 'str', from_date: 'str', to_date: 'str') -> 'pd.DataFrame'
+intraday_data (self, instrument_key: 'str', interval: 'str' = '1minute') -> 'pd.DataFrame'
+market_depth (self, instrument_key: 'str', refresh: 'bool' = False) -> 'Dict[str, Any]'
+refresh_quotes (self, instrument_keys: 'List[str]') -> 'Dict[str, Any]'

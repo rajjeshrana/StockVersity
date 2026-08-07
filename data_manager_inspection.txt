@@ -1,0 +1,850 @@
+"""
+=========================================================
+StockVersity Scanner Pro
+Data Manager
+=========================================================
+
+Central Market Data Manager
+
+Responsibilities
+----------------
+✔ Historical Data Cache
+✔ Live Tick Cache
+✔ Multi-Timeframe Storage
+✔ Indicator Cache
+✔ Batch Downloads
+✔ Scanner Feed
+✔ Watchlist Feed
+✔ Thread Safe
+✔ Auto Refresh
+✔ Performance Monitoring
+"""
+
+from __future__ import annotations
+
+import logging
+import threading
+from collections import defaultdict
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+
+import pandas as pd
+
+from core.indicator_engine import IndicatorEngine
+from core.upstox_client import UpstoxClient
+
+
+class DataManager:
+    """
+    Central market data manager.
+
+    All scanners, dashboard widgets and
+    indicator calculations should obtain
+    their data through this class.
+    """
+
+    VERSION = "1.0"
+
+    # =====================================================
+    # INITIALIZATION
+    # =====================================================
+
+    def __init__(
+
+        self,
+
+        client: UpstoxClient,
+
+        indicator_engine: IndicatorEngine,
+
+    ) -> None:
+
+        self.client = client
+
+        self.indicators = indicator_engine
+
+        # ---------------------------------------------
+        # Historical Data
+        # ---------------------------------------------
+
+        self.data: Dict[
+            str,
+            Dict[str, pd.DataFrame],
+        ] = defaultdict(dict)
+
+        # ---------------------------------------------
+        # Latest Tick Cache
+        # ---------------------------------------------
+
+        self.live_ticks: Dict[
+            str,
+            Dict[str, Any],
+        ] = {}
+
+        # ---------------------------------------------
+        # Watchlists
+        # ---------------------------------------------
+
+        self.watchlists: Dict[
+            str,
+            List[str],
+        ] = defaultdict(list)
+
+        # ---------------------------------------------
+        # Refresh Tracking
+        # ---------------------------------------------
+
+        self.last_refresh: Dict[
+            str,
+            datetime,
+        ] = {}
+
+        # ---------------------------------------------
+        # Runtime Statistics
+        # ---------------------------------------------
+
+        self.requests = 0
+
+        self.cache_hits = 0
+
+        self.cache_misses = 0
+
+        self.started = datetime.now()
+
+        # ---------------------------------------------
+        # Thread Safety
+        # ---------------------------------------------
+
+        self.lock = threading.RLock()
+
+        # ---------------------------------------------
+        # Logger
+        # ---------------------------------------------
+
+        self.logger = logging.getLogger(
+
+            "StockVersity.DataManager"
+
+        )
+
+        self.logger.setLevel(
+
+            logging.INFO
+
+        )
+
+        # ---------------------------------------------
+        # Register Tick Callback
+        # ---------------------------------------------
+
+        self.client.register_tick_callback(
+
+            self.on_tick
+
+        )
+
+    # =====================================================
+    # STORE DATAFRAME
+    # =====================================================
+
+    def set_data(
+
+        self,
+
+        instrument_key: str,
+
+        timeframe: str,
+
+        dataframe: pd.DataFrame,
+
+    ) -> None:
+        """
+        Store OHLCV dataframe.
+        """
+
+        with self.lock:
+
+            self.data[
+
+                instrument_key
+
+            ][
+
+                timeframe
+
+            ] = dataframe.copy()
+
+            self.last_refresh[
+
+                f"{instrument_key}:{timeframe}"
+
+            ] = datetime.now()
+
+    # =====================================================
+    # GET DATAFRAME
+    # =====================================================
+
+    def get_data(
+
+        self,
+
+        instrument_key: str,
+
+        timeframe: str,
+
+    ) -> Optional[pd.DataFrame]:
+        """
+        Return cached dataframe.
+        """
+
+        with self.lock:
+
+            timeframe_map = self.data.get(
+
+                instrument_key
+
+            )
+
+            if timeframe_map is None:
+
+                self.cache_misses += 1
+
+                return None
+
+            dataframe = timeframe_map.get(
+
+                timeframe
+
+            )
+
+            if dataframe is None:
+
+                self.cache_misses += 1
+
+                return None
+
+            self.cache_hits += 1
+
+            return dataframe.copy()
+
+    # =====================================================
+    # HAS DATA
+    # =====================================================
+
+    def has_data(
+
+        self,
+
+        instrument_key: str,
+
+        timeframe: str,
+
+    ) -> bool:
+
+        return (
+
+            instrument_key in self.data
+
+            and timeframe in self.data[
+
+                instrument_key
+
+            ]
+
+        )
+
+    # =====================================================
+    # REMOVE DATA
+    # =====================================================
+
+    def remove_data(
+
+        self,
+
+        instrument_key: str,
+
+        timeframe: str,
+
+    ) -> None:
+
+        with self.lock:
+
+            if (
+
+                instrument_key in self.data
+
+                and timeframe in self.data[
+
+                    instrument_key
+
+                ]
+
+            ):
+
+                del self.data[
+
+                    instrument_key
+
+                ][
+
+                    timeframe
+
+                ]
+                    # =====================================================
+    # LOAD HISTORICAL DATA
+    # =====================================================
+
+    def load_history(
+
+        self,
+
+        instrument_key: str,
+
+        timeframe: str,
+
+        from_date: str,
+
+        to_date: str,
+
+        force: bool = False,
+
+    ) -> pd.DataFrame:
+        """
+        Load historical data from Upstox.
+        """
+
+        if (
+
+            not force
+
+            and self.has_data(
+
+                instrument_key,
+
+                timeframe,
+
+            )
+
+        ):
+
+            cached = self.get_data(
+
+                instrument_key,
+
+                timeframe,
+
+            )
+
+            if cached is not None:
+
+                return cached
+
+        dataframe = self.client.historical_data(
+
+            instrument_key=instrument_key,
+
+            interval=timeframe,
+
+            from_date=from_date,
+
+            to_date=to_date,
+
+        )
+
+        self.set_data(
+
+            instrument_key,
+
+            timeframe,
+
+            dataframe,
+
+        )
+
+        self.requests += 1
+
+        return dataframe.copy()
+
+    # =====================================================
+    # REFRESH DATA
+    # =====================================================
+
+    def refresh_data(
+
+        self,
+
+        instrument_key: str,
+"""
+=========================================================
+StockVersity Scanner Pro
+Market Data Scanner Bridge
+Version : 2.0
+=========================================================
+
+Connects live/historical market data with the scanner system.
+
+Flow
+----
+
+Upstox WebSocket
+        ↓
+Market Data Parser
+        ↓
+MarketDataBridge
+        ↓
+ScannerManager
+        ↓
+ScannerEngine
+        ↓
+Individual Scanners
+
+=========================================================
+"""
+
+from __future__ import annotations
+
+from copy import deepcopy
+from datetime import datetime
+from threading import RLock
+
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Mapping
+from typing import Optional
+
+from core.scanner.signal import Signal
+from core.scanner.scanner_manager import ScannerManager
+
+
+# =========================================================
+# HELPER FUNCTIONS
+# =========================================================
+
+def _safe_float(
+    value: Any,
+    default: float = 0.0,
+) -> float:
+    """
+    Convert a value safely to float.
+    """
+
+    try:
+
+        if value is None:
+            return default
+
+        return float(value)
+
+    except (
+        TypeError,
+        ValueError,
+    ):
+
+        return default
+
+
+def _safe_int(
+    value: Any,
+    default: int = 0,
+) -> int:
+    """
+    Convert a value safely to int.
+    """
+
+    try:
+
+        if value is None:
+            return default
+
+        return int(float(value))
+
+    except (
+        TypeError,
+        ValueError,
+    ):
+
+        return default
+
+
+def _first_value(
+    data: Mapping[str, Any],
+    *keys: str,
+    default: Any = None,
+) -> Any:
+    """
+    Return first available non-None value.
+    """
+
+    for key in keys:
+
+        if key in data:
+
+            value = data[key]
+
+            if value is not None:
+                return value
+
+    return default
+
+
+def _normalize_symbol(
+    symbol: Any,
+) -> str:
+    """
+    Normalize trading symbol.
+    """
+
+    if symbol is None:
+        return ""
+
+    return str(
+        symbol
+    ).strip().upper()
+
+
+def _normalize_instrument_key(
+    instrument_key: Any,
+) -> str:
+    """
+    Normalize Upstox instrument key.
+    """
+
+    if instrument_key is None:
+        return ""
+
+    return str(
+        instrument_key
+    ).strip()
+
+
+# =========================================================
+# MARKET DATA BRIDGE
+# =========================================================
+
+class MarketDataBridge:
+    """
+    Bridge between market-data providers and ScannerManager.
+
+    The bridge keeps one normalized snapshot for each
+    instrument.
+
+    Example snapshot
+    ----------------
+
+    {
+        "NSE_EQ|INE002A01018": {
+
+            "instrument_key": "NSE_EQ|INE002A01018",
+
+            "symbol": "RELIANCE",
+
+            "last_price": 1450.00,
+
+            "open": 1435.00,
+
+            "high": 1455.00,
+
+            "low": 1430.00,
+
+            "close": 1450.00,
+
+            "previous_close": 1438.00,
+
+            "volume": 5000000,
+
+            "average_volume": 2500000,
+
+            "volume_ratio": 2.0,
+
+            "timestamp": "...",
+
+            "candles": {
+                "1m": [],
+                "5m": [],
+                "15m": [],
+                "1h": [],
+                "1d": [],
+            }
+        }
+    }
+    """
+
+    def __init__(
+        self,
+        manager: Optional[ScannerManager] = None,
+        *,
+        debug: bool = False,
+        auto_scan: bool = False,
+    ) -> None:
+
+        self.manager = manager
+
+        self.debug = debug
+
+        self.auto_scan = auto_scan
+
+        self._lock = RLock()
+
+        self._market_data: Dict[
+            str,
+            Dict[str, Any]
+        ] = {}
+
+        self._symbol_index: Dict[
+            str,
+            str
+        ] = {}
+
+        self.total_updates: int = 0
+
+        self.last_update: Optional[
+            datetime
+        ] = None
+
+        self.last_scan: Optional[
+            datetime
+        ] = None
+
+        self.last_error: Optional[
+            str
+        ] = None
+
+    # =====================================================
+    # MANAGER
+    # =====================================================
+
+    def set_manager(
+        self,
+        manager: ScannerManager,
+    ) -> None:
+        """
+        Attach ScannerManager.
+        """
+
+        self.manager = manager
+
+    # =====================================================
+    # NORMALIZE QUOTE
+    # =====================================================
+
+    def normalize_quote(
+        self,
+        data: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """
+"""
+=========================================================
+StockVersity Scanner Pro
+Upstox Client
+Version : 2.0
+=========================================================
+
+Official Upstox SDK Wrapper
+
+Features
+--------
+✔ OAuth Authentication
+✔ Access Token Management
+✔ Instrument Master
+✔ Historical Data
+✔ Live Quotes
+✔ WebSocket Streaming
+✔ Option Chain
+✔ Market Depth
+✔ Batch Requests
+✔ Rate Limiter
+✔ Automatic Retry
+✔ Session Management
+✔ Error Handling
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import threading
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+
+import pandas as pd
+
+import upstox_client
+from upstox_client.rest import ApiException
+
+
+class UpstoxClient:
+    """
+    Official SDK Wrapper
+    """
+
+    VERSION = "2.0"
+
+    def __init__(
+
+        self,
+
+        api_key: str,
+
+        access_token: str,
+
+        sandbox: bool = False,
+
+    ) -> None:
+
+        self.api_key = api_key
+
+        self.access_token = access_token
+
+        self.sandbox = sandbox
+
+        # ---------------------------------
+        # SDK CONFIGURATION
+        # ---------------------------------
+
+        self.configuration = (
+
+            upstox_client.Configuration()
+
+        )
+
+        self.configuration.access_token = (
+
+            access_token
+
+        )
+
+        self.api_client = (
+
+            upstox_client.ApiClient(
+
+                self.configuration
+
+            )
+
+        )
+
+        # ---------------------------------
+        # API OBJECTS
+        # ---------------------------------
+
+        self.history_api = (
+
+            upstox_client.HistoryV3Api(
+
+                self.api_client
+
+            )
+
+        )
+
+        self.market_api = (
+
+            upstox_client.MarketQuoteApi(
+
+                self.api_client
+
+            )
+
+        )
+
+        self.order_api = (
+
+            upstox_client.OrderApi(
+
+                self.api_client
+
+            )
+
+        )
+
+        self.user_api = (
+
+            upstox_client.UserApi(
+
+                self.api_client
+
+            )
+
+        )
+
+        self.option_api = (
+
+            upstox_client.OptionsApi(
+
+                self.api_client
+
+            )
+
+        )
+
+        # ---------------------------------
+        # CACHE
+        # ---------------------------------
+
+        self.instrument_cache: Dict[
+            str,
+            Any,
+        ] = {}
+
+        self.quote_cache: Dict[
+            str,
+            Any,
+        ] = {}
+
+        self.history_cache: Dict[
+            str,
+            pd.DataFrame,
+        ] = {}
+
+        # ---------------------------------
+        # SESSION
+        # ---------------------------------
+
+        self.connected = False
+
+        self.last_request = None
+
+        self.requests = 0
+
+        self.errors = 0
+
+        self.started = datetime.now()
+
+        # ---------------------------------
+        # THREAD SAFETY
+        # ---------------------------------
+
+        self.lock = threading.Lock()
+
+        # ---------------------------------
+        # LOGGER
+        # ---------------------------------
+
+        self.logger = logging.getLogger(
+
+            "StockVersity.Upstox"
+
+        )
+
+        self.logger.setLevel(
+
+            logging.INFO
+
+        )
+
+        self.connect()
+
+    # =====================================================
+    # CONNECT
+    # =====================================================

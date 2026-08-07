@@ -1,0 +1,1084 @@
+"""
+=========================================================
+StockVersity Scanner Pro
+Market Data Parser
+Version 3.0
+=========================================================
+
+Converts Upstox MarketDataStreamerV3 messages
+into internal Tick objects.
+
+Supported V3 feed structures:
+
+    market_info
+
+    feeds
+        fullFeed
+            indexFF
+            marketFF
+
+        ltpc
+
+Legacy aliases are also supported where possible.
+=========================================================
+"""
+
+from __future__ import annotations
+
+import logging
+
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from .models import Tick
+
+
+logger = logging.getLogger(__name__)
+
+
+# =========================================================
+# MARKET DATA PARSER
+# =========================================================
+
+class MarketDataParser:
+
+    """
+    Convert Upstox WebSocket V3 feed messages
+    into StockVersity Tick objects.
+    """
+
+    def __init__(self):
+
+        self.total_messages = 0
+
+        self.total_ticks = 0
+
+        self.failed_messages = 0
+
+        self.market_info_messages = 0
+
+        self.feed_messages = 0
+
+        self.last_market_info: Dict[
+            str,
+            Any,
+        ] = {}
+
+    # =====================================================
+    # ENTRY POINT
+    # =====================================================
+
+    def parse(
+        self,
+        message: Any,
+    ) -> Optional[List[Tick]]:
+
+        self.total_messages += 1
+
+        try:
+
+            if message is None:
+
+                return []
+
+            # -------------------------------------------------
+            # SDK OBJECT -> DICTIONARY
+            # -------------------------------------------------
+
+            if hasattr(
+                message,
+                "to_dict",
+            ):
+
+                message = (
+                    message.to_dict()
+                )
+
+            # -------------------------------------------------
+            # ONLY DICTIONARY PAYLOADS SUPPORTED HERE
+            # -------------------------------------------------
+
+            if not isinstance(
+                message,
+                dict,
+            ):
+
+                return []
+
+            # -------------------------------------------------
+            # MARKET INFORMATION MESSAGE
+            # -------------------------------------------------
+
+            message_type = (
+                message.get(
+                    "type"
+                )
+            )
+
+            if message_type == "market_info":
+
+                self.market_info_messages += 1
+
+                market_info = (
+                    message.get(
+                        "marketInfo",
+                        {},
+                    )
+                )
+
+                if isinstance(
+                    market_info,
+                    dict,
+                ):
+
+                    self.last_market_info = (
+                        market_info
+                    )
+
+                return []
+
+            # -------------------------------------------------
+            # FEED MESSAGE
+            # -------------------------------------------------
+
+            if message.get(
+                "feeds"
+            ):
+
+                self.feed_messages += 1
+
+            return self._parse_feed(
+                message
+            )
+
+        except Exception:
+
+            self.failed_messages += 1
+
+            logger.exception(
+                "Unable to parse websocket message."
+            )
+
+            return []
+
+    # =====================================================
+    # FEED PARSER
+    # =====================================================
+
+    def _parse_feed(
+        self,
+        data: Dict[str, Any],
+    ) -> List[Tick]:
+
+        ticks: List[Tick] = []
+
+        feeds = data.get(
+            "feeds",
+            {},
+        )
+
+        if not isinstance(
+            feeds,
+            dict,
+        ):
+
+            return ticks
+
+        if not feeds:
+
+            return ticks
+
+        for (
+            instrument_key,
+            payload,
+        ) in feeds.items():
+
+            if not isinstance(
+                payload,
+                dict,
+            ):
+
+                continue
+
+            tick = (
+                self._parse_instrument(
+                    instrument_key,
+                    payload,
+                )
+            )
+
+            if tick is not None:
+
+                ticks.append(
+                    tick
+                )
+
+                self.total_ticks += 1
+
+        return ticks
+
+    # =====================================================
+    # INSTRUMENT PARSER
+    # =====================================================
+
+    def _parse_instrument(
+        self,
+        instrument_key: str,
+        payload: Dict[str, Any],
+    ) -> Optional[Tick]:
+
+        # -------------------------------------------------
+        # CURRENT UPSTOX V3 FULL FEED
+        # -------------------------------------------------
+
+        full_feed = (
+            payload.get(
+                "fullFeed"
+            )
+        )
+
+        if isinstance(
+            full_feed,
+            dict,
+        ):
+
+            return self._parse_full_feed(
+                instrument_key,
+                full_feed,
+            )
+
+        # -------------------------------------------------
+        # LEGACY / ALTERNATE ALIAS
+        # -------------------------------------------------
+
+        full_feed = (
+            payload.get(
+                "ff"
+            )
+        )
+
+        if isinstance(
+            full_feed,
+            dict,
+        ):
+
+            return self._parse_full_feed(
+                instrument_key,
+                full_feed,
+            )
+
+        # -------------------------------------------------
+        # DIRECT LTPC FEED
+        # -------------------------------------------------
+
+        ltpc = (
+            payload.get(
+                "ltpc"
+            )
+        )
+
+        if isinstance(
+            ltpc,
+            dict,
+        ):
+
+            return self._parse_ltpc(
+                instrument_key,
+                ltpc,
+            )
+
+        return None
+
+    # =====================================================
+    # FULL FEED
+    # =====================================================
+
+    def _parse_full_feed(
+        self,
+        instrument_key: str,
+        feed: Dict[str, Any],
+    ) -> Optional[Tick]:
+
+        # -------------------------------------------------
+        # INDEX FEED
+        #
+        # Actual Upstox V3 structure:
+        #
+        # fullFeed
+        #     indexFF
+        #         ltpc
+        #         marketOHLC
+        # -------------------------------------------------
+
+        index_feed = (
+            feed.get(
+                "indexFF"
+            )
+        )
+
+        if isinstance(
+            index_feed,
+            dict,
+        ):
+
+            return self._parse_index_feed(
+                instrument_key,
+                index_feed,
+            )
+
+        # -------------------------------------------------
+        # EQUITY / MARKET FEED
+        # -------------------------------------------------
+
+        market_feed = (
+            feed.get(
+                "marketFF"
+            )
+        )
+
+        if isinstance(
+            market_feed,
+            dict,
+        ):
+
+            return self._parse_market_feed(
+                instrument_key,
+                market_feed,
+            )
+
+        # -------------------------------------------------
+        # SOME PAYLOADS MAY ALREADY CONTAIN LTPC
+        # -------------------------------------------------
+
+        ltpc = (
+            feed.get(
+                "ltpc"
+            )
+        )
+
+        if isinstance(
+            ltpc,
+            dict,
+        ):
+
+            return self._parse_ltpc(
+                instrument_key,
+                ltpc,
+            )
+
+        return None
+
+    # =====================================================
+    # INDEX FEED
+    # =====================================================
+
+    def _parse_index_feed(
+        self,
+        instrument_key: str,
+        feed: Dict[str, Any],
+    ) -> Tick:
+
+        ltpc = feed.get(
+            "ltpc",
+            {},
+        )
+
+        market_ohlc = (
+            feed.get(
+                "marketOHLC",
+                {},
+            )
+        )
+
+        ohlc = self._extract_ohlc(
+            market_ohlc
+        )
+
+        day = ohlc.get(
+            "1d",
+            {},
+        )
+
+        timestamp = (
+            self._timestamp(
+                ltpc.get(
+                    "ltt"
+                )
+            )
+        )
+
+        return Tick(
+
+            instrument_key=instrument_key,
+
+            timestamp=timestamp,
+
+            ltp=self._float(
+                ltpc.get(
+                    "ltp"
+                )
+            ),
+
+            volume=0,
+
+            open=self._float(
+                day.get(
+                    "open"
+                )
+            ),
+
+            high=self._float(
+                day.get(
+                    "high"
+                )
+            ),
+
+            low=self._float(
+                day.get(
+                    "low"
+                )
+            ),
+
+            close=self._float(
+                day.get(
+                    "close"
+                )
+            ),
+
+            previous_close=self._float(
+                ltpc.get(
+                    "cp"
+                )
+            ),
+
+            bid_price=0.0,
+
+            ask_price=0.0,
+
+            bid_quantity=0,
+
+            ask_quantity=0,
+
+            open_interest=0,
+
+        )
+
+    # =====================================================
+    # MARKET / EQUITY FULL FEED
+    # =====================================================
+
+    def _parse_market_feed(
+        self,
+        instrument_key: str,
+        market: Dict[str, Any],
+    ) -> Tick:
+
+        ltpc = market.get(
+            "ltpc",
+            {},
+        )
+
+        e_feed = market.get(
+            "eFeedDetails",
+            {},
+        )
+
+        market_ohlc = market.get(
+            "marketOHLC",
+            {},
+        )
+
+        ohlc = self._extract_ohlc(
+            market_ohlc
+        )
+
+        day = ohlc.get(
+            "1d",
+            {},
+        )
+
+        market_level = market.get(
+            "marketLevel",
+            {},
+        )
+
+        bid_ask = market_level.get(
+            "bidAskQuote",
+            [],
+        )
+
+        if not isinstance(
+            bid_ask,
+            list,
+        ):
+
+            bid_ask = []
+
+        best_bid = {}
+
+        best_ask = {}
+
+        # -------------------------------------------------
+        # FIND FIRST VALID BID / ASK
+        # -------------------------------------------------
+
+        for quote in bid_ask:
+
+            if not isinstance(
+                quote,
+                dict,
+            ):
+
+                continue
+
+            if (
+                not best_bid
+                and self._float(
+                    quote.get(
+                        "bidP"
+                    )
+                ) > 0
+            ):
+
+                best_bid = quote
+
+            if (
+                not best_ask
+                and self._float(
+                    quote.get(
+                        "askP"
+                    )
+                ) > 0
+            ):
+
+                best_ask = quote
+
+            if (
+                best_bid
+                and best_ask
+            ):
+
+                break
+
+        timestamp = (
+            self._timestamp(
+                ltpc.get(
+                    "ltt"
+                )
+            )
+        )
+
+        return Tick(
+
+            instrument_key=instrument_key,
+
+            timestamp=timestamp,
+
+            last_price=self._float(
+                ltpc.get(
+                    "ltp"
+                )
+            ),
+
+            volume=self._int(
+                e_feed.get(
+                    "vtt"
+                )
+            ),
+
+            open=self._float(
+                day.get(
+                    "open"
+                )
+            ),
+
+            high=self._float(
+                day.get(
+                    "high"
+                )
+            ),
+
+            low=self._float(
+                day.get(
+                    "low"
+                )
+            ),
+
+            close=self._float(
+                day.get(
+                    "close"
+                )
+            ),
+
+            previous_close=self._float(
+                ltpc.get(
+                    "cp"
+                )
+            ),
+
+            bid=self._float(
+                best_bid.get(
+                    "bidP"
+                )
+            ),
+
+            ask=self._float(
+                best_ask.get(
+                    "askP"
+                )
+            ),
+
+            bid_qty=self._int(
+                best_bid.get(
+                    "bidQ"
+                )
+            ),
+
+            ask_qty=self._int(
+                best_ask.get(
+                    "askQ"
+                )
+            ),
+
+            open_interest=self._int(
+                e_feed.get(
+                    "oi"
+                )
+            ),
+
+        )
+
+    # =====================================================
+    # LTPC FEED
+    # =====================================================
+
+    def _parse_ltpc(
+        self,
+        instrument_key: str,
+        ltpc: Dict[str, Any],
+    ) -> Tick:
+
+        timestamp = (
+            self._timestamp(
+                ltpc.get(
+                    "ltt"
+                )
+            )
+        )
+
+        return Tick(
+
+            instrument_key=instrument_key,
+
+            timestamp=timestamp,
+
+            last_price=self._float(
+                ltpc.get(
+                    "ltp"
+                )
+            ),
+
+            volume=0,
+
+            open=0.0,
+
+            high=0.0,
+
+            low=0.0,
+
+            close=self._float(
+                ltpc.get(
+                    "cp"
+                )
+            ),
+
+            previous_close=self._float(
+                ltpc.get(
+                    "cp"
+                )
+            ),
+
+            bid=0.0,
+
+            ask=0.0,
+
+            bid_qty=0,
+
+            ask_qty=0,
+
+            open_interest=0,
+
+        )
+
+    # =====================================================
+    # EXTRACT OHLC
+    # =====================================================
+
+    def _extract_ohlc(
+        self,
+        market_ohlc: Any,
+    ) -> Dict[str, Dict[str, Any]]:
+
+        result: Dict[
+            str,
+            Dict[str, Any],
+        ] = {}
+
+        if not isinstance(
+            market_ohlc,
+            dict,
+        ):
+
+            return result
+
+        items = market_ohlc.get(
+            "ohlc",
+            [],
+        )
+
+        if not isinstance(
+            items,
+            list,
+        ):
+
+            return result
+
+        for item in items:
+
+            if not isinstance(
+                item,
+                dict,
+            ):
+
+                continue
+
+            interval = str(
+                item.get(
+                    "interval",
+                    "",
+                )
+            )
+
+            if not interval:
+
+                continue
+
+            result[
+                interval
+            ] = item
+
+        return result
+
+    # =====================================================
+    # TIMESTAMP CONVERSION
+    # =====================================================
+
+    def _timestamp(
+        self,
+        value: Any,
+    ) -> int:
+
+        if value is None:
+            return 0
+
+        try:
+
+            return int(
+                value
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return 0
+
+    # =====================================================
+    # SAFE FLOAT
+    # =====================================================
+
+    @staticmethod
+    def _float(
+        value: Any,
+        default: float = 0.0,
+    ) -> float:
+
+        if value is None:
+
+            return default
+
+        try:
+
+            return float(
+                value
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return default
+
+    # =====================================================
+    # SAFE INTEGER
+    # =====================================================
+
+    @staticmethod
+    def _int(
+        value: Any,
+        default: int = 0,
+    ) -> int:
+
+        if value is None:
+
+            return default
+
+        try:
+
+            return int(
+                float(
+                    value
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return default
+
+    # =====================================================
+    # RESET
+    # =====================================================
+
+    def reset(
+        self,
+    ) -> None:
+
+        self.total_messages = 0
+
+        self.total_ticks = 0
+
+        self.failed_messages = 0
+
+        self.market_info_messages = 0
+
+        self.feed_messages = 0
+
+        self.last_market_info = {}
+
+    # =====================================================
+    # STATISTICS
+    # =====================================================
+
+    def statistics(
+        self,
+    ) -> Dict[str, int]:
+
+        return {
+
+            "messages":
+                self.total_messages,
+
+            "ticks":
+                self.total_ticks,
+
+            "failed":
+                self.failed_messages,
+
+            "market_info":
+                self.market_info_messages,
+
+            "feed_messages":
+                self.feed_messages,
+
+        }
+
+    # =====================================================
+    # HEALTH
+    # =====================================================
+
+    @property
+    def healthy(
+        self,
+    ) -> bool:
+
+        return (
+            self.failed_messages
+            == 0
+        )
+
+    # =====================================================
+    # SUCCESS RATE
+    # =====================================================
+
+    @property
+    def success_rate(
+        self,
+    ) -> float:
+
+        if (
+            self.total_messages
+            == 0
+        ):
+
+            return 100.0
+
+        successful = (
+            self.total_messages
+            - self.failed_messages
+        )
+
+        return round(
+
+            (
+                successful
+                / self.total_messages
+            )
+            * 100.0,
+
+            2,
+        )
+
+    # =====================================================
+    # DIAGNOSTICS
+    # =====================================================
+
+    def diagnostics(
+        self,
+    ) -> Dict[str, Any]:
+
+        return {
+
+            "healthy":
+                self.healthy,
+
+            "messages":
+                self.total_messages,
+
+            "ticks":
+                self.total_ticks,
+
+            "failed":
+                self.failed_messages,
+
+            "market_info":
+                self.market_info_messages,
+
+            "feed_messages":
+                self.feed_messages,
+
+            "success_rate":
+                self.success_rate,
+
+            "last_market_info":
+                self.last_market_info,
+
+        }
+
+    # =====================================================
+    # VALIDATE TICK
+    # =====================================================
+
+    def validate_tick(
+        self,
+        tick: Tick,
+    ) -> bool:
+
+        if tick is None:
+
+            return False
+
+        if not getattr(
+            tick,
+            "instrument_key",
+            None,
+        ):
+
+            return False
+
+        try:
+
+            price = float(
+                getattr(
+                    tick,
+                    "last_price",
+                    0,
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return False
+
+        return price >= 0
+
+    # =====================================================
+    # PARSE ONE
+    # =====================================================
+
+    def parse_one(
+        self,
+        message: Any,
+    ) -> Optional[Tick]:
+
+        ticks = self.parse(
+            message
+        )
+
+        if not ticks:
+
+            return None
+
+        return ticks[0]
+
+    # =====================================================
+    # LENGTH
+    # =====================================================
+
+    def __len__(
+        self,
+    ) -> int:
+
+        return self.total_ticks
+
+    # =====================================================
+    # STRING
+    # =====================================================
+
+    def __str__(
+        self,
+    ) -> str:
+
+        return (
+
+            "MarketDataParser("
+            f"messages={self.total_messages}, "
+            f"ticks={self.total_ticks}, "
+            f"failed={self.failed_messages}"
+            ")"
+
+        )
+
+    # =====================================================
+    # REPR
+    # =====================================================
+
+    def __repr__(
+        self,
+    ) -> str:
+
+        return (
+
+            "<MarketDataParser "
+            f"messages={self.total_messages} "
+            f"ticks={self.total_ticks} "
+            f"failed={self.failed_messages}>"
+
+        )

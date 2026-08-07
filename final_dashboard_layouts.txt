@@ -1,0 +1,884 @@
+﻿===== SCANNER SUMMARY =====
+            card.layout.addWidget(row)
+
+        return card
+
+
+    # =====================================================
+    # ROW 2 â€” SCANNER SUMMARY
+    # =====================================================
+
+    def _scanner_summary(self) -> DashboardCard:
+        card = DashboardCard("SCANNER SUMMARY")
+        donut = DonutChart(total=127, buy=74, sell=53)
+        card.layout.addWidget(donut, 1)
+
+        stats = QHBoxLayout()
+        stats.setSpacing(6)
+        for title, value, color in (("BUY", "74", GREEN), ("SELL", "53", RED), ("AVG", "81", BLUE)):
+            box = QFrame()
+            box.setStyleSheet(f"QFrame {{ background:{ROW_BG}; border:1px solid {BORDER_SOFT}; border-radius:5px; }}")
+            box_layout = QVBoxLayout(box)
+            box_layout.setContentsMargins(5, 4, 5, 4)
+            box_layout.setSpacing(0)
+            t = make_label(title, 9, MUTED, True)
+            v = make_label(value, 14, color, True)
+            t.setAlignment(Qt.AlignCenter)
+            v.setAlignment(Qt.AlignCenter)
+            box_layout.addWidget(t)
+            box_layout.addWidget(v)
+            stats.addWidget(box)
+        card.layout.addLayout(stats)
+
+        button = QPushButton("OPEN SCANNER")
+        button.setFixedHeight(30)
+        button.setCursor(Qt.PointingHandCursor)
+        button.setStyleSheet(f"QPushButton {{ background:{BLUE}; border:none; border-radius:5px; color:white; font-size:11px; font-weight:800; }} QPushButton:hover {{ background:#4a89ff; }}")
+        button.clicked.connect(lambda: self.scanner_requested.emit("scanner"))
+        card.layout.addWidget(button)
+        return card
+
+
+    # =====================================================
+    # ROW 2 â€” TOP MOVERS
+    # =====================================================
+
+    def _top_movers(self) -> DashboardCard:
+        card = DashboardCard("TOP MOVERS")
+        for symbol, change, color in (
+            ("TRENT", "+5.42%", GREEN),
+            ("BEL", "+4.18%", GREEN),
+            ("HAL", "+3.91%", GREEN),
+            ("BAJFINANCE", "-2.64%", RED),
+            ("TATASTEEL", "-2.12%", RED),
+        ):
+            row = self._table_row_frame()
+            layout = QHBoxLayout(row)
+            layout.setContentsMargins(10, 5, 10, 5)
+            layout.addWidget(self._table_cell(symbol), 1)
+            change_label = self._table_cell(change, color)
+            change_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            layout.addWidget(change_label)
+            card.layout.addWidget(row)
+        card.layout.addStretch(1)
+        return card
+
+
+    # =====================================================
+    # ROW 2 â€” LIVE SCANNER ALERTS
+    # =====================================================
+
+    def _live_scanner_alerts(self) -> DashboardCard:
+        card = DashboardCard("LIVE SCANNER ALERTS")
+
+        header = QHBoxLayout()
+        header.addWidget(make_label("SYMBOL", 10, MUTED, True))
+        header.addStretch(1)
+        header.addWidget(make_label("TRIGGER", 10, MUTED, True))
+        card.layout.addLayout(header)
+
+        alerts = (
+            ("RELIANCE", "VWAP Breakout", GREEN),
+            ("HDFCBANK", "Volume Expansion", GREEN),
+            ("INFY", "Weak Momentum", RED),
+            ("TCS", "High Confidence", BLUE),
+            ("SBIN", "Trend Continuation", GREEN),
+        )
+        for symbol, trigger, color in alerts:
+            row = self._table_row_frame()
+            layout = QHBoxLayout(row)
+            layout.setContentsMargins(10, 5, 10, 5)
+            layout.setSpacing(8)
+            layout.addWidget(self._table_cell(symbol), 1)
+            trigger_label = self._table_cell(trigger, color)
+            trigger_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            layout.addWidget(trigger_label, 2)
+            card.layout.addWidget(row)
+        card.layout.addStretch(1)
+        return card
+
+
+    # =====================================================
+
+    def _institutional_flow(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "INSTITUTIONAL FLOW"
+        )
+
+        # -------------------------------------------------
+        # FII
+        # -------------------------------------------------
+
+        fii_header = QHBoxLayout()
+
+        fii_header.addWidget(
+            make_label(
+                "FII",
+                13,
+                TEXT,
+                True,
+            )
+        )
+
+        fii_header.addStretch(1)
+
+        fii_header.addWidget(
+            make_label(
+                "+â‚¹1,842 Cr",
+                14,
+                GREEN,
+                True,
+            )
+        )
+
+        card.layout.addLayout(
+            fii_header
+        )
+
+        fii_bar = StrengthBar(
+            78,
+            GREEN,
+        )
+
+        fii_bar.setFixedHeight(
+            15
+        )
+
+        card.layout.addWidget(
+            fii_bar
+        )
+
+        fii_detail = QHBoxLayout()
+
+        fii_detail.addWidget(
+            make_label(
+                "BUY â‚¹8,426 Cr",
+                10,
+                GREEN,
+                True,
+            )
+        )
+
+        fii_detail.addStretch(1)
+
+        fii_detail.addWidget(
+            make_label(
+                "SELL â‚¹6,584 Cr",
+                10,
+                RED,
+                True,
+            )
+        )
+
+        card.layout.addLayout(
+            fii_detail
+        )
+
+        card.layout.addWidget(
+            horizontal_line()
+        )
+
+        # -------------------------------------------------
+        # DII
+        # -------------------------------------------------
+
+        dii_header = QHBoxLayout()
+
+        dii_header.addWidget(
+            make_label(
+===== DERIVATIVES PULSE =====
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 3 â€” DERIVATIVES PULSE
+    # =====================================================
+
+    def _derivatives_pulse(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "DERIVATIVES PULSE"
+        )
+
+        gauge = DerivativesGauge(
+            value=0.72,
+            bullish=True,
+        )
+
+        card.layout.addWidget(
+            gauge,
+            1,
+        )
+
+        status = QLabel(
+            "BULLISH"
+        )
+
+        status.setAlignment(
+            Qt.AlignCenter
+        )
+
+        status.setStyleSheet(
+            f"""
+            QLabel {{
+                color: {GREEN};
+                background: transparent;
+                border: none;
+                font-size: 17px;
+                font-weight: 900;
+            }}
+            """
+        )
+
+        card.layout.addWidget(
+            status
+        )
+
+        # -------------------------------------------------
+        # Derivative statistics
+        # -------------------------------------------------
+
+        stats = QGridLayout()
+
+        stats.setHorizontalSpacing(
+            10
+        )
+
+        stats.setVerticalSpacing(
+            5
+        )
+
+        labels = [
+            (
+                "PCR",
+                "1.18",
+                GREEN,
+            ),
+            (
+                "MAX PAIN",
+                "25,500",
+                BLUE,
+            ),
+            (
+                "FUT OI",
+                "+4.2%",
+                GREEN,
+            ),
+            (
+                "VIX",
+                "12.42",
+                GREEN,
+            ),
+        ]
+
+        for i, (
+            title,
+            value,
+            color,
+        ) in enumerate(labels):
+
+            box = QFrame()
+
+            box.setStyleSheet(
+                f"""
+                QFrame {{
+                    background: {ROW_BG};
+                    border: 1px solid {BORDER_SOFT};
+                    border-radius: 5px;
+                }}
+                """
+            )
+
+            layout = QVBoxLayout(
+                box
+            )
+
+            layout.setContentsMargins(
+                6,
+                4,
+                6,
+                4,
+            )
+
+            layout.setSpacing(
+                0
+            )
+
+            title_label = make_label(
+                title,
+                9,
+                MUTED,
+                True,
+            )
+
+            title_label.setAlignment(
+                Qt.AlignCenter
+            )
+
+            value_label = make_label(
+                value,
+                12,
+                color,
+                True,
+            )
+
+            value_label.setAlignment(
+                Qt.AlignCenter
+            )
+
+            layout.addWidget(
+                title_label
+            )
+
+            layout.addWidget(
+                value_label
+            )
+
+            stats.addWidget(
+                box,
+                i // 2,
+                i % 2,
+            )
+
+        card.layout.addLayout(
+            stats
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 3 â€” NIFTY OI CHART
+    # =====================================================
+
+    def _nifty_oi_chart(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "NIFTY OI CHART"
+        )
+
+        # -------------------------------------------------
+        # Chart header / legend
+        # -------------------------------------------------
+
+        legend = QHBoxLayout()
+
+        legend.setSpacing(
+            12
+        )
+
+        legend.addWidget(
+            make_label(
+                "25,488.90",
+                17,
+                TEXT,
+                True,
+            )
+        )
+
+        legend.addWidget(
+            make_label(
+                "+0.97%",
+                12,
+                GREEN,
+                True,
+            )
+        )
+
+        legend.addStretch(
+            1
+        )
+
+        call_legend = QLabel(
+            "â–  CALL OI"
+        )
+
+        call_legend.setStyleSheet(
+            f"""
+            color: {GREEN};
+            font-size: 9px;
+            font-weight: 800;
+            """
+        )
+
+===== NIFTY OI CARD =====
+        card.layout.addLayout(
+            stats
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 3 â€” NIFTY OI CHART
+    # =====================================================
+
+    def _nifty_oi_chart(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "NIFTY OI CHART"
+        )
+
+        # -------------------------------------------------
+        # Chart header / legend
+        # -------------------------------------------------
+
+        legend = QHBoxLayout()
+
+        legend.setSpacing(
+            12
+        )
+
+        legend.addWidget(
+            make_label(
+                "25,488.90",
+                17,
+                TEXT,
+                True,
+            )
+        )
+
+        legend.addWidget(
+            make_label(
+                "+0.97%",
+                12,
+                GREEN,
+                True,
+            )
+        )
+
+        legend.addStretch(
+            1
+        )
+
+        call_legend = QLabel(
+            "â–  CALL OI"
+        )
+
+        call_legend.setStyleSheet(
+            f"""
+            color: {GREEN};
+            font-size: 9px;
+            font-weight: 800;
+            """
+        )
+
+        put_legend = QLabel(
+            "â–  PUT OI"
+        )
+
+        put_legend.setStyleSheet(
+            f"""
+            color: {RED};
+            font-size: 9px;
+            font-weight: 800;
+            """
+        )
+
+        price_legend = QLabel(
+            "â” PRICE"
+        )
+
+        price_legend.setStyleSheet(
+            f"""
+            color: {BLUE};
+            font-size: 9px;
+            font-weight: 800;
+            """
+        )
+
+        legend.addWidget(
+            call_legend
+        )
+
+        legend.addWidget(
+            put_legend
+        )
+
+        legend.addWidget(
+            price_legend
+        )
+
+        card.layout.addLayout(
+            legend
+        )
+
+        chart = NiftyOIChart()
+
+        card.layout.addWidget(
+            chart,
+            1,
+        )
+
+        # -------------------------------------------------
+        # Bottom OI information
+        # -------------------------------------------------
+
+        bottom = QHBoxLayout()
+
+        bottom.setSpacing(
+            8
+        )
+
+        for title, value, color in (
+            (
+                "CALL WALL",
+                "25,600",
+                RED,
+            ),
+            (
+                "MAX PAIN",
+                "25,500",
+                BLUE,
+            ),
+            (
+                "PUT WALL",
+                "25,300",
+                GREEN,
+            ),
+        ):
+
+            box = QFrame()
+
+            box.setStyleSheet(
+                f"""
+                QFrame {{
+                    background: {ROW_BG};
+                    border: 1px solid {BORDER_SOFT};
+                    border-radius: 5px;
+                }}
+                """
+            )
+
+            box_layout = QVBoxLayout(
+                box
+            )
+
+            box_layout.setContentsMargins(
+                7,
+                4,
+                7,
+                4,
+            )
+
+            box_layout.setSpacing(
+                0
+            )
+
+            title_label = make_label(
+                title,
+                8,
+                MUTED,
+                True,
+            )
+
+            title_label.setAlignment(
+                Qt.AlignCenter
+            )
+
+            value_label = make_label(
+                value,
+                11,
+                color,
+===== NIFTY OI CHART CLASS =====
+            7,
+            7,
+        )
+
+
+# =========================================================
+# NIFTY OI CHART
+# =========================================================
+
+class NiftyOIChart(QWidget):
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.setMinimumHeight(
+            210
+        )
+
+        self.call_values = [
+            11,
+            14,
+            18,
+            13,
+            9,
+            16,
+            21,
+            17,
+            12,
+            20,
+            15,
+            19,
+        ]
+
+        self.put_values = [
+            8,
+            11,
+            14,
+            17,
+            19,
+            13,
+            16,
+            22,
+            18,
+            15,
+            21,
+            23,
+        ]
+
+        self.price_values = [
+            42,
+            45,
+            49,
+            53,
+            57,
+            59,
+            61,
+            60,
+            63,
+            68,
+            73,
+            80,
+        ]
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        area = self.rect().adjusted(
+            35,
+            18,
+            -18,
+            -28,
+        )
+
+        count = len(
+            self.call_values
+        )
+
+        if count == 0:
+            return
+
+        group_width = (
+            area.width()
+            / count
+        )
+
+        max_oi = max(
+            max(self.call_values),
+            max(self.put_values),
+            1,
+        )
+
+        # horizontal grid
+        grid_pen = QPen(
+            QColor("#17304a")
+        )
+
+        grid_pen.setWidth(1)
+
+        painter.setPen(
+            grid_pen
+        )
+
+        for i in range(4):
+
+            y = (
+                area.top()
+                + (
+                    area.height()
+                    * i
+                    / 3
+                )
+            )
+
+            painter.drawLine(
+                QPointF(
+                    area.left(),
+                    y,
+                ),
+                QPointF(
+                    area.right(),
+                    y,
+                ),
+            )
+
+        # bars
+        for i in range(count):
+
+            base_x = (
+                area.left()
+                + i
+                * group_width
+            )
+
+            call_h = (
+                area.height()
+                * 0.55
+                * self.call_values[i]
+                / max_oi
+            )
+
+            put_h = (
+                area.height()
+                * 0.55
+                * self.put_values[i]
+                / max_oi
+            )
+
+            bar_w = max(
+                4,
+                group_width * 0.22,
+            )
+
+            painter.setPen(
+                Qt.NoPen
+            )
+
+            painter.setBrush(
+                QColor(GREEN)
+            )
+
+            painter.drawRect(
+                QRectF(
+                    base_x
+                    + group_width * 0.20,
+                    area.bottom()
+                    - call_h,
+                    bar_w,
+                    call_h,
+                )
+            )
+
+            painter.setBrush(
+                QColor(RED)
+            )
+
+            painter.drawRect(
+                QRectF(
+                    base_x
+                    + group_width * 0.52,
+                    area.bottom()
+                    - put_h,
+                    bar_w,
+                    put_h,
+                )
+            )
+
+        # Price line
+        minimum = min(
+            self.price_values
+        )
+
+        maximum = max(
+            self.price_values
+        )
+
+        spread = max(
+            maximum - minimum,
+            1,
+        )
+
+        path = QPainterPath()
+
+        for i, value in enumerate(
+            self.price_values
+        ):
+
+            x = (
+                area.left()
+                + group_width
+                * (
+                    i + 0.5
+                )
+            )
+
+            normalized = (
+                value - minimum
+            ) / spread
+
+            y = (
+                area.top()
+                + area.height()
+                * 0.45
+                * (
+                    1 - normalized
+                )
+            )
+
+            point = QPointF(
+                x,
+                y,
+            )
+
+            if i == 0:
+                path.moveTo(
+                    point
+                )
+            else:
+                path.lineTo(
+                    point
+                )
+
+        price_pen = QPen(
+            QColor(BLUE)
+        )
+
+        price_pen.setWidth(3)
+
+        painter.setPen(
+            price_pen
+        )
+
+        painter.drawPath(
+            path
+        )
+
+
+# =========================================================
+# END OF PART 1
+# =========================================================
+# =========================================================
+# DASHBOARD PAGE
+# =========================================================
+
+class DashboardPage(QWidget):
+
+    stock_requested = Signal(str)
+    scanner_requested = Signal(str)
+    refresh_requested = Signal()
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.setObjectName(
+            "dashboardPage"
+        )
+

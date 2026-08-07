@@ -1,0 +1,140 @@
+﻿            Qt.AlignCenter,
+            str(self.total),
+        )
+
+
+# =========================================================
+# MARKET BREADTH GAUGE
+# =========================================================
+
+class BreadthGauge(QWidget):
+
+    def __init__(
+        self,
+        value: float = 64,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.value = value
+
+        self.setMinimumHeight(
+            100
+        )
+
+        self.setMaximumHeight(
+            115
+        )
+
+    def set_value(
+        self,
+        value: float,
+    ) -> None:
+
+        try:
+            self.value = float(value)
+        except (TypeError, ValueError):
+            self.value = 0
+
+        self.update()
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        width = min(
+            self.width() - 36,
+            165,
+        )
+
+        rect = QRectF(
+            (self.width() - width) / 2,
+            8,
+            width,
+            width,
+        )
+
+        pen = QPen()
+
+        pen.setWidth(14)
+
+        pen.setCapStyle(
+            Qt.RoundCap
+        )
+
+        # Background semicircle
+        pen.setColor(
+            QColor(TRACK)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            0,
+            180 * 16,
+        )
+
+        value = max(
+            0,
+            min(
+                100,
+                self.value,
+            ),
+        )
+
+        angle = int(
+            180
+            * value
+            / 100
+            * 16
+        )
+
+        pen.setColor(
+            QColor(GREEN)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            180 * 16,
+            -angle,
+        )
+
+        painter.setPen(
+            QColor(TEXT)
+        )
+
+        painter.setFont(
+            QFont(
+                "Segoe UI",
+                22,
+                QFont.Bold,
+            )
+        )
+
+        text_rect = QRectF(
+            rect.x(),
+            rect.y() + 22,
+            rect.width(),
+            58,
+        )
+
+        painter.drawText(
+            text_rect,
+            Qt.AlignCenter,
+            f"{int(value)}%",
+        )
+
+
+# =========================================================
+# MARKET PULSE TREND GRAPH
+# =========================================================

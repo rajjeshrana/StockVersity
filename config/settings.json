@@ -1,0 +1,42 @@
+{
+    "application": {
+        "name": "StockVersity Scanner Pro",
+        "version": "4.0",
+        "powered_by": "AI",
+        "theme": "Dark",
+        "auto_save": true,
+        "language": "English",
+        "refresh_interval": 60
+    },
+    "scanner": {
+        "market": "NSE",
+        "scan_interval": 60,
+        "max_results": 5,
+        "minimum_price": 200,
+        "minimum_market_cap": 1000,
+        "volume_multiplier": 2.0,
+        "minimum_rvol": 1.5,
+        "enable_intraday": true,
+        "enable_swing": true,
+        "enable_positional": true
+    },
+    "risk": {
+        "capital": 100000,
+        "risk_per_trade": 1000,
+        "max_open_positions": 5,
+        "reward_ratio": 2,
+        "daily_loss_limit": 3000,
+        "trailing_stop": true
+    },
+    "dashboard": {
+        "show_heatmap": true,
+        "show_sector_rotation": true,
+        "show_market_breadth": true,
+        "show_news": false,
+        "show_watchlist": true
+    },
+    "watchlist": [],
+    "recent_scans": [],
+    "window_geometry": "AdnQywADAAAAAAAHAAAAAAAABgkAAANvAAAABwAAAB4AAAYJAAADbwAAAAAAAAAABgAAAAAHAAAAHgAABgkAAANv",
+    "window_state": "AAAA/wAAAAD9AAAAAAAABgMAAANSAAAABAAAAAQAAAAIAAAACPwAAAAA"
+}

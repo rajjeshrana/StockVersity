@@ -1,0 +1,3 @@
+"""
+StockVersity Professional Trading Terminal
+"""

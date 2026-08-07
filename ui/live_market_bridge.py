@@ -1,0 +1,474 @@
+"""
+=========================================================
+StockVersity Scanner Pro
+Live Market UI Bridge
+=========================================================
+
+Thread-safe bridge between the Upstox WebSocket worker
+thread and the PySide6 GUI thread.
+
+WebSocketManager
+        ->
+Tick
+        ->
+LiveMarketBridge
+        ->
+Qt Signal
+        ->
+MarketController
+        ->
+DashboardPage.index_cards
+=========================================================
+"""
+
+from __future__ import annotations
+
+import logging
+from collections import defaultdict
+from typing import Dict, List
+
+from PySide6.QtCore import QObject, Signal, Slot
+
+from core.market_data.models import Tick
+
+
+logger = logging.getLogger(__name__)
+
+
+class LiveMarketBridge(QObject):
+    """
+    Thread-safe bridge for live market ticks.
+
+    IMPORTANT:
+    WebSocketManager invokes tick callbacks from its
+    background message-processing thread.
+
+    Therefore the callback must NOT update Qt widgets
+    directly.
+
+    tick_received emits the Tick into Qt's event system.
+    _process_tick then executes safely on the GUI thread.
+    """
+
+    tick_received = Signal(object)
+
+    market_updated = Signal(str, float, float)
+
+    # -----------------------------------------------------
+    # UPSTOX INSTRUMENT -> DASHBOARD SYMBOL
+    # -----------------------------------------------------
+
+    INSTRUMENT_MAP = {
+
+        "NSE_INDEX|Nifty 50":
+            "NIFTY",
+
+        "NSE_INDEX|Nifty Bank":
+            "BANKNIFTY",
+
+        "NSE_INDEX|Nifty Fin Service":
+            "FINNIFTY",
+
+        "NSE_INDEX|India VIX":
+            "INDIA VIX",
+
+    }
+
+    def __init__(
+        self,
+        market_controller,
+        parent=None,
+    ) -> None:
+
+        super().__init__(parent)
+
+        self.market_controller = (
+            market_controller
+        )
+
+        # Keep short rolling histories for sparklines.
+        self.history: Dict[
+            str,
+            List[float],
+        ] = defaultdict(list)
+
+        self.max_history = 60
+
+        # -----------------------------------------------------
+        # HISTORICAL PREVIOUS-CLOSE FALLBACK
+        # -----------------------------------------------------
+        # Populated once during application startup.
+        # Used only when an incoming WebSocket tick does not
+        # contain a valid previous_close value.
+        self.previous_closes: Dict[str, float] = {}
+
+        # Queued Qt signal crossing worker -> GUI thread.
+        self.tick_received.connect(
+            self._process_tick
+        )
+
+        logger.info(
+            "LiveMarketBridge initialized."
+        )
+
+    # =====================================================
+    # HISTORICAL PREVIOUS CLOSE
+    # =====================================================
+
+    def set_previous_closes(
+        self,
+        values: Dict[str, float],
+    ) -> None:
+        """
+        Store latest completed-session closes.
+
+        Keys must be Upstox instrument keys, for example:
+            NSE_INDEX|Nifty 50
+            NSE_INDEX|Nifty Bank
+            NSE_INDEX|Nifty Fin Service
+            NSE_INDEX|India VIX
+        """
+
+        cleaned: Dict[str, float] = {}
+
+        for instrument_key, value in (values or {}).items():
+
+            close = self._number(value)
+
+            if instrument_key and close > 0:
+                cleaned[str(instrument_key)] = close
+
+        self.previous_closes = cleaned
+
+        logger.info(
+            "Historical previous closes loaded for %d indices.",
+            len(cleaned),
+        )
+
+    # =====================================================
+    # WEBSOCKET CALLBACK
+    # =====================================================
+
+    def on_tick(
+        self,
+        tick: Tick,
+    ) -> None:
+        """
+        Called by WebSocketManager.
+
+        This method may execute on the WebSocket worker
+        thread. Do not manipulate Qt widgets here.
+        """
+
+        if tick is None:
+            return
+
+        self.tick_received.emit(
+            tick
+        )
+
+    # =====================================================
+    # QT MAIN THREAD PROCESSOR
+    # =====================================================
+
+    @Slot(object)
+    def _process_tick(
+        self,
+        tick: Tick,
+    ) -> None:
+
+        try:
+
+            instrument_key = getattr(
+                tick,
+                "instrument_key",
+                "",
+            )
+
+            market_key = (
+                self.INSTRUMENT_MAP.get(
+                    instrument_key
+                )
+            )
+
+            # Ignore instruments not displayed in
+            # dashboard index cards.
+            if market_key is None:
+                return
+
+            ltp = self._number(
+                getattr(
+                    tick,
+                    "ltp",
+                    0.0,
+                )
+            )
+
+            previous_close = self._number(
+                getattr(
+                    tick,
+                    "previous_close",
+                    0.0,
+                )
+            )
+
+            # Some Upstox index ticks may not provide a
+            # usable previous_close. Fall back to the latest
+            # completed daily candle loaded during startup.
+            if previous_close <= 0:
+
+                previous_close = self._number(
+                    self.previous_closes.get(
+                        instrument_key,
+                        0.0,
+                    )
+                )
+
+            # ---------------------------------------------
+            # CHANGE %
+            # ---------------------------------------------
+
+            if previous_close > 0:
+
+                change_percent = (
+                    (
+                        ltp
+                        - previous_close
+                    )
+                    / previous_close
+                ) * 100.0
+
+            else:
+
+                change_percent = 0.0
+
+            # ---------------------------------------------
+            # SPARKLINE HISTORY
+            # ---------------------------------------------
+
+            history = self.history[
+                market_key
+            ]
+
+            if ltp > 0:
+
+                history.append(
+                    ltp
+                )
+
+                if len(history) > self.max_history:
+
+                    del history[
+                        :-self.max_history
+                    ]
+
+            # ---------------------------------------------
+            # BUILD CONTROLLER INDEX DATA
+            # ---------------------------------------------
+
+            index_data = {
+
+                "instrument_key":
+                    instrument_key,
+
+                "value":
+                    ltp,
+
+                "ltp":
+                    ltp,
+
+                "last_price":
+                    ltp,
+
+                "previous_close":
+                    previous_close,
+
+                "change_percent":
+                    change_percent,
+
+                "change_pct":
+                    change_percent,
+
+                "change":
+                    change_percent,
+
+                "open":
+                    self._number(
+                        getattr(
+                            tick,
+                            "open",
+                            0.0,
+                        )
+                    ),
+
+                "high":
+                    self._number(
+                        getattr(
+                            tick,
+                            "high",
+                            0.0,
+                        )
+                    ),
+
+                "low":
+                    self._number(
+                        getattr(
+                            tick,
+                            "low",
+                            0.0,
+                        )
+                    ),
+
+                "close":
+                    self._number(
+                        getattr(
+                            tick,
+                            "close",
+                            0.0,
+                        )
+                    ),
+
+                "volume":
+                    self._integer(
+                        getattr(
+                            tick,
+                            "volume",
+                            0,
+                        )
+                    ),
+
+                "timestamp":
+                    getattr(
+                        tick,
+                        "timestamp",
+                        0,
+                    ),
+
+                "history":
+                    list(history),
+
+            }
+
+            # ---------------------------------------------
+            # UPDATE MARKET CONTROLLER
+            # ---------------------------------------------
+
+            if not hasattr(
+                self.market_controller,
+                "indices",
+            ):
+
+                self.market_controller.indices = {}
+
+            self.market_controller.indices[
+                market_key
+            ] = index_data
+
+            # ---------------------------------------------
+            # UPDATE FIXED DASHBOARD INDEX CARDS
+            # ---------------------------------------------
+
+            if hasattr(
+                self.market_controller,
+                "update_index_cards",
+            ):
+
+                self.market_controller.update_index_cards()
+
+            self.market_updated.emit(
+                market_key,
+                ltp,
+                change_percent,
+            )
+
+            logger.debug(
+                "%s updated: %.2f (%+.2f%%)",
+                market_key,
+                ltp,
+                change_percent,
+            )
+
+        except Exception:
+
+            logger.exception(
+                "Unable to process live market tick."
+            )
+
+    # =====================================================
+    # HELPERS
+    # =====================================================
+
+    @staticmethod
+    def _number(
+        value,
+    ) -> float:
+
+        try:
+
+            if value is None:
+                return 0.0
+
+            return float(
+                value
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return 0.0
+
+    @staticmethod
+    def _integer(
+        value,
+    ) -> int:
+
+        try:
+
+            if value is None:
+                return 0
+
+            return int(
+                float(value)
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            return 0
+
+    # =====================================================
+    # RESET
+    # =====================================================
+
+    def reset_history(
+        self,
+    ) -> None:
+
+        self.history.clear()
+
+    # =====================================================
+    # DIAGNOSTICS
+    # =====================================================
+
+    def statistics(
+        self,
+    ) -> dict:
+
+        return {
+
+            "tracked_indices":
+                list(
+                    self.history.keys()
+                ),
+
+            "history_points": {
+                key: len(values)
+                for key, values
+                in self.history.items()
+            },
+
+        }

@@ -1,0 +1,470 @@
+D:\StockVersityScanner\patch_fix_adx_indentation.py:16: bad = """        self.previous_close = close
+D:\StockVersityScanner\patch_fix_adx_indentation.py:19: good = """        self.previous_close = close
+D:\StockVersityScanner\patch_ltpc_parser.py:40: previous_close = self._float(
+D:\StockVersityScanner\patch_ltpc_parser.py:48: previous_close=previous_close,
+D:\StockVersityScanner\patch_ltpc_parser.py:49: close=previous_close,
+D:\StockVersityScanner\backend\scanner.py:1609: if "previous_close" not in row.index:
+D:\StockVersityScanner\backend\scanner.py:1612: previous = row["previous_close"]
+D:\StockVersityScanner\backend\ai\market_sentiment_engine.py:1471: previous_close = self.close.iloc[-2]
+D:\StockVersityScanner\backend\ai\market_sentiment_engine.py:1477: (today_open - previous_close)
+D:\StockVersityScanner\backend\ai\market_sentiment_engine.py:1479: / previous_close
+D:\StockVersityScanner\backend\ai\volume_analysis_engine.py:691: previous_close = close.iloc[-2]
+D:\StockVersityScanner\backend\ai\volume_analysis_engine.py:701: previous_close
+D:\StockVersityScanner\backend\ai\volume_analysis_engine.py:707: previous_close
+D:\StockVersityScanner\backend\models\market_data.py:42: previous_close: float = 0.0
+D:\StockVersityScanner\backend\models\market_data.py:324: if self.previous_close:
+D:\StockVersityScanner\backend\models\market_data.py:327: self.ltp - self.previous_close,
+D:\StockVersityScanner\backend\models\market_data.py:332: (self.change / self.previous_close) * 100,
+D:\StockVersityScanner\backend\models\market_data.py:342: if self.previous_close == 0:
+D:\StockVersityScanner\backend\models\market_data.py:346: ((self.open - self.previous_close)
+D:\StockVersityScanner\backend\models\market_data.py:347: / self.previous_close) * 100,
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:652: def load_previous_day_data(
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1057: self.load_previous_day_data()
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1352: previous_close = previous["Close"]
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1358: (open_price - previous_close)
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1360: / previous_close
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1374: "Previous Close": previous_close,
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1410: previous_close = previous["Close"]
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1416: (open_price - previous_close)
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1418: / previous_close
+D:\StockVersityScanner\backend\scanner\nse_data_engine.py:1432: "Previous Close": previous_close,
+D:\StockVersityScanner\backend\services\data_service.py:437: market.previous_close = quote.get(
+D:\StockVersityScanner\backend\services\data_service.py:438: "previous_close",
+D:\StockVersityScanner\backend\services\live_market_service.py:385: close=data.previous_close,
+D:\StockVersityScanner\backend\services\live_market_service.py:439: close=data.previous_close,
+D:\StockVersityScanner\backend\services\market_data.py:1575: previous_close = df.iloc[-2]["close"]
+D:\StockVersityScanner\backend\services\market_data.py:1587: previous_close
+D:\StockVersityScanner\backend\services\market_data.py:1593: previous_close
+D:\StockVersityScanner\backend\services\market_data.py:1997: previous_close = df.iloc[-2]["close"]
+D:\StockVersityScanner\backend\services\market_data.py:2009: previous_close
+D:\StockVersityScanner\backend\services\market_data.py:2015: previous_close
+D:\StockVersityScanner\backend\services\nse_service.py:326: "previous_close": summary.get("previousClose"),
+D:\StockVersityScanner\backend\services\nse_service.py:1034: "previous_close": info.get("previousClose"),
+D:\StockVersityScanner\backend\services\yahoo_service.py:81: "previous_close": previous,
+D:\StockVersityScanner\backend\services\yahoo_service.py:105: "previous_close": None,
+D:\StockVersityScanner\backend\services\yahoo_service.py:1008: yesterday = data.iloc[-2]
+D:\StockVersityScanner\backend\services\yahoo_service.py:1014: (today["Open"] - yesterday["Close"])
+D:\StockVersityScanner\backend\services\yahoo_service.py:1016: / yesterday["Close"]
+D:\StockVersityScanner\backend\services\yahoo_service.py:1313: yesterday = data.iloc[-2]
+D:\StockVersityScanner\backend\services\yahoo_service.py:1319: (today["Open"] - yesterday["Close"])
+D:\StockVersityScanner\backend\services\yahoo_service.py:1321: / yesterday["Close"]
+D:\StockVersityScanner\core\market_data_manager.py:35: previous_close: float = 0.0
+D:\StockVersityScanner\core\previous_session_loader.py:31: class PreviousSessionLoader:
+D:\StockVersityScanner\core\previous_session_loader.py:71: "previous_close": 24379.85,
+D:\StockVersityScanner\core\previous_session_loader.py:161: previous_close = self._number(
+D:\StockVersityScanner\core\previous_session_loader.py:172: previous_close is not None
+D:\StockVersityScanner\core\previous_session_loader.py:173: and previous_close != 0
+D:\StockVersityScanner\core\previous_session_loader.py:176: latest_close - previous_close
+D:\StockVersityScanner\core\previous_session_loader.py:180: change / previous_close
+D:\StockVersityScanner\core\previous_session_loader.py:188: "previous_close": (
+D:\StockVersityScanner\core\previous_session_loader.py:189: previous_close
+D:\StockVersityScanner\core\previous_session_loader.py:190: if previous_close is not None
+D:\StockVersityScanner\core\screener_engine.py:1019: previous_close: float,
+D:\StockVersityScanner\core\screener_engine.py:1027: if previous_close <= 0:
+D:\StockVersityScanner\core\screener_engine.py:1032: (today_open - previous_close)
+D:\StockVersityScanner\core\screener_engine.py:1034: / previous_close
+D:\StockVersityScanner\core\screener_engine.py:1152: "previous_close",
+D:\StockVersityScanner\core\indicators\adx.py:34: self.previous_close = None
+D:\StockVersityScanner\core\indicators\adx.py:68: self.previous_close = close
+D:\StockVersityScanner\core\indicators\adx.py:92: abs(high - self.previous_close),
+D:\StockVersityScanner\core\indicators\adx.py:94: abs(low - self.previous_close),
+D:\StockVersityScanner\core\indicators\adx.py:102: self.previous_close = close
+D:\StockVersityScanner\core\indicators\atr.py:30: self.previous_close = None
+D:\StockVersityScanner\core\indicators\atr.py:48: if self.previous_close is None:
+D:\StockVersityScanner\core\indicators\atr.py:52: self.previous_close = close
+D:\StockVersityScanner\core\indicators\atr.py:64: abs(high - self.previous_close),
+D:\StockVersityScanner\core\indicators\atr.py:66: abs(low - self.previous_close),
+D:\StockVersityScanner\core\indicators\atr.py:70: self.previous_close = close
+D:\StockVersityScanner\core\indicators\rsi.py:24: self.previous_close = None
+D:\StockVersityScanner\core\indicators\rsi.py:34: if self.previous_close is None:
+D:\StockVersityScanner\core\indicators\rsi.py:36: self.previous_close = close
+D:\StockVersityScanner\core\indicators\rsi.py:40: change = close - self.previous_close
+D:\StockVersityScanner\core\indicators\rsi.py:46: self.previous_close = close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:53: previous_close: float = 0.0
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:67: def has_previous_close(self) -> bool:
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:68: return self.previous_close > 0.0
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:72: if not self.has_price or not self.has_previous_close:
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:218: previous_close = self._safe_float(
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:219: getattr(tick, "previous_close", 0.0)
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:234: # cp -> previous_close is already populated by
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:236: if previous_close > 0.0:
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:237: state.previous_close = previous_close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:247: and state.previous_close > 0.0
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:251: - state.previous_close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:256: / state.previous_close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:395: and state.has_previous_close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:532: "previous_close": state.previous_close,
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:562: and state.has_previous_close
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:622: previous_close=1500.0,
+D:\StockVersityScanner\core\market_data\live_stock_universe.py:639: f"{reliance.previous_close:.2f}",
+D:\StockVersityScanner\core\market_data\market_data_parser.py:448: previous_close=self._float(
+D:\StockVersityScanner\core\market_data\market_data_parser.py:613: previous_close=self._float(
+D:\StockVersityScanner\core\market_data\market_data_parser.py:677: previous_close = self._float(
+D:\StockVersityScanner\core\market_data\market_data_parser.py:685: previous_close=previous_close,
+D:\StockVersityScanner\core\market_data\market_data_parser.py:686: close=previous_close,
+D:\StockVersityScanner\core\market_data\models.py:98: previous_close: float = 0.0
+D:\StockVersityScanner\core\market_data\models_broken.py:98: previous_close: float = 0.0
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:71: "previous_close": 1505,
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:91: "previous_day_high": 1525,
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:92: "previous_day_low": 1480,
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:331: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:333: "previous_close"
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:366: previous_close > 0
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:374: - previous_close
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:377: / previous_close
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:771: previous_close=(
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:772: previous_close
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:961: "PREVIOUS_DAY_HIGH",
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:964: "previous_day_high"
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:1035: "PREVIOUS_DAY_LOW",
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:1038: "previous_day_low"
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:1542: "PREVIOUS_DAY_HIGH": 11,
+D:\StockVersityScanner\core\scanner\breakout_scanner.py:1544: "PREVIOUS_DAY_LOW": 11,
+D:\StockVersityScanner\core\scanner\context.py:336: previous_close: float = 0.0
+D:\StockVersityScanner\core\scanner\context.py:406: "previous_close":
+D:\StockVersityScanner\core\scanner\context.py:407: self.previous_close,
+D:\StockVersityScanner\core\scanner\indicators.py:614: previous_close = (
+D:\StockVersityScanner\core\scanner\indicators.py:626: - previous_close
+D:\StockVersityScanner\core\scanner\indicators.py:631: - previous_close
+D:\StockVersityScanner\core\scanner\indicators.py:653: previous_close: float,
+D:\StockVersityScanner\core\scanner\indicators.py:665: previous_close
+D:\StockVersityScanner\core\scanner\indicators.py:672: previous_close
+D:\StockVersityScanner\core\scanner\indicators.py:1986: previous_close = (
+D:\StockVersityScanner\core\scanner\indicators.py:1995: or previous_close
+D:\StockVersityScanner\core\scanner\indicators.py:2012: or previous_close
+D:\StockVersityScanner\core\scanner\indicator_engine.py:571: previous_close = float(
+D:\StockVersityScanner\core\scanner\indicator_engine.py:583: - previous_close
+D:\StockVersityScanner\core\scanner\indicator_engine.py:588: - previous_close
+D:\StockVersityScanner\core\scanner\indicator_engine.py:1713: previous_close = float(
+D:\StockVersityScanner\core\scanner\indicator_engine.py:1728: or previous_close
+D:\StockVersityScanner\core\scanner\indicator_engine.py:1755: or previous_close
+D:\StockVersityScanner\core\scanner\indicator_engine.py:2077: previous_close = 0.0
+D:\StockVersityScanner\core\scanner\indicator_engine.py:2081: previous_close = (
+D:\StockVersityScanner\core\scanner\indicator_engine.py:2128: "previous_close": (
+D:\StockVersityScanner\core\scanner\indicator_engine.py:2129: previous_close
+D:\StockVersityScanner\core\scanner\intraday.py:105: "previous_close": 2970.0,
+D:\StockVersityScanner\core\scanner\intraday.py:359: previous_close = self._number(
+D:\StockVersityScanner\core\scanner\intraday.py:361: "previous_close",
+D:\StockVersityScanner\core\scanner\intraday.py:362: "prev_close",
+D:\StockVersityScanner\core\scanner\intraday.py:397: previous_close,
+D:\StockVersityScanner\core\scanner\intraday.py:905: previous_close=previous_close,
+D:\StockVersityScanner\core\scanner\intraday.py:1981: previous_close: float,
+D:\StockVersityScanner\core\scanner\intraday.py:1984: if previous_close <= 0:
+D:\StockVersityScanner\core\scanner\intraday.py:1993: - previous_close
+D:\StockVersityScanner\core\scanner\intraday.py:1995: / previous_close
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:177: "previous_close": 1438.00,
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:353: previous_close = _safe_float(
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:356: "previous_close",
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:357: "prev_close",
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:411: and previous_close > 0
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:416: - previous_close
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:421: / previous_close
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:456: "previous_close":
+D:\StockVersityScanner\core\scanner\market_data_bridge.py:457: previous_close,
+D:\StockVersityScanner\core\scanner\orb_scanner.py:357: previous_close = self._number(
+D:\StockVersityScanner\core\scanner\orb_scanner.py:359: "previous_close",
+D:\StockVersityScanner\core\scanner\orb_scanner.py:361: "previous_close",
+D:\StockVersityScanner\core\scanner\orb_scanner.py:384: previous_close,
+D:\StockVersityScanner\core\scanner\orb_scanner.py:679: previous_close=previous_close,
+D:\StockVersityScanner\core\scanner\orb_scanner.py:755: previous_close=previous_close,
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1151: previous_close=values[
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1152: "previous_close"
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1639: previous_close=values[
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1640: "previous_close"
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1944: previous_close: float,
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1947: if previous_close <= 0:
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1957: - previous_close
+D:\StockVersityScanner\core\scanner\orb_scanner.py:1960: / previous_close
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:195: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:196: data.get("previous_close")
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:223: previous_close > 0
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:230: - previous_close
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:232: / previous_close
+D:\StockVersityScanner\core\scanner\pattern_scanner.py:545: previous_close=previous_close,
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:71: "previous_close": 1445,
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:308: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:310: "previous_close"
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:464: if previous_close > 0:
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:469: - previous_close
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:471: / previous_close
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:760: previous_close=(
+D:\StockVersityScanner\core\scanner\positional_Scanner.py:761: previous_close
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:74: "previous_close": 1428.00,
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:228: previous_close: float,
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:231: if previous_close <= 0:
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:239: - previous_close
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:241: / previous_close
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:375: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:378: "previous_close",
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:379: "prev_close",
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:444: and previous_close > 0
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:450: previous_close,
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:702: "previous_close":
+D:\StockVersityScanner\core\scanner\scanner_data_adapter.py:703: previous_close,
+D:\StockVersityScanner\core\scanner\signal.py:397: previous_close: float = 0.0
+D:\StockVersityScanner\core\scanner\signal.py:778: "previous_close",
+D:\StockVersityScanner\core\scanner\signal.py:1771: "previous_close":
+D:\StockVersityScanner\core\scanner\signal.py:1772: self.previous_close,
+D:\StockVersityScanner\core\scanner\signal.py:2155: previous_close=_safe_float(
+D:\StockVersityScanner\core\scanner\signal.py:2157: "previous_close"
+D:\StockVersityScanner\core\scanner\swing_scanner.py:68: "previous_close": 1445,
+D:\StockVersityScanner\core\scanner\swing_scanner.py:302: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\swing_scanner.py:304: "previous_close"
+D:\StockVersityScanner\core\scanner\swing_scanner.py:448: if previous_close > 0:
+D:\StockVersityScanner\core\scanner\swing_scanner.py:454: - previous_close
+D:\StockVersityScanner\core\scanner\swing_scanner.py:457: / previous_close
+D:\StockVersityScanner\core\scanner\swing_scanner.py:704: previous_close=(
+D:\StockVersityScanner\core\scanner\swing_scanner.py:705: previous_close
+D:\StockVersityScanner\core\scanner\utils.py:264: previous_close: Any,
+D:\StockVersityScanner\core\scanner\utils.py:274: previous_close
+D:\StockVersityScanner\core\scanner\utils.py:303: previous_close: Any,
+D:\StockVersityScanner\core\scanner\utils.py:316: previous_close,
+D:\StockVersityScanner\core\scanner\utils.py:1673: previous_close: Optional[Any] = None,
+D:\StockVersityScanner\core\scanner\utils.py:1705: and previous_close is not None
+D:\StockVersityScanner\core\scanner\utils.py:1711: previous_close,
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:68: "previous_close": 1500,
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:259: previous_close = self._float(
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:260: data.get("previous_close")
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:287: previous_close > 0
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:294: - previous_close
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:296: / previous_close
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:675: previous_close=(
+D:\StockVersityScanner\core\scanner\vcp_scanner.py:676: previous_close
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:492: previous_close = _float(
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:495: "previous_close",
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:496: "prev_close",
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:534: previous_close,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:782: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:824: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:1144: previous_close: float,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:1351: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:1991: previous_close: float,
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:1996: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:2004: - previous_close
+D:\StockVersityScanner\core\scanners\breakout_scanner.py:2006: / previous_close
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:492: previous_close = _float(
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:495: "previous_close",
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:496: "prev_close",
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:507: previous_close,
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:1092: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:1772: previous_close: float,
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:1777: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:1785: - previous_close
+D:\StockVersityScanner\core\scanners\bull_flag_scanner.py:1787: / previous_close
+D:\StockVersityScanner\core\scanners\cup_handle_scanner.py:460: "previous_close":
+D:\StockVersityScanner\core\scanners\cup_handle_scanner.py:464: "previous_close",
+D:\StockVersityScanner\core\scanners\cup_handle_scanner.py:465: "prev_close",
+D:\StockVersityScanner\core\scanners\cup_handle_scanner.py:2273: previous_close=(
+D:\StockVersityScanner\core\scanners\cup_handle_scanner.py:2275: "previous_close"
+D:\StockVersityScanner\core\scanners\falling_wedge_scanner.py:440: "previous_close":
+D:\StockVersityScanner\core\scanners\falling_wedge_scanner.py:444: "previous_close",
+D:\StockVersityScanner\core\scanners\falling_wedge_scanner.py:445: "prev_close",
+D:\StockVersityScanner\core\scanners\falling_wedge_scanner.py:1961: previous_close=(
+D:\StockVersityScanner\core\scanners\falling_wedge_scanner.py:1963: "previous_close"
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:180: "previous_close":
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:556: previous_close = _float(
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:559: "previous_close",
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:560: "prev_close",
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:598: previous_close,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:833: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:873: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:1168: previous_close: float,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:1387: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:2050: previous_close: float,
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:2055: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:2063: - previous_close
+D:\StockVersityScanner\core\scanners\momentum_scanner.py:2065: / previous_close
+D:\StockVersityScanner\core\scanners\orb_scanner.py:180: "previous_close": 1385,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:537: previous_close = _float(
+D:\StockVersityScanner\core\scanners\orb_scanner.py:540: "previous_close",
+D:\StockVersityScanner\core\scanners\orb_scanner.py:541: "prev_close",
+D:\StockVersityScanner\core\scanners\orb_scanner.py:584: previous_close,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:827: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:867: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1299: previous_close: float,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1304: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1312: - previous_close
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1314: / previous_close
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1334: previous_close: float,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1531: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1623: previous_close: float,
+D:\StockVersityScanner\core\scanners\orb_scanner.py:1803: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\positional_scanner.py:485: previous_close = _float(
+D:\StockVersityScanner\core\scanners\positional_scanner.py:488: "previous_close",
+D:\StockVersityScanner\core\scanners\positional_scanner.py:489: "prev_close",
+D:\StockVersityScanner\core\scanners\positional_scanner.py:500: previous_close,
+D:\StockVersityScanner\core\scanners\positional_scanner.py:1108: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\positional_scanner.py:2209: previous_close: float,
+D:\StockVersityScanner\core\scanners\positional_scanner.py:2214: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\positional_scanner.py:2222: - previous_close
+D:\StockVersityScanner\core\scanners\positional_scanner.py:2224: / previous_close
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:408: previous_close = _float(
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:411: "previous_close",
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:412: "prev_close",
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:423: previous_close,
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:841: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:1535: previous_close: float,
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:1540: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:1548: - previous_close
+D:\StockVersityScanner\core\scanners\relative_strength_scanner.py:1550: / previous_close
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:473: previous_close = _float(
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:476: "previous_close",
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:477: "prev_close",
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:488: previous_close,
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:932: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:1811: previous_close: float,
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:1816: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:1824: - previous_close
+D:\StockVersityScanner\core\scanners\sector_rotation_scanner.py:1826: / previous_close
+D:\StockVersityScanner\core\scanners\swing_scanner.py:79: previous_close
+D:\StockVersityScanner\core\scanners\swing_scanner.py:404: previous_close = self._float(
+D:\StockVersityScanner\core\scanners\swing_scanner.py:407: "previous_close",
+D:\StockVersityScanner\core\scanners\swing_scanner.py:408: "prev_close",
+D:\StockVersityScanner\core\scanners\swing_scanner.py:643: and previous_close > 0
+D:\StockVersityScanner\core\scanners\swing_scanner.py:650: - previous_close
+D:\StockVersityScanner\core\scanners\swing_scanner.py:652: / previous_close
+D:\StockVersityScanner\core\scanners\swing_scanner.py:708: "previous_close": previous_close,
+D:\StockVersityScanner\core\scanners\swing_scanner.py:2094: previous_close=(
+D:\StockVersityScanner\core\scanners\swing_scanner.py:2096: "previous_close"
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:510: previous_close = _float(
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:513: "previous_close",
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:514: "prev_close",
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:525: previous_close,
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:1011: previous_close=previous_close,
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:1834: previous_close: float,
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:1839: or previous_close <= 0
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:1847: - previous_close
+D:\StockVersityScanner\core\scanners\vcp_scanner.py:1849: / previous_close
+D:\StockVersityScanner\scanner\breakout_scanner.py:71: "previous_close": 1505,
+D:\StockVersityScanner\scanner\breakout_scanner.py:91: "previous_day_high": 1525,
+D:\StockVersityScanner\scanner\breakout_scanner.py:92: "previous_day_low": 1480,
+D:\StockVersityScanner\scanner\breakout_scanner.py:331: previous_close = self._float(
+D:\StockVersityScanner\scanner\breakout_scanner.py:333: "previous_close"
+D:\StockVersityScanner\scanner\breakout_scanner.py:366: previous_close > 0
+D:\StockVersityScanner\scanner\breakout_scanner.py:374: - previous_close
+D:\StockVersityScanner\scanner\breakout_scanner.py:377: / previous_close
+D:\StockVersityScanner\scanner\breakout_scanner.py:771: previous_close=(
+D:\StockVersityScanner\scanner\breakout_scanner.py:772: previous_close
+D:\StockVersityScanner\scanner\breakout_scanner.py:961: "PREVIOUS_DAY_HIGH",
+D:\StockVersityScanner\scanner\breakout_scanner.py:964: "previous_day_high"
+D:\StockVersityScanner\scanner\breakout_scanner.py:1035: "PREVIOUS_DAY_LOW",
+D:\StockVersityScanner\scanner\breakout_scanner.py:1038: "previous_day_low"
+D:\StockVersityScanner\scanner\breakout_scanner.py:1542: "PREVIOUS_DAY_HIGH": 11,
+D:\StockVersityScanner\scanner\breakout_scanner.py:1544: "PREVIOUS_DAY_LOW": 11,
+D:\StockVersityScanner\scanner\context.py:336: previous_close: float = 0.0
+D:\StockVersityScanner\scanner\context.py:406: "previous_close":
+D:\StockVersityScanner\scanner\context.py:407: self.previous_close,
+D:\StockVersityScanner\scanner\indicators.py:614: previous_close = (
+D:\StockVersityScanner\scanner\indicators.py:626: - previous_close
+D:\StockVersityScanner\scanner\indicators.py:631: - previous_close
+D:\StockVersityScanner\scanner\indicators.py:653: previous_close: float,
+D:\StockVersityScanner\scanner\indicators.py:665: previous_close
+D:\StockVersityScanner\scanner\indicators.py:672: previous_close
+D:\StockVersityScanner\scanner\indicators.py:1986: previous_close = (
+D:\StockVersityScanner\scanner\indicators.py:1995: or previous_close
+D:\StockVersityScanner\scanner\indicators.py:2012: or previous_close
+D:\StockVersityScanner\scanner\indicator_engine.py:571: previous_close = float(
+D:\StockVersityScanner\scanner\indicator_engine.py:583: - previous_close
+D:\StockVersityScanner\scanner\indicator_engine.py:588: - previous_close
+D:\StockVersityScanner\scanner\indicator_engine.py:1713: previous_close = float(
+D:\StockVersityScanner\scanner\indicator_engine.py:1728: or previous_close
+D:\StockVersityScanner\scanner\indicator_engine.py:1755: or previous_close
+D:\StockVersityScanner\scanner\indicator_engine.py:2077: previous_close = 0.0
+D:\StockVersityScanner\scanner\indicator_engine.py:2081: previous_close = (
+D:\StockVersityScanner\scanner\indicator_engine.py:2128: "previous_close": (
+D:\StockVersityScanner\scanner\indicator_engine.py:2129: previous_close
+D:\StockVersityScanner\scanner\intraday.py:105: "previous_close": 2970.0,
+D:\StockVersityScanner\scanner\intraday.py:359: previous_close = self._number(
+D:\StockVersityScanner\scanner\intraday.py:361: "previous_close",
+D:\StockVersityScanner\scanner\intraday.py:362: "prev_close",
+D:\StockVersityScanner\scanner\intraday.py:397: previous_close,
+D:\StockVersityScanner\scanner\intraday.py:905: previous_close=previous_close,
+D:\StockVersityScanner\scanner\intraday.py:1981: previous_close: float,
+D:\StockVersityScanner\scanner\intraday.py:1984: if previous_close <= 0:
+D:\StockVersityScanner\scanner\intraday.py:1993: - previous_close
+D:\StockVersityScanner\scanner\intraday.py:1995: / previous_close
+D:\StockVersityScanner\scanner\market_data_bridge.py:177: "previous_close": 1438.00,
+D:\StockVersityScanner\scanner\market_data_bridge.py:353: previous_close = _safe_float(
+D:\StockVersityScanner\scanner\market_data_bridge.py:356: "previous_close",
+D:\StockVersityScanner\scanner\market_data_bridge.py:357: "prev_close",
+D:\StockVersityScanner\scanner\market_data_bridge.py:411: and previous_close > 0
+D:\StockVersityScanner\scanner\market_data_bridge.py:416: - previous_close
+D:\StockVersityScanner\scanner\market_data_bridge.py:421: / previous_close
+D:\StockVersityScanner\scanner\market_data_bridge.py:456: "previous_close":
+D:\StockVersityScanner\scanner\market_data_bridge.py:457: previous_close,
+D:\StockVersityScanner\scanner\orb_scanner.py:336: previous_close = self._number(
+D:\StockVersityScanner\scanner\orb_scanner.py:338: "previous_close",
+D:\StockVersityScanner\scanner\orb_scanner.py:340: "previous_close",
+D:\StockVersityScanner\scanner\orb_scanner.py:363: previous_close,
+D:\StockVersityScanner\scanner\orb_scanner.py:658: previous_close=previous_close,
+D:\StockVersityScanner\scanner\orb_scanner.py:734: previous_close=previous_close,
+D:\StockVersityScanner\scanner\orb_scanner.py:1130: previous_close=values[
+D:\StockVersityScanner\scanner\orb_scanner.py:1131: "previous_close"
+D:\StockVersityScanner\scanner\orb_scanner.py:1618: previous_close=values[
+D:\StockVersityScanner\scanner\orb_scanner.py:1619: "previous_close"
+D:\StockVersityScanner\scanner\orb_scanner.py:1923: previous_close: float,
+D:\StockVersityScanner\scanner\orb_scanner.py:1926: if previous_close <= 0:
+D:\StockVersityScanner\scanner\orb_scanner.py:1936: - previous_close
+D:\StockVersityScanner\scanner\orb_scanner.py:1939: / previous_close
+D:\StockVersityScanner\scanner\pattern_scanner.py:195: previous_close = self._float(
+D:\StockVersityScanner\scanner\pattern_scanner.py:196: data.get("previous_close")
+D:\StockVersityScanner\scanner\pattern_scanner.py:223: previous_close > 0
+D:\StockVersityScanner\scanner\pattern_scanner.py:230: - previous_close
+D:\StockVersityScanner\scanner\pattern_scanner.py:232: / previous_close
+D:\StockVersityScanner\scanner\pattern_scanner.py:545: previous_close=previous_close,
+D:\StockVersityScanner\scanner\positional_Scanner.py:71: "previous_close": 1445,
+D:\StockVersityScanner\scanner\positional_Scanner.py:308: previous_close = self._float(
+D:\StockVersityScanner\scanner\positional_Scanner.py:310: "previous_close"
+D:\StockVersityScanner\scanner\positional_Scanner.py:464: if previous_close > 0:
+D:\StockVersityScanner\scanner\positional_Scanner.py:469: - previous_close
+D:\StockVersityScanner\scanner\positional_Scanner.py:471: / previous_close
+D:\StockVersityScanner\scanner\positional_Scanner.py:760: previous_close=(
+D:\StockVersityScanner\scanner\positional_Scanner.py:761: previous_close
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:74: "previous_close": 1428.00,
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:228: previous_close: float,
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:231: if previous_close <= 0:
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:239: - previous_close
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:241: / previous_close
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:375: previous_close = self._float(
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:378: "previous_close",
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:379: "prev_close",
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:444: and previous_close > 0
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:450: previous_close,
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:702: "previous_close":
+D:\StockVersityScanner\scanner\scanner_data_adapter.py:703: previous_close,
+D:\StockVersityScanner\scanner\signal.py:397: previous_close: float = 0.0
+D:\StockVersityScanner\scanner\signal.py:778: "previous_close",
+D:\StockVersityScanner\scanner\signal.py:1771: "previous_close":
+D:\StockVersityScanner\scanner\signal.py:1772: self.previous_close,
+D:\StockVersityScanner\scanner\signal.py:2155: previous_close=_safe_float(
+D:\StockVersityScanner\scanner\signal.py:2157: "previous_close"
+D:\StockVersityScanner\scanner\swing_scanner.py:68: "previous_close": 1445,
+D:\StockVersityScanner\scanner\swing_scanner.py:302: previous_close = self._float(
+D:\StockVersityScanner\scanner\swing_scanner.py:304: "previous_close"
+D:\StockVersityScanner\scanner\swing_scanner.py:448: if previous_close > 0:
+D:\StockVersityScanner\scanner\swing_scanner.py:454: - previous_close
+D:\StockVersityScanner\scanner\swing_scanner.py:457: / previous_close
+D:\StockVersityScanner\scanner\swing_scanner.py:704: previous_close=(
+D:\StockVersityScanner\scanner\swing_scanner.py:705: previous_close
+D:\StockVersityScanner\scanner\utils.py:264: previous_close: Any,
+D:\StockVersityScanner\scanner\utils.py:274: previous_close
+D:\StockVersityScanner\scanner\utils.py:303: previous_close: Any,
+D:\StockVersityScanner\scanner\utils.py:316: previous_close,
+D:\StockVersityScanner\scanner\utils.py:1673: previous_close: Optional[Any] = None,
+D:\StockVersityScanner\scanner\utils.py:1705: and previous_close is not None
+D:\StockVersityScanner\scanner\utils.py:1711: previous_close,
+D:\StockVersityScanner\scanner\vcp_scanner.py:68: "previous_close": 1500,
+D:\StockVersityScanner\scanner\vcp_scanner.py:259: previous_close = self._float(
+D:\StockVersityScanner\scanner\vcp_scanner.py:260: data.get("previous_close")
+D:\StockVersityScanner\scanner\vcp_scanner.py:287: previous_close > 0
+D:\StockVersityScanner\scanner\vcp_scanner.py:294: - previous_close
+D:\StockVersityScanner\scanner\vcp_scanner.py:296: / previous_close
+D:\StockVersityScanner\scanner\vcp_scanner.py:675: previous_close=(
+D:\StockVersityScanner\scanner\vcp_scanner.py:676: previous_close
+D:\StockVersityScanner\ui\live_market_bridge.py:165: previous_close = self._number(
+D:\StockVersityScanner\ui\live_market_bridge.py:168: "previous_close",
+D:\StockVersityScanner\ui\live_market_bridge.py:177: if previous_close > 0:
+D:\StockVersityScanner\ui\live_market_bridge.py:182: - previous_close
+D:\StockVersityScanner\ui\live_market_bridge.py:184: / previous_close
+D:\StockVersityScanner\ui\live_market_bridge.py:229: "previous_close":
+D:\StockVersityScanner\ui\live_market_bridge.py:230: previous_close,

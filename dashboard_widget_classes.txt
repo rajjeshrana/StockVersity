@@ -1,0 +1,661 @@
+﻿===== DONUT CHART =====
+class DonutChart(QWidget):
+
+    def __init__(
+        self,
+        total: int = 127,
+        buy: int = 74,
+        sell: int = 53,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.total = total
+        self.buy = buy
+        self.sell = sell
+
+        self.setMinimumSize(
+            150,
+            150,
+        )
+
+        self.setMaximumHeight(
+            175
+        )
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        size = min(
+            self.width(),
+            self.height(),
+        ) - 24
+
+        rect = QRectF(
+            (self.width() - size) / 2,
+            (self.height() - size) / 2,
+            size,
+            size,
+        )
+
+        pen = QPen()
+
+        pen.setWidth(16)
+        pen.setCapStyle(
+            Qt.RoundCap
+        )
+
+        # Background
+        pen.setColor(
+            QColor(TRACK)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            0,
+            360 * 16,
+        )
+
+        total_parts = max(
+            self.buy + self.sell,
+            1,
+        )
+
+        buy_angle = int(
+            360
+            * self.buy
+            / total_parts
+            * 16
+        )
+
+        sell_angle = (
+            360 * 16
+            - buy_angle
+        )
+
+        # BUY
+        pen.setColor(
+            QColor(GREEN)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            90 * 16,
+            -buy_angle,
+        )
+
+        # SELL
+        pen.setColor(
+            QColor(RED)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            (90 * 16) - buy_angle,
+            -sell_angle,
+        )
+
+        painter.setPen(
+            QColor(TEXT)
+        )
+
+        font = QFont(
+            "Segoe UI",
+            21,
+            QFont.Bold,
+        )
+
+        painter.setFont(font)
+
+        painter.drawText(
+            rect,
+            Qt.AlignCenter,
+            str(self.total),
+        )
+
+
+# =========================================================
+# MARKET BREADTH GAUGE
+# =========================================================
+
+===== BREADTH GAUGE =====
+class BreadthGauge(QWidget):
+
+    def __init__(
+        self,
+        value: float = 64,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.value = value
+
+        self.setMinimumHeight(
+            145
+        )
+
+        self.setMaximumHeight(
+            175
+        )
+
+    def set_value(
+        self,
+        value: float,
+    ) -> None:
+
+        try:
+            self.value = float(value)
+        except (TypeError, ValueError):
+            self.value = 0
+
+        self.update()
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        width = min(
+            self.width() - 28,
+            220,
+        )
+
+        rect = QRectF(
+            (self.width() - width) / 2,
+            22,
+            width,
+            width,
+        )
+
+        pen = QPen()
+
+        pen.setWidth(14)
+
+        pen.setCapStyle(
+            Qt.RoundCap
+        )
+
+        # Background semicircle
+        pen.setColor(
+            QColor(TRACK)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            0,
+            180 * 16,
+        )
+
+        value = max(
+            0,
+            min(
+                100,
+                self.value,
+            ),
+        )
+
+        angle = int(
+            180
+            * value
+            / 100
+            * 16
+        )
+
+        pen.setColor(
+            QColor(GREEN)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            180 * 16,
+            -angle,
+        )
+
+        painter.setPen(
+            QColor(TEXT)
+        )
+
+        painter.setFont(
+            QFont(
+                "Segoe UI",
+                22,
+                QFont.Bold,
+            )
+        )
+
+        text_rect = QRectF(
+            rect.x(),
+            rect.y() + 35,
+            rect.width(),
+            80,
+        )
+
+        painter.drawText(
+            text_rect,
+            Qt.AlignCenter,
+            f"{int(value)}%",
+        )
+
+
+# =========================================================
+# MARKET PULSE TREND GRAPH
+# =========================================================
+
+===== PULSE TREND GRAPH =====
+class PulseTrendGraph(QWidget):
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.values = [
+            32,
+            39,
+            35,
+            48,
+            44,
+            55,
+            61,
+            58,
+            70,
+            66,
+            79,
+        ]
+
+        self.setMinimumHeight(
+            120
+        )
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        area = self.rect().adjusted(
+            8,
+            12,
+            -8,
+            -12,
+        )
+
+        # Grid
+        grid_pen = QPen(
+            QColor("#18324d")
+        )
+
+        grid_pen.setWidth(1)
+
+        painter.setPen(
+            grid_pen
+        )
+
+        for i in range(4):
+
+            y = (
+                area.top()
+                + (
+                    area.height()
+                    * i
+                    / 3
+                )
+            )
+
+            painter.drawLine(
+                QPointF(
+                    area.left(),
+                    y,
+                ),
+                QPointF(
+                    area.right(),
+                    y,
+                ),
+            )
+
+        if len(self.values) < 2:
+            return
+
+        minimum = min(
+            self.values
+        )
+
+        maximum = max(
+            self.values
+        )
+
+        spread = max(
+            maximum - minimum,
+            1,
+        )
+
+        points: List[QPointF] = []
+
+        for i, value in enumerate(
+            self.values
+        ):
+
+            x = (
+                area.left()
+                + (
+                    area.width()
+                    * i
+                    / (
+                        len(self.values)
+                        - 1
+                    )
+                )
+            )
+
+            normalized = (
+                value - minimum
+            ) / spread
+
+            y = (
+                area.bottom()
+                - (
+                    normalized
+                    * area.height()
+                    * 0.75
+                )
+                - 8
+            )
+
+            points.append(
+                QPointF(
+                    x,
+                    y,
+                )
+            )
+
+        path = QPainterPath()
+
+        path.moveTo(
+            points[0]
+        )
+
+        for point in points[1:]:
+            path.lineTo(point)
+
+        pen = QPen(
+            QColor(GREEN)
+        )
+
+        pen.setWidth(3)
+
+        painter.setPen(pen)
+
+        painter.drawPath(path)
+
+        # small endpoint dots
+        painter.setPen(
+            Qt.NoPen
+        )
+
+        painter.setBrush(
+            QColor(GREEN)
+        )
+
+        for point in points:
+            painter.drawEllipse(
+                point,
+                3.5,
+                3.5,
+            )
+
+
+# =========================================================
+# APPROVED BULL / BEAR MARKET SYMBOL
+# =========================================================
+
+===== MARKET ANIMAL GRAPHIC =====
+class MarketAnimalGraphic(QWidget):
+
+    """Approved image-based bull / bear Market Pulse graphic."""
+
+    def __init__(
+        self,
+        bullish: bool = True,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.bullish = bool(bullish)
+        self.setMinimumSize(190, 132)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Assets live in: ui/assets/market/
+        self._asset_dir = Path(__file__).resolve().parents[1] / "assets" / "market"
+        self._bull_path = self._asset_dir / "bull.png"
+        self._bear_path = self._asset_dir / "bear.png"
+
+        self._bull_pixmap = QPixmap(str(self._bull_path))
+        self._bear_pixmap = QPixmap(str(self._bear_path))
+
+    def set_bullish(self, bullish: bool) -> None:
+        self.bullish = bool(bullish)
+        self.update()
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+
+        pixmap = self._bull_pixmap if self.bullish else self._bear_pixmap
+
+        if pixmap.isNull():
+            # Clear fallback if an asset was accidentally not copied.
+            painter.setPen(QColor(GREEN if self.bullish else RED))
+            font = QFont("Segoe UI", 13, QFont.Bold)
+            painter.setFont(font)
+            painter.drawText(self.rect(), Qt.AlignCenter, "BULL" if self.bullish else "BEAR")
+            return
+
+        margin = 4
+        target = self.rect().adjusted(margin, margin, -margin, -margin)
+        scaled = pixmap.scaled(
+            target.size(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation,
+        )
+
+        x = target.x() + (target.width() - scaled.width()) // 2
+        y = target.y() + (target.height() - scaled.height()) // 2
+        painter.drawPixmap(x, y, scaled)
+
+
+# =========================================================
+# DERIVATIVES GAUGE
+# =========================================================
+
+===== DERIVATIVES GAUGE =====
+class DerivativesGauge(QWidget):
+
+    def __init__(
+        self,
+        value: float = 0.72,
+        bullish: bool = True,
+        parent: Optional[QWidget] = None,
+    ):
+        super().__init__(parent)
+
+        self.value = max(
+            0.0,
+            min(
+                1.0,
+                value,
+            ),
+        )
+
+        self.bullish = bullish
+
+        self.setMinimumHeight(
+            175
+        )
+
+    def paintEvent(
+        self,
+        event,
+    ) -> None:
+
+        painter = QPainter(self)
+
+        painter.setRenderHint(
+            QPainter.Antialiasing
+        )
+
+        size = min(
+            self.width() - 20,
+            180,
+        )
+
+        rect = QRectF(
+            (self.width() - size) / 2,
+            25,
+            size,
+            size,
+        )
+
+        pen = QPen()
+
+        pen.setWidth(16)
+
+        pen.setCapStyle(
+            Qt.RoundCap
+        )
+
+        # red zone
+        pen.setColor(
+            QColor(RED)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            180 * 16,
+            -55 * 16,
+        )
+
+        # yellow zone
+        pen.setColor(
+            QColor(YELLOW)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            125 * 16,
+            -55 * 16,
+        )
+
+        # green zone
+        pen.setColor(
+            QColor(GREEN)
+        )
+
+        painter.setPen(pen)
+
+        painter.drawArc(
+            rect,
+            70 * 16,
+            -70 * 16,
+        )
+
+        # Needle
+        angle_deg = (
+            180
+            - (
+                180
+                * self.value
+            )
+        )
+
+        angle = math.radians(
+            angle_deg
+        )
+
+        center = QPointF(
+            rect.center().x(),
+            rect.center().y(),
+        )
+
+        radius = (
+            rect.width()
+            * 0.38
+        )
+
+        end = QPointF(
+            center.x()
+            + radius
+            * math.cos(angle),
+            center.y()
+            - radius
+            * math.sin(angle),
+        )
+
+        needle_pen = QPen(
+            QColor(TEXT)
+        )
+
+        needle_pen.setWidth(4)
+
+        painter.setPen(
+            needle_pen
+        )
+
+        painter.drawLine(
+            center,
+            end,
+        )
+
+        painter.setPen(
+            Qt.NoPen
+        )
+
+        painter.setBrush(
+            QColor(TEXT)
+        )
+
+        painter.drawEllipse(
+            center,
+            7,
+            7,
+        )
+
+
+# =========================================================
+# NIFTY OI CHART
+# =========================================================
+

@@ -1,0 +1,694 @@
+﻿===== MARKET PULSE =====
+    def _market_pulse(self) -> DashboardCard:
+
+        card = DashboardCard(
+            "MARKET PULSE"
+        )
+
+        # -------------------------------------------------
+        # Header status
+        # -------------------------------------------------
+
+        header = QHBoxLayout()
+
+        self.market_pulse_status = QLabel(
+            "BULLISH"
+        )
+
+        self.market_pulse_status.setStyleSheet(
+            f"""
+            color: {GREEN};
+            font-size: 21px;
+            font-weight: 900;
+            """
+        )
+
+        score = QLabel(
+            "78 / 100"
+        )
+
+        score.setStyleSheet(
+            f"""
+            color: {GREEN};
+            font-size: 16px;
+            font-weight: 800;
+            """
+        )
+
+        header.addWidget(
+            self.market_pulse_status
+        )
+
+        header.addStretch(1)
+
+        header.addWidget(
+            score
+        )
+
+        card.layout.addLayout(
+            header
+        )
+
+        # -------------------------------------------------
+        # Graphic section
+        # -------------------------------------------------
+
+        graphics = QHBoxLayout()
+
+        graphics.setSpacing(
+            12
+        )
+
+        self.market_animal = (
+            MarketAnimalGraphic(
+                bullish=True
+            )
+        )
+
+        trend = PulseTrendGraph()
+
+        graphics.addWidget(
+            self.market_animal,
+            2,
+        )
+
+        graphics.addWidget(
+            trend,
+            4,
+        )
+
+        card.layout.addLayout(
+            graphics,
+            1,
+        )
+
+        # -------------------------------------------------
+        # Bottom statistics
+        # -------------------------------------------------
+
+        stats = QHBoxLayout()
+
+        stats.setSpacing(
+            8
+        )
+
+        for title, value, color in (
+            (
+                "Momentum",
+                "Strong",
+                GREEN,
+            ),
+            (
+                "Trend",
+                "Positive",
+                GREEN,
+            ),
+            (
+                "Volatility",
+                "Low",
+                BLUE,
+            ),
+            (
+                "Breadth",
+                "Healthy",
+                GREEN,
+            ),
+        ):
+
+            box = QFrame()
+
+            box.setStyleSheet(
+                f"""
+                QFrame {{
+                    background: {ROW_BG};
+                    border: 1px solid {BORDER_SOFT};
+                    border-radius: 5px;
+                }}
+                """
+            )
+
+            box_layout = QVBoxLayout(
+                box
+            )
+
+            box_layout.setContentsMargins(
+                8,
+                5,
+                8,
+                5,
+            )
+
+            box_layout.setSpacing(
+                1
+            )
+
+            title_label = make_label(
+                title,
+                10,
+                MUTED,
+                False,
+            )
+
+            value_label = make_label(
+                value,
+                14,
+                color,
+                True,
+            )
+
+            box_layout.addWidget(
+                title_label
+            )
+
+            box_layout.addWidget(
+                value_label
+            )
+
+            stats.addWidget(
+                box
+            )
+
+        card.layout.addLayout(
+            stats
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 1 â€” SECTOR STRENGTH
+    # =====================================================
+
+===== MARKET BREADTH =====
+    def _market_breadth(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "MARKET BREADTH"
+        )
+
+        gauge = BreadthGauge(
+            64
+        )
+
+        card.layout.addWidget(
+            gauge,
+            1,
+        )
+
+        # -------------------------------------------------
+        # IMPORTANT COMPATIBILITY OBJECTS
+        # -------------------------------------------------
+
+        self.advance_card = BreadthValue(
+            "advance_card",
+            "Advances",
+            "1,247",
+            GREEN,
+        )
+
+        self.decline_card = BreadthValue(
+            "decline_card",
+            "Declines",
+            "684",
+            RED,
+        )
+
+        self.unchanged_card = BreadthValue(
+            "unchanged_card",
+            "Unchanged",
+            "91",
+            MUTED,
+        )
+
+        card.layout.addWidget(
+            self.advance_card
+        )
+
+        card.layout.addWidget(
+            horizontal_line()
+        )
+
+        card.layout.addWidget(
+            self.decline_card
+        )
+
+        card.layout.addWidget(
+            horizontal_line()
+        )
+
+        card.layout.addWidget(
+            self.unchanged_card
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 1 â€” MARKET HEATMAP
+    # =====================================================
+
+    def _market_heatmap(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "MARKET HEATMAP"
+        )
+
+        card.layout.addStretch(
+            1
+        )
+
+        grid = QGridLayout()
+
+        grid.setHorizontalSpacing(
+            5
+        )
+
+        grid.setVerticalSpacing(
+            5
+        )
+
+        items = [
+            (
+                "RELIANCE\n+1.62%",
+                GREEN_DARK,
+            ),
+            (
+                "HDFC\n+0.90%",
+                GREEN_DARK,
+            ),
+            (
+                "TCS\n+1.20%",
+                GREEN_DARK,
+            ),
+            (
+                "INFY\n-0.70%",
+                RED_DARK,
+            ),
+            (
+                "ICICI\n+1.10%",
+                GREEN_DARK,
+            ),
+            (
+                "SBIN\n+1.40%",
+                GREEN_DARK,
+            ),
+            (
+                "ITC\n-0.50%",
+                RED_DARK,
+            ),
+            (
+                "LT\n+0.80%",
+                GREEN_DARK,
+            ),
+            (
+                "AXIS\n+1.00%",
+                GREEN_DARK,
+            ),
+        ]
+
+        for i, (
+            text,
+            color,
+        ) in enumerate(items):
+
+            tile = QLabel(text)
+
+            tile.setAlignment(
+                Qt.AlignCenter
+            )
+
+            tile.setMinimumHeight(
+                48
+            )
+
+            tile.setStyleSheet(
+                f"""
+                QLabel {{
+                    background: {color};
+                    border: 1px solid {
+                        GREEN
+                        if color == GREEN_DARK
+                        else RED
+                    };
+                    border-radius: 5px;
+                    color: #ffffff;
+                    font-size: 11px;
+                    font-weight: 800;
+                }}
+                """
+            )
+
+            grid.addWidget(
+                tile,
+                i // 3,
+                i % 3,
+            )
+
+        card.layout.addLayout(
+            grid
+        )
+
+        card.layout.addStretch(
+            1
+        )
+
+        return card
+        # =====================================================
+    # ROW 3 â€” INSTITUTIONAL FLOW
+    # =====================================================
+===== SCANNER SUMMARY =====
+    def _scanner_summary(self) -> DashboardCard:
+        card = DashboardCard("SCANNER SUMMARY")
+        donut = DonutChart(total=127, buy=74, sell=53)
+        card.layout.addWidget(donut, 1)
+
+        stats = QHBoxLayout()
+        stats.setSpacing(6)
+        for title, value, color in (("BUY", "74", GREEN), ("SELL", "53", RED), ("AVG", "81", BLUE)):
+            box = QFrame()
+            box.setStyleSheet(f"QFrame {{ background:{ROW_BG}; border:1px solid {BORDER_SOFT}; border-radius:5px; }}")
+            box_layout = QVBoxLayout(box)
+            box_layout.setContentsMargins(5, 4, 5, 4)
+            box_layout.setSpacing(0)
+            t = make_label(title, 9, MUTED, True)
+            v = make_label(value, 14, color, True)
+            t.setAlignment(Qt.AlignCenter)
+            v.setAlignment(Qt.AlignCenter)
+            box_layout.addWidget(t)
+            box_layout.addWidget(v)
+            stats.addWidget(box)
+        card.layout.addLayout(stats)
+
+        button = QPushButton("OPEN SCANNER")
+        button.setFixedHeight(30)
+        button.setCursor(Qt.PointingHandCursor)
+        button.setStyleSheet(f"QPushButton {{ background:{BLUE}; border:none; border-radius:5px; color:white; font-size:11px; font-weight:800; }} QPushButton:hover {{ background:#4a89ff; }}")
+        button.clicked.connect(lambda: self.scanner_requested.emit("scanner"))
+        card.layout.addWidget(button)
+        return card
+
+
+    # =====================================================
+    # ROW 2 â€” TOP MOVERS
+    # =====================================================
+
+    def _top_movers(self) -> DashboardCard:
+        card = DashboardCard("TOP MOVERS")
+        for symbol, change, color in (
+            ("TRENT", "+5.42%", GREEN),
+            ("BEL", "+4.18%", GREEN),
+            ("HAL", "+3.91%", GREEN),
+            ("BAJFINANCE", "-2.64%", RED),
+            ("TATASTEEL", "-2.12%", RED),
+        ):
+            row = self._table_row_frame()
+            layout = QHBoxLayout(row)
+            layout.setContentsMargins(10, 5, 10, 5)
+            layout.addWidget(self._table_cell(symbol), 1)
+            change_label = self._table_cell(change, color)
+            change_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            layout.addWidget(change_label)
+            card.layout.addWidget(row)
+        card.layout.addStretch(1)
+        return card
+
+
+    # =====================================================
+    # ROW 2 â€” LIVE SCANNER ALERTS
+    # =====================================================
+
+    def _live_scanner_alerts(self) -> DashboardCard:
+        card = DashboardCard("LIVE SCANNER ALERTS")
+
+        header = QHBoxLayout()
+        header.addWidget(make_label("SYMBOL", 10, MUTED, True))
+        header.addStretch(1)
+        header.addWidget(make_label("TRIGGER", 10, MUTED, True))
+        card.layout.addLayout(header)
+
+        alerts = (
+            ("RELIANCE", "VWAP Breakout", GREEN),
+            ("HDFCBANK", "Volume Expansion", GREEN),
+            ("INFY", "Weak Momentum", RED),
+            ("TCS", "High Confidence", BLUE),
+            ("SBIN", "Trend Continuation", GREEN),
+        )
+        for symbol, trigger, color in alerts:
+            row = self._table_row_frame()
+            layout = QHBoxLayout(row)
+            layout.setContentsMargins(10, 5, 10, 5)
+            layout.setSpacing(8)
+            layout.addWidget(self._table_cell(symbol), 1)
+            trigger_label = self._table_cell(trigger, color)
+            trigger_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            layout.addWidget(trigger_label, 2)
+            card.layout.addWidget(row)
+        card.layout.addStretch(1)
+        return card
+
+
+    # =====================================================
+
+    def _institutional_flow(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "INSTITUTIONAL FLOW"
+        )
+
+        # -------------------------------------------------
+        # FII
+        # -------------------------------------------------
+
+        fii_header = QHBoxLayout()
+
+        fii_header.addWidget(
+            make_label(
+                "FII",
+                13,
+                TEXT,
+                True,
+            )
+        )
+
+        fii_header.addStretch(1)
+
+        fii_header.addWidget(
+            make_label(
+                "+â‚¹1,842 Cr",
+                14,
+                GREEN,
+                True,
+            )
+        )
+
+        card.layout.addLayout(
+            fii_header
+        )
+
+        fii_bar = StrengthBar(
+            78,
+            GREEN,
+        )
+
+        fii_bar.setFixedHeight(
+            15
+        )
+
+        card.layout.addWidget(
+            fii_bar
+        )
+
+        fii_detail = QHBoxLayout()
+
+        fii_detail.addWidget(
+            make_label(
+                "BUY â‚¹8,426 Cr",
+                10,
+                GREEN,
+===== DERIVATIVES PULSE =====
+    def _derivatives_pulse(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "DERIVATIVES PULSE"
+        )
+
+        gauge = DerivativesGauge(
+            value=0.72,
+            bullish=True,
+        )
+
+        card.layout.addWidget(
+            gauge,
+            1,
+        )
+
+        status = QLabel(
+            "BULLISH"
+        )
+
+        status.setAlignment(
+            Qt.AlignCenter
+        )
+
+        status.setStyleSheet(
+            f"""
+            QLabel {{
+                color: {GREEN};
+                background: transparent;
+                border: none;
+                font-size: 17px;
+                font-weight: 900;
+            }}
+            """
+        )
+
+        card.layout.addWidget(
+            status
+        )
+
+        # -------------------------------------------------
+        # Derivative statistics
+        # -------------------------------------------------
+
+        stats = QGridLayout()
+
+        stats.setHorizontalSpacing(
+            10
+        )
+
+        stats.setVerticalSpacing(
+            5
+        )
+
+        labels = [
+            (
+                "PCR",
+                "1.18",
+                GREEN,
+            ),
+            (
+                "MAX PAIN",
+                "25,500",
+                BLUE,
+            ),
+            (
+                "FUT OI",
+                "+4.2%",
+                GREEN,
+            ),
+            (
+                "VIX",
+                "12.42",
+                GREEN,
+            ),
+        ]
+
+        for i, (
+            title,
+            value,
+            color,
+        ) in enumerate(labels):
+
+            box = QFrame()
+
+            box.setStyleSheet(
+                f"""
+                QFrame {{
+                    background: {ROW_BG};
+                    border: 1px solid {BORDER_SOFT};
+                    border-radius: 5px;
+                }}
+                """
+            )
+
+            layout = QVBoxLayout(
+                box
+            )
+
+            layout.setContentsMargins(
+                6,
+                4,
+                6,
+                4,
+            )
+
+            layout.setSpacing(
+                0
+            )
+
+            title_label = make_label(
+                title,
+                9,
+                MUTED,
+                True,
+            )
+
+            title_label.setAlignment(
+                Qt.AlignCenter
+            )
+
+            value_label = make_label(
+                value,
+                12,
+                color,
+                True,
+            )
+
+            value_label.setAlignment(
+                Qt.AlignCenter
+            )
+
+            layout.addWidget(
+                title_label
+            )
+
+            layout.addWidget(
+                value_label
+            )
+
+            stats.addWidget(
+                box,
+                i // 2,
+                i % 2,
+            )
+
+        card.layout.addLayout(
+            stats
+        )
+
+        return card
+
+
+    # =====================================================
+    # ROW 3 â€” NIFTY OI CHART
+    # =====================================================
+
+    def _nifty_oi_chart(
+        self,
+    ) -> DashboardCard:
+
+        card = DashboardCard(
+            "NIFTY OI CHART"
+        )
+
+        # -------------------------------------------------
+        # Chart header / legend
+        # -------------------------------------------------
+
+        legend = QHBoxLayout()
+
+        legend.setSpacing(
+            12
+        )
+
+        legend.addWidget(
+            make_label(
+                "25,488.90",
