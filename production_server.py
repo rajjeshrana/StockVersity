@@ -1,17 +1,21 @@
 ﻿from pathlib import Path
+import sys
 
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+ROOT = Path(__file__).resolve().parent
+BACKEND = ROOT / "website_backend"
+
+# Allow production_server.py to import website_backend/server.py
+sys.path.insert(0, str(BACKEND))
+
 import server
 
-ROOT = Path(__file__).resolve().parent
-
-# Reuse the existing standalone market API application.
+# Reuse the standalone market API.
 app = server.app
 
-# The API application already defines "/".
-# Remove that API-root route so the website can own "/".
+# Remove the API's root route so "/" serves the website.
 for route in list(app.routes):
     if getattr(route, "path", None) == "/":
         try:
@@ -19,7 +23,6 @@ for route in list(app.routes):
         except ValueError:
             pass
 
-# Website assets.
 app.mount(
     "/assets",
     StaticFiles(directory=str(ROOT / "assets")),
