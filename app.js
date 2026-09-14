@@ -1087,4 +1087,55 @@ async function refreshLocalMarket(){
   window.setInterval(refreshLocalMarket, 3000);
 })();
 
+// ============================================================
+// STOCKVERSITY DAILY MARKET FOCUS
+// Mirrors the frozen desktop Daily Message Engine.
+// One deterministic message for the entire India calendar day.
+// ============================================================
+(function(){
+  const dailyMessages = [
+    ["Trade the setup,<br>not the emotion.","Stay disciplined. Protect capital and wait for high-quality opportunities."],
+    ["Patience is a<br>trading edge.","Wait for confirmation. Let the market come to your setup."],
+    ["Protect capital<br>before chasing profit.","Small losses are acceptable. Large uncontrolled losses are not."],
+    ["Follow your plan,<br>not the noise.","Avoid emotional trades and focus only on high-quality setups."],
+    ["Quality trades<br>beat more trades.","Trade selectively. One excellent setup is better than many mediocre ones."],
+    ["Let winners run,<br>cut losers early.","Respect your stop-loss and give strong trades room to develop."],
+    ["Risk first.<br>Reward second.","Know your risk before entering and demand a worthwhile reward."],
+    ["No setup?<br>No trade.","Cash is a position. Wait patiently until the market offers an edge."],
+    ["Trade with<br>confidence, not urgency.","A missed trade is better than a forced trade."],
+    ["Consistency creates<br>the edge.","Follow the process every day and let disciplined execution compound."],
+    ["Wait for the<br>high-quality breakout.","Volume, structure and confirmation should support the move."],
+    ["The market rewards<br>patience.","Do not chase candles. Let price come to your planned entry."],
+    ["Control risk.<br>Control emotions.","Your first job is to protect trading capital."],
+    ["Plan the trade.<br>Trade the plan.","Define entry, stop-loss and target before taking the position."]
+  ];
+  function updateDailyMarketFocus(){
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+    const year = Number(parts.find(x => x.type === "year")?.value);
+    const month = Number(parts.find(x => x.type === "month")?.value);
+    const day = Number(parts.find(x => x.type === "day")?.value);
+    const indiaDate = new Date(Date.UTC(year, month - 1, day));
+    const ordinal = Math.floor(indiaDate.getTime() / 86400000) + 719163;
+    const index = ordinal % dailyMessages.length;
+    const message = dailyMessages[index];
+    if(!message) return;
+    const quote = document.querySelector(".focus-quote");
+    const copy = document.querySelector(".focus-copy");
+    if(quote){
+      quote.innerHTML =
+        '<span class="quote-mark">&#8220;</span><div>' +
+        message[0] +
+        '</div>';
+    }
+    if(copy){
+      copy.textContent = message[1];
+    }
+  }
+  updateDailyMarketFocus();
+})();
 
