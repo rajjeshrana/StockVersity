@@ -1,5 +1,5 @@
 ﻿const $ = id => document.getElementById(id);
-const API_BASE = window.STOCKVERSITY_API_BASE || "https://api.stockversity.in";
+const API_BASE = window.STOCKVERSITY_API_BASE || "";
 const MARKET_URL = `${API_BASE}/api/market`;
 const FUTURES_URL = `${API_BASE}/api/futures`;
 
@@ -1086,3 +1086,4 @@ async function refreshLocalMarket(){
   refreshLocalMarket();
   window.setInterval(refreshLocalMarket, 3000);
 })();
+
