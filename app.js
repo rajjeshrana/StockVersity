@@ -1,4 +1,4 @@
-﻿const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 const API_BASE = window.STOCKVERSITY_API_BASE || "https://api.stockversity.in";
 const MARKET_URL = `${API_BASE}/api/market`;
 const FUTURES_URL = "/api/futures";
