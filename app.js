@@ -1415,10 +1415,7 @@ async function refreshLocalMarket(){
     if (status) status.textContent = "SCANNING...";
 
     try {
-      const response = await fetch(
-        `${FUTURES_URL}?sv=${Date.now()}`,
-        { cache: "no-store" }
-      );
+      const response = await fetch(`/api/futures?history_days=3&sv=${Date.now()}`, { cache: "no-store" });
 
       if (!response.ok) {
         throw new Error(
