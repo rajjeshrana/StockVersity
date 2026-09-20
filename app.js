@@ -3393,3 +3393,101 @@ async function refreshLocalMarket(){
 
   start();
 })();
+/* SV_FO_DATA_BRIDGE_FINAL */
+(() => {
+  "use strict";
+
+  const PAGE = "sv-futures-page";
+  const API = "/api/futures?history_days=3";
+
+  const money = v => {
+    const n = Number(v);
+    return Number.isFinite(n)
+      ? n.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})
+      : "--";
+  };
+
+  const esc = v => String(v ?? "--")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+
+  function row(x){
+    const action = String(x.action || "").toUpperCase();
+    const cls = action.includes("BUY") ? "sv-fo-buy" : action.includes("SELL") ? "sv-fo-sell" : "";
+    return `<tr>
+      <td>${esc(x.time || x.generated)}</td>
+      <td class="sv-fo-stock">${esc(x.symbol || x.trading_symbol)}</td>
+      <td>${money(x.ltp)}</td>
+      <td>${Number.isFinite(Number(x.score)) ? Number(x.score).toFixed(0) : "--"}</td>
+      <td>${money(x.entry)}</td>
+      <td>${money(x.sl)}</td>
+      <td>${money(x.target)}</td>
+      <td>${Number.isFinite(Number(x.rr)) ? Number(x.rr).toFixed(2) : "--"}</td>
+      <td><span class="sv-fo-action ${cls}">${esc(action)}</span></td>
+    </tr>`;
+  }
+
+  function historyBlock(history){
+    if(!Array.isArray(history) || !history.length) return "";
+    return `<div id="sv-fo-history-bridge" style="margin-top:16px">
+      <div style="font-weight:800;font-size:14px;margin:0 0 12px;color:#E7EEF7">LAST 3 TRADING DAYS</div>
+      ${history.map(d => `<div style="margin:0 0 18px">
+        <div style="font-weight:800;margin:0 0 8px;color:#DCE8F5">
+          ${esc(d.date)} <span style="opacity:.7">(${Number(d.count)||0} setups)</span>
+        </div>
+        <div class="sv-fo-table-wrap">
+          <table class="sv-fo-table">
+            <thead><tr>
+              <th>TIME</th><th>STOCK</th><th>LTP</th><th>SCORE</th>
+              <th>ENTRY</th><th>SL</th><th>TARGET</th><th>RR</th><th>ACTION</th>
+            </tr></thead>
+            <tbody>${(Array.isArray(d.rows)?d.rows:[]).map(row).join("")}</tbody>
+          </table>
+        </div>
+      </div>`).join("")}
+    </div>`;
+  }
+
+  async function refresh(){
+    const page = document.getElementById(PAGE);
+    const body = document.getElementById("sv-fo-body");
+    if(!page || !body) return;
+
+    try{
+      const r = await fetch(`${API}&sv=${Date.now()}`,{cache:"no-store"});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const data = await r.json();
+
+      const results = Array.isArray(data.results) ? data.results.slice(0,10) : [];
+      body.innerHTML = results.length
+        ? results.map(row).join("")
+        : `<tr><td colspan="9" class="sv-fo-empty">NO A1 FUTURES SETUPS</td></tr>`;
+
+      const count = document.getElementById("sv-fo-count");
+      if(count) count.textContent = `${results.length} setup${results.length === 1 ? "" : "s"}`;
+
+      const status = document.getElementById("sv-fo-status");
+      if(status) status.textContent = "LIVE";
+
+      let old = document.getElementById("sv-fo-history-bridge");
+      if(old) old.remove();
+
+      const card = page.querySelector(".sv-fo-card");
+      if(card){
+        card.insertAdjacentHTML("afterend",historyBlock(data.history));
+      }
+    }catch(e){
+      console.warn("StockVersity F&O bridge:",e);
+    }
+  }
+
+  let lastPage = false;
+  setInterval(() => {
+    const exists = !!document.getElementById(PAGE);
+    if(exists && !lastPage) refresh();
+    if(exists) refresh();
+    lastPage = exists;
+  },5000);
+})();
