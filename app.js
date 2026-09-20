@@ -2487,7 +2487,7 @@ async function refreshLocalMarket(){
     if (!rows.length) {
       body.innerHTML = `
         <tr>
-          <td colspan="12" class="sv-fo-real-empty">
+          <td colspan="9" class="sv-fo-real-empty">
             ${escapeHtml(emptyText)}
           </td>
         </tr>
@@ -2642,7 +2642,7 @@ async function refreshLocalMarket(){
                       }).join("")
                     : `
                       <tr>
-                        <td colspan="12" class="sv-fo-real-empty">
+                        <td colspan="9" class="sv-fo-real-empty">
                           No qualifying A1 setups for this trading day.
                         </td>
                       </tr>
@@ -2992,7 +2992,7 @@ async function refreshLocalMarket(){
               </tr>
             </thead>
             <tbody id="sv-fo-v7-body">
-              <tr><td colspan="12" class="sv-fo-v7-empty">Loading A1 futures setups...</td></tr>
+              <tr><td colspan="9" class="sv-fo-v7-empty">Loading A1 futures setups...</td></tr>
             </tbody>
           </table>
         </div>
@@ -3030,7 +3030,7 @@ async function refreshLocalMarket(){
     if (!rows.length) {
       body.innerHTML = `
         <tr>
-          <td colspan="12" class="sv-fo-v7-empty">
+          <td colspan="9" class="sv-fo-v7-empty">
             No A1 setups found for this session.
           </td>
         </tr>
@@ -3319,9 +3319,9 @@ async function refreshLocalMarket(){
     ["STOCK","symbol"],
     ["LTP","ltp"],
     ["SCORE","score"],
-    ["TREND STRENGTH","trend_strength"],
-    ["OI SETUP","oi_setup"],
-    ["RVOL","rvol"],
+
+
+
     ["ENTRY","entry"],
     ["SL","sl"],
     ["TARGET","target"],
@@ -3334,7 +3334,7 @@ async function refreshLocalMarket(){
     const body = rows.length ? rows.map(r =>
       `<tr>${cols.map(c => `<td>${esc(fmt(r[c[1]]))}</td>`).join("")}</tr>`
     ).join("") :
-      `<tr><td colspan="12">No setups for this session.</td></tr>`;
+      `<tr><td colspan="9">No setups for this session.</td></tr>`;
 
     return `<div class="sv-fo-real-table-wrap" style="overflow:auto">
       <table class="sv-fo-real-table">
@@ -3360,9 +3360,7 @@ async function refreshLocalMarket(){
     const page = document.getElementById(PAGE_ID);
     if (!page) return false;
 
-    const body = page.querySelector(".sv-isfo-body") ||
-                 page.querySelector(".sv-fo-real-body") ||
-                 page;
+    const body = page;
 
     try {
       const response = await fetch(API, { cache: "no-store" });
@@ -3377,7 +3375,7 @@ async function refreshLocalMarket(){
       } else {
         const existing = body.querySelector("#sv-fo-history-final");
         if (existing) existing.remove();
-        body.insertAdjacentHTML("beforeend", table(Array.isArray(data.results) ? data.results : ""));
+        body.insertAdjacentHTML("beforeend", table(Array.isArray(data.results) ? data.results : []));
       }
 
       const oldHistory = body.querySelector("#sv-fo-history-final");
