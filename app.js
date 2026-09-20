@@ -2165,10 +2165,7 @@ async function refreshLocalMarket(){
     if (status) status.textContent = "SCANNING...";
 
     try {
-      const url =
-        typeof FUTURES_URL !== "undefined"
-          ? FUTURES_URL
-          : `${API_BASE}/api/futures`;
+      const url = "/api/futures?history_days=3";
 
       const response = await fetch(
         `${url}${url.includes("?") ? "&" : "?"}sv=${Date.now()}`,
