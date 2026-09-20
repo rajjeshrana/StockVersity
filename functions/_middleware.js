@@ -1,11 +1,17 @@
 ﻿export async function onRequest(context) {
     const incoming = new URL(context.request.url);
 
-    const target = new URL(incoming.pathname.startsWith("/api/futures") ? "https://api.stockversity.in" : "https://stockversity-de4efc1c.appliedintelligencecorporation.com");
+    // Keep the live Futures API proxy.
+    if (incoming.pathname.startsWith("/api/futures")) {
+        const target = new URL("https://api.stockversity.in");
 
-    target.pathname = incoming.pathname;
-    target.search = incoming.search;
+        target.pathname = incoming.pathname;
+        target.search = incoming.search;
 
-    const request = new Request(target.toString(), context.request);
-    return fetch(request);
+        const request = new Request(target.toString(), context.request);
+        return fetch(request);
+    }
+
+    // Serve the current Cloudflare Pages frontend/assets.
+    return context.next();
 }
