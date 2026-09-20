@@ -2279,6 +2279,7 @@ async function refreshLocalMarket(){
 
 
 
+if (false) {
 /* STOCKVERSITY_FUTURES_FINAL_UI_20260916 */
 (() => {
   "use strict";
@@ -2896,7 +2897,9 @@ async function refreshLocalMarket(){
 
 
 
-/* SV_FO_FRONTEND_V7 */
+}
+
+/* SV_FO_FRONTEND_V7 */ (false) {
 (() => {
   "use strict";
 
@@ -3301,6 +3304,8 @@ async function refreshLocalMarket(){
 })();
 
 
+
+}
 
 /* SV_FO_ACTIVE_RENDERER_V8 */
 (() => {
