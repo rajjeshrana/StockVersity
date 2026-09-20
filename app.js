@@ -3301,3 +3301,103 @@ async function refreshLocalMarket(){
 })();
 
 
+
+/* SV_FO_ACTIVE_RENDERER_V8 */
+(() => {
+  "use strict";
+
+  const PAGE_ID = "sv-intraday-futures-page";
+  const API = "/api/futures?history_days=3";
+
+  const esc = v => String(v == null ? "--" : v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+  const fmt = v => v == null || v === "" ? "--" : v;
+  const cols = [
+    ["TIME","time"],
+    ["STOCK","symbol"],
+    ["LTP","ltp"],
+    ["SCORE","score"],
+    ["TREND STRENGTH","trend_strength"],
+    ["OI SETUP","oi_setup"],
+    ["RVOL","rvol"],
+    ["ENTRY","entry"],
+    ["SL","sl"],
+    ["TARGET","target"],
+    ["RR","rr"],
+    ["ACTION","action"]
+  ];
+
+  function table(rows) {
+    const head = cols.map(c => `<th>${c[0]}</th>`).join("");
+    const body = rows.length ? rows.map(r =>
+      `<tr>${cols.map(c => `<td>${esc(fmt(r[c[1]]))}</td>`).join("")}</tr>`
+    ).join("") :
+      `<tr><td colspan="12">No setups for this session.</td></tr>`;
+
+    return `<div class="sv-fo-real-table-wrap" style="overflow:auto">
+      <table class="sv-fo-real-table">
+        <thead><tr>${head}</tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>`;
+  }
+
+  function history(history) {
+    if (!Array.isArray(history) || !history.length) return "";
+    return `<div id="sv-fo-history-final" style="margin-top:16px">
+      <div style="font-weight:700;margin:0 0 10px">LAST 3 TRADING DAYS</div>
+      ${history.map(day => `
+        <div style="margin:0 0 18px">
+          <div style="font-weight:700;margin:0 0 8px">${esc(day.date)} <span style="opacity:.7">(${fmt(day.count)} setups)</span></div>
+          ${table(Array.isArray(day.rows) ? day.rows : [])}
+        </div>`).join("")}
+    </div>`;
+  }
+
+  async function render() {
+    const page = document.getElementById(PAGE_ID);
+    if (!page) return false;
+
+    const body = page.querySelector(".sv-isfo-body") ||
+                 page.querySelector(".sv-fo-real-body") ||
+                 page;
+
+    try {
+      const response = await fetch(API, { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const data = await response.json();
+
+      const oldTable = body.querySelector(".sv-fo-real-table");
+      if (oldTable) {
+        const wrap = oldTable.closest(".sv-fo-real-table-wrap") || oldTable.parentElement;
+        if (wrap) wrap.outerHTML = table(Array.isArray(data.results) ? data.results : []);
+        else oldTable.outerHTML = table(Array.isArray(data.results) ? data.results : []);
+      } else {
+        const existing = body.querySelector("#sv-fo-history-final");
+        if (existing) existing.remove();
+        body.insertAdjacentHTML("beforeend", table(Array.isArray(data.results) ? data.results : ""));
+      }
+
+      const oldHistory = body.querySelector("#sv-fo-history-final");
+      if (oldHistory) oldHistory.outerHTML = history(data.history);
+      else body.insertAdjacentHTML("beforeend", history(data.history));
+
+      return true;
+    } catch (e) {
+      console.warn("StockVersity F&O V8:", e);
+      return false;
+    }
+  }
+
+  function start() {
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries++;
+      if (await render() || tries >= 30) clearInterval(timer);
+    }, 500);
+  }
+
+  start();
+})();
