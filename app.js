@@ -200,7 +200,7 @@ function renderInstitutional(d) {
   const net = (id,v) => {
     const e=$(id),x=n(v);
     if(!e)return;
-    e.textContent=x===null?"--":`${x>=0?"+":"-"}â‚¹${cr(Math.abs(x))} Cr`;
+    e.textContent=x===null?"--":`${x>=0?"+":"-"}Ã¢â€šÂ¹${cr(Math.abs(x))} Cr`;
     setPctClass(e,x);
   };
   const bars = (prefix,buy,sell) => {
@@ -215,13 +215,13 @@ function renderInstitutional(d) {
   set("institutional-date",inst?.date?"("+String(inst.date).split("-").reverse().join("-")+")":"--");
 
   /* HTML already contains BUY / SELL labels */
-  set("fii-buy",fii.buy==null?"--":`â‚¹${cr(fii.buy)} Cr`);
-  set("fii-sell",fii.sell==null?"--":`â‚¹${cr(fii.sell)} Cr`);
+  set("fii-buy",fii.buy==null?"--":`Ã¢â€šÂ¹${cr(fii.buy)} Cr`);
+  set("fii-sell",fii.sell==null?"--":`Ã¢â€šÂ¹${cr(fii.sell)} Cr`);
   net("fii-net",fii.net);
   bars("fii",fii.buy,fii.sell);
 
-  set("dii-buy",dii.buy==null?"--":`â‚¹${cr(dii.buy)} Cr`);
-  set("dii-sell",dii.sell==null?"--":`â‚¹${cr(dii.sell)} Cr`);
+  set("dii-buy",dii.buy==null?"--":`Ã¢â€šÂ¹${cr(dii.buy)} Cr`);
+  set("dii-sell",dii.sell==null?"--":`Ã¢â€šÂ¹${cr(dii.sell)} Cr`);
   net("dii-net",dii.net);
   bars("dii",dii.buy,dii.sell);
 
@@ -235,9 +235,9 @@ function renderInstitutional(d) {
   const turnover = n(agg.turnover)!=null ? agg.turnover : (n(inst.turnover)!=null ? inst.turnover : null);
   const totalNet = n(agg.net)!=null ? agg.net : (n(inst.net)!=null ? inst.net : null);
 
-  set("institutional-turnover",turnover===null?"--":`â‚¹${cr(turnover)} Cr`);
-  set("institutional-buy-total",buy===null?"--":`â‚¹${cr(buy)} Cr`);
-  set("institutional-sell-total",sell===null?"--":`â‚¹${cr(sell)} Cr`);
+  set("institutional-turnover",turnover===null?"--":`Ã¢â€šÂ¹${cr(turnover)} Cr`);
+  set("institutional-buy-total",buy===null?"--":`Ã¢â€šÂ¹${cr(buy)} Cr`);
+  set("institutional-sell-total",sell===null?"--":`Ã¢â€šÂ¹${cr(sell)} Cr`);
   net("institutional-net",totalNet);
   set("institutional-bias",totalNet===null?"--":(totalNet>=0?"NET BUYERS":"NET SELLERS"));
 
@@ -550,7 +550,7 @@ setInterval(refreshInstitutionalFlow, 60000);
         "white-space:nowrap !important;";
     });
 
-    // Rebuild Institutional Flow values with a runtime-generated â‚¹.
+    // Rebuild Institutional Flow values with a runtime-generated Ã¢â€šÂ¹.
     const rupee = String.fromCharCode(8377);
 
     const netNodes = [
@@ -611,11 +611,11 @@ setInterval(refreshInstitutionalFlow, 60000);
       const a=i.aggregate||i.aggregates||i.totals||{};
 
       const sub=document.querySelector(".sv-institutional-card .sv-if-subtitle");
-      if(sub)sub.textContent="FII â€¢ DII â€¢ PRO";
+      if(sub)sub.textContent="FII Ã¢â‚¬Â¢ DII Ã¢â‚¬Â¢ PRO";
 
-      { const fx=Number(f.net); const fp=document.getElementById("fii-net-pct"); if(fp){fp.textContent=Number.isFinite(fx)?((fx>=0?"â–² +":"â–¼ -")+Math.abs(fx/(Number(f.buy)+Number(f.sell))*100).toFixed(1)+"%"):"--"; fp.className="sv-if-net-pct "+(fx>=0?"positive":"negative");} }
-      { const dx=Number(d.net); const dp=document.getElementById("dii-net-pct"); if(dp){dp.textContent=Number.isFinite(dx)?((dx>=0?"â–² +":"â–¼ -")+Math.abs(dx/(Number(d.buy)+Number(d.sell))*100).toFixed(1)+"%"):"--"; dp.className="sv-if-net-pct "+(dx>=0?"positive":"negative");} }
-      { const px=Number(p.net_oi); const pp=document.getElementById("pro-net-pct"); if(pp){pp.textContent=Number.isFinite(px)?((px>=0?"â–² +":"â–¼ -")+Math.abs(px/(Number(p.total_long)+Number(p.total_short))*100).toFixed(1)+"%"):"--"; pp.className="sv-if-net-pct "+(px>=0?"positive":"negative"); pp.style.setProperty("color",px>=0?"#00e69a":"#ff5065","important");} }
+      { const fx=Number(f.net); const fp=document.getElementById("fii-net-pct"); if(fp){fp.textContent=Number.isFinite(fx)?((fx>=0?"Ã¢â€“Â² +":"Ã¢â€“Â¼ -")+Math.abs(fx/(Number(f.buy)+Number(f.sell))*100).toFixed(1)+"%"):"--"; fp.className="sv-if-net-pct "+(fx>=0?"positive":"negative");} }
+      { const dx=Number(d.net); const dp=document.getElementById("dii-net-pct"); if(dp){dp.textContent=Number.isFinite(dx)?((dx>=0?"Ã¢â€“Â² +":"Ã¢â€“Â¼ -")+Math.abs(dx/(Number(d.buy)+Number(d.sell))*100).toFixed(1)+"%"):"--"; dp.className="sv-if-net-pct "+(dx>=0?"positive":"negative");} }
+      { const px=Number(p.net_oi); const pp=document.getElementById("pro-net-pct"); if(pp){pp.textContent=Number.isFinite(px)?((px>=0?"Ã¢â€“Â² +":"Ã¢â€“Â¼ -")+Math.abs(px/(Number(p.total_long)+Number(p.total_short))*100).toFixed(1)+"%"):"--"; pp.className="sv-if-net-pct "+(px>=0?"positive":"negative"); pp.style.setProperty("color",px>=0?"#00e69a":"#ff5065","important");} }
       put("fii-buy",money(f.buy));
       put("fii-sell",money(f.sell));
       setnet("fii-net",f.net);
@@ -665,7 +665,7 @@ setInterval(refreshInstitutionalFlow, 60000);
     netPctEl.textContent=
       pct==null
         ? "--"
-        : (pct>=0 ? "â–² +" : "â–¼ -")+Math.abs(pct).toFixed(1)+"%";
+        : (pct>=0 ? "Ã¢â€“Â² +" : "Ã¢â€“Â¼ -")+Math.abs(pct).toFixed(1)+"%";
 
     netPctEl.style.setProperty(
       "color",
@@ -1185,87 +1185,85 @@ async function refreshLocalMarket(){
   };
 
   function buildFuturesPage() {
-    let page = get(FO_PAGE_ID);
+    let page=get(FO_PAGE_ID);
+    if(page)return page;
 
-    if (page) return page;
+    if(!document.getElementById("sv-fno-final-style")){
+      const style=document.createElement("style");
+      style.id="sv-fno-final-style";
+      style.textContent=`
+#sv-futures-page{padding:0 8px 30px!important;color:#eef4f8}
+#sv-futures-page .sv-fno-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:18px}
+#sv-futures-page .sv-fno-title{margin:0;font-size:28px;line-height:1.15;font-weight:800}
+#sv-futures-page .sv-fno-sub{margin:7px 0 0;color:#8fa3b7;font-size:12px}
+#sv-futures-page .sv-fno-tabs{display:flex;border:1px solid rgba(120,160,200,.18);background:rgba(8,22,36,.72);border-radius:9px;overflow:hidden}
+#sv-futures-page .sv-fno-tab{border:0;background:transparent;color:#a8b8c8;padding:11px 28px;font-size:12px;font-weight:800;cursor:pointer}
+#sv-futures-page .sv-fno-tab.active{background:#12c98b;color:#06151e}
+#sv-futures-page .sv-fno-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:14px}
+#sv-futures-page .sv-fno-info-box{padding:12px 14px;border:1px solid rgba(120,160,200,.14);background:rgba(10,25,41,.65);border-radius:9px}
+#sv-futures-page .sv-fno-label{color:#71879b;font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase}
+#sv-futures-page .sv-fno-value{margin-top:5px;color:#dce8f2;font-size:12px;font-weight:700}
+#sv-futures-page .sv-fno-card{border:1px solid rgba(120,160,200,.16);background:rgba(8,22,36,.72);border-radius:9px;overflow:hidden}
+#sv-futures-page .sv-fno-card-head{display:flex;align-items:center;padding:15px 16px;border-bottom:1px solid rgba(120,160,200,.12)}
+#sv-futures-page .sv-fno-card-title{font-size:15px;font-weight:800}
+#sv-futures-page .sv-fno-live{margin-left:auto;color:#16d28d;font-size:10px;font-weight:800}
+#sv-futures-page .sv-fno-refresh{margin-left:16px;border:1px solid rgba(120,160,200,.22);background:rgba(14,34,54,.8);color:#dbe7ef;border-radius:6px;padding:7px 11px;font-size:10px;font-weight:800;cursor:pointer}
+#sv-futures-page .sv-fno-day{padding:13px 16px 9px;color:#dfe9f2;font-size:13px;font-weight:800}
+#sv-futures-page .sv-fno-day span{color:#7d91a4;font-weight:600}
+#sv-futures-page .sv-fno-wrap{overflow-x:auto}
+#sv-futures-page .sv-fno-table{width:100%;min-width:820px;border-collapse:collapse}
+#sv-futures-page .sv-fno-table th{height:38px;padding:0 12px;background:rgba(16,38,60,.78);border-bottom:1px solid rgba(120,160,200,.13);text-align:left;color:#91a7ba;font-size:9px;font-weight:800;letter-spacing:.45px}
+#sv-futures-page .sv-fno-table td{height:49px;padding:0 12px;border-bottom:1px solid rgba(120,160,200,.08);color:#e8eff5;font-size:11px;white-space:nowrap}
+#sv-futures-page .sv-fno-score{display:inline-flex;min-width:28px;justify-content:center;padding:4px 6px;border-radius:4px;background:rgba(22,201,139,.12);color:#28df9c;font-weight:800}
+#sv-futures-page .sv-fno-action{display:inline-flex;padding:4px 8px;border-radius:5px;font-size:9px;font-weight:800}
+#sv-futures-page .sv-fno-buy{color:#16d28d;background:rgba(22,210,141,.11)}
+#sv-futures-page .sv-fno-sell{color:#ff6675;background:rgba(255,90,105,.11)}
+#sv-futures-page .sv-fno-empty{padding:48px 15px;text-align:center;color:#7f94a7;font-size:12px}
+#sv-futures-page .sv-fno-footer{display:flex;justify-content:space-between;padding:11px 16px;color:#687f93;font-size:10px}
+@media(max-width:900px){#sv-futures-page .sv-fno-info{grid-template-columns:repeat(2,minmax(0,1fr))}#sv-futures-page .sv-fno-head{align-items:flex-start;flex-direction:column}}
+      `;
+      document.head.appendChild(style);
+    }
 
-    page = document.createElement("section");
-    page.id = FO_PAGE_ID;
-
-    page.innerHTML = `
-      <div class="sv-fo-page-header">
-        <div>
-          <h1>Futures &amp; Options</h1>
-          <p>Intraday Scanner · NSE Stock Futures · Elite A1 Setups</p>
-        </div>
-
-        <div class="sv-fo-page-status">
-          <span class="sv-fo-status-dot"></span>
-          <span id="sv-fo-status">READY</span>
-          <button id="sv-fo-refresh" type="button">REFRESH</button>
-        </div>
-      </div>
-
-      <div class="sv-fo-rules">
-        <span>SCORE ≥ 90</span>
-        <span>5 MIN</span>
-        <span>VWAP</span>
-        <span>ATR RISK</span>
-        <span>ELITE A1 ONLY</span>
-        <span>MAX 10 SETUPS</span>
-      </div>
-
-      <div class="sv-fo-card">
-        <div class="sv-fo-card-head">
-          <div>
-            <strong>Intraday Futures A1 Setups</strong>
-            <small id="sv-fo-count">0 setups</small>
-          </div>
-          <span id="sv-fo-date"></span>
-        </div>
-
-        <div class="sv-fo-table-wrap">
-          <table class="sv-fo-table">
-            <thead>
-              <tr>
-                <th>TIME</th>
-                <th>STOCK</th>
-                <th>LTP</th>
-                <th>SCORE</th>
-                <th>ENTRY</th>
-                <th>SL</th>
-                <th>TARGET</th>
-                <th>RR</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-
-            <tbody id="sv-fo-body">
-              <tr>
-                <td colspan="9" class="sv-fo-empty">
-                  Loading A1 futures setups...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    page=document.createElement("section");
+    page.id=FO_PAGE_ID;
+    page.className="sv-fno-final-page";
+    page.innerHTML=`
+      <div class="sv-fno-head">
+        <div><h1 class="sv-fno-title">Futures &amp; Options</h1>
+        <p class="sv-fno-sub">Intraday Scanner &nbsp;â€º&nbsp; NSE F&amp;O &nbsp;Â·&nbsp; Rule-based A1 setups</p></div>
+        <div class="sv-fno-tabs">
+          <button class="sv-fno-tab active" data-fno-tab="futures">Futures</button>
+          <button class="sv-fno-tab" data-fno-tab="options">Options</button>
         </div>
       </div>
-    `;
-
-    const main = document.querySelector(".main-area");
-
-    if (!main) return null;
-
+      <div class="sv-fno-info">
+        <div class="sv-fno-info-box"><div class="sv-fno-label">Strategy</div><div class="sv-fno-value">StockVersity F&amp;O A1</div></div>
+        <div class="sv-fno-info-box"><div class="sv-fno-label">Universe</div><div class="sv-fno-value">NSE F&amp;O</div></div>
+        <div class="sv-fno-info-box"><div class="sv-fno-label">Timeframe</div><div class="sv-fno-value">5 Minute</div></div>
+        <div class="sv-fno-info-box"><div class="sv-fno-label">Data</div><div class="sv-fno-value">Live + Last 3 Trading Days</div></div>
+      </div>
+      <div class="sv-fno-card">
+        <div class="sv-fno-card-head"><span class="sv-fno-card-title">F&amp;O Setups</span>
+        <span class="sv-fno-live">â— LIVE</span>
+        <button id="sv-fo-refresh" class="sv-fno-refresh" type="button">REFRESH</button></div>
+        <div id="sv-fo-body"><div class="sv-fno-empty">Loading F&amp;O setups...</div></div>
+      </div>`;
+    const main=document.querySelector(".main-area");
+    if(!main)return null;
     main.appendChild(page);
 
-    get("sv-fo-refresh")?.addEventListener(
-      "click",
-      loadFuturesPage
-    );
-
+    page.querySelectorAll("[data-fno-tab]").forEach(button=>{
+      button.addEventListener("click",()=>{
+        page.querySelectorAll("[data-fno-tab]").forEach(x=>x.classList.toggle("active",x===button));
+        if(button.dataset.fnoTab==="options")
+          get("sv-fo-body").innerHTML='<div class="sv-fno-empty">Options scanner is ready as a dynamic tab. Options live feed will appear here when enabled.</div>';
+        else loadFuturesPage();
+      });
+    });
+    get("sv-fo-refresh")?.addEventListener("click",loadFuturesPage);
     return page;
   }
-
   function hideDashboard() {
     document
       .querySelectorAll(".main-area > *")
@@ -1291,120 +1289,35 @@ async function refreshLocalMarket(){
     loadFuturesPage();
   }
 
-  function renderFuturesPage(rows) {
-    const body = get("sv-fo-body");
-    const status = get("sv-fo-status");
-    const count = get("sv-fo-count");
+  function renderFuturesPage(payload) {
+    const body=get("sv-fo-body");
+    if(!body)return;
 
-    if (!body) return;
+    const escText=v=>String(v??"--").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    const dayLabel=v=>{
+      const t=String(v||"");
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(t))return escText(t);
+      return new Date(t+"T00:00:00+05:30").toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
+    };
+    const rowHtml=row=>{
+      const action=String(row.action||row.signal||row.side||row.direction||"").toUpperCase();
+      const buy=action.includes("BUY")||String(row.direction||"").toUpperCase()==="LONG";
+      return `<tr><td>${escText(row.time||row.generated||"--")}</td><td><strong>${escText(row.symbol||row.trading_symbol||row.name||"--")}</strong></td><td>${money(row.ltp??row.price??row.last_price??row.last_traded_price)}</td><td><span class="sv-fno-score">${score(row.score??row.confidence??row.opportunity_score)}</span></td><td>${money(row.entry??row.entry_price??row.entryPrice)}</td><td>${money(row.sl??row.stop_loss??row.stopLoss??row.stop_loss_price)}</td><td>${money(row.target??row.target_price??row.targetPrice)}</td><td>${rr(row.rr??row.risk_reward??row.risk_reward_ratio)}</td><td><span class="sv-fno-action ${buy?"sv-fno-buy":"sv-fno-sell"}">${escText(action||"--")}</span></td></tr>`;
+    };
 
-    if (!rows.length) {
-      body.innerHTML = `
-        <tr>
-          <td colspan="9" class="sv-fo-empty">
-            NO A1 FUTURES SETUPS
-          </td>
-        </tr>
-      `;
+    const days=[];
+    if(Array.isArray(payload?.results))days.push({date:payload?.session_date||"",rows:payload.results.slice(0,10)});
+    if(Array.isArray(payload?.history))payload.history.forEach(d=>{if(Array.isArray(d?.rows))days.push({date:d.date||"",rows:d.rows.slice(0,10)});});
+    const usable=days.slice(0,3);
 
-      if (count) count.textContent = "0 setups";
-      if (status) status.textContent = "LIVE";
+    if(!usable.length){body.innerHTML='<div class="sv-fno-empty">No F&amp;O setups available for the selected trading days.</div>';return;}
 
-      return;
-    }
-
-    body.innerHTML = rows
-      .slice()
-      .sort(
-        (a, b) =>
-          (Number(b.score) || 0) -
-          (Number(a.score) || 0)
-      )
-      .slice(0, 10)
-      .map(row => {
-        const action = String(
-          row.action ||
-          row.signal ||
-          row.side ||
-          ""
-        ).toUpperCase();
-
-        const actionClass =
-          action.includes("BUY")
-            ? "sv-fo-buy"
-            : action.includes("SELL")
-              ? "sv-fo-sell"
-              : "";
-
-        return `
-          <tr>
-            <td>${row.time || "--"}</td>
-
-            <td class="sv-fo-stock">
-              ${row.symbol ||
-                row.trading_symbol ||
-                row.name ||
-                "--"}
-            </td>
-
-            <td>${money(
-              row.ltp ??
-              row.price ??
-              row.last_price ??
-              row.last_traded_price
-            )}</td>
-
-            <td class="sv-fo-score">
-              ${score(
-                row.score ??
-                row.confidence ??
-                row.opportunity_score
-              )}
-            </td>
-
-            <td>${money(
-              row.entry ??
-              row.entry_price ??
-              row.entryPrice
-            )}</td>
-
-            <td>${money(
-              row.sl ??
-              row.stop_loss ??
-              row.stopLoss ??
-              row.stop_loss_price
-            )}</td>
-
-            <td>${money(
-              row.target ??
-              row.target_price ??
-              row.targetPrice
-            )}</td>
-
-            <td>${rr(
-              row.rr ??
-              row.risk_reward ??
-              row.risk_reward_ratio
-            )}</td>
-
-            <td>
-              <span class="sv-fo-action ${actionClass}">
-                ${action || "--"}
-              </span>
-            </td>
-          </tr>
-        `;
-      })
-      .join("");
-
-    if (count) {
-      count.textContent =
-        `${Math.min(rows.length, 10)} setup${Math.min(rows.length, 10) === 1 ? "" : "s"}`;
-    }
-
-    if (status) status.textContent = "LIVE";
+    let total=0;
+    body.innerHTML=usable.map(day=>{
+      total+=day.rows.length;
+      return `<div class="sv-fno-day">${dayLabel(day.date)} <span>(${day.rows.length} ${day.rows.length===1?"setup":"setups"})</span></div><div class="sv-fno-wrap"><table class="sv-fno-table"><thead><tr><th>TIME</th><th>STOCK</th><th>LTP</th><th>SCORE</th><th>ENTRY</th><th>SL</th><th>TARGET</th><th>RR</th><th>ACTION</th></tr></thead><tbody>${day.rows.length?day.rows.map(rowHtml).join(""):'<tr><td colspan="9" class="sv-fno-empty">NO A1 FUTURES SETUPS</td></tr>'}</tbody></table></div>`;
+    }).join("")+`<div class="sv-fno-footer"><span>Last 3 Trading Days</span><span>${total} setups</span></div>`;
   }
-
   async function loadFuturesPage() {
     const page = buildFuturesPage();
 
@@ -1430,7 +1343,7 @@ async function refreshLocalMarket(){
           ? payload.results
           : [];
 
-      renderFuturesPage(rows);
+      renderFuturesPage(payload);
 
       const date = get("sv-fo-date");
 
@@ -1486,7 +1399,7 @@ async function refreshLocalMarket(){
         children.classList.toggle("open");
 
       if (plus) {
-        plus.textContent = open ? "âˆ’" : "+";
+        plus.textContent = open ? "Ã¢Ë†â€™" : "+";
       }
     }
   );
@@ -1695,7 +1608,7 @@ async function refreshLocalMarket(){
 })();
 
 /* ============================================================
-   STOCKVERSITY â€” FINAL F&O MENU STRUCTURE
+   STOCKVERSITY Ã¢â‚¬â€ FINAL F&O MENU STRUCTURE
    MAIN Future & Options = separate main page
    Intraday Scanner > Futures & Options = separate intraday page
    ============================================================ */
@@ -1769,7 +1682,7 @@ async function refreshLocalMarket(){
     mainFO.className = "frozen-nav-item frozen-expand";
 
     mainFO.innerHTML = `
-      <span class="frozen-nav-icon">â–¥</span>
+      <span class="frozen-nav-icon">›</span>
       <span>Future &amp; Options</span>
       <b>+</b>
     `;
@@ -1807,7 +1720,7 @@ async function refreshLocalMarket(){
     child.className = "frozen-nav-item";
 
     child.innerHTML = `
-      <span class="frozen-nav-icon">â–¥</span>
+      <span class="frozen-nav-icon">›</span>
       <span>Futures &amp; Options</span>
     `;
 
@@ -1901,7 +1814,7 @@ async function refreshLocalMarket(){
         font-size:11px;
         font-weight:700;
       ">
-        <span>SCORE ≥ 90</span>
+        <span>SCORE â‰¥ 90</span>
         <span>5 MIN</span>
         <span>VWAP</span>
         <span>RVOL</span>
@@ -2252,7 +2165,7 @@ async function refreshLocalMarket(){
     const plus = scanner.querySelector("b");
 
     if (plus) {
-      plus.textContent = "âˆ’";
+      plus.textContent = "Ã¢Ë†â€™";
     }
   }
 
@@ -2381,29 +2294,29 @@ async function refreshLocalMarket(){
     let s = String(value ?? "");
 
     const replacements = [
-      ["ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢", "â€¢"],
-      ["Ã¢â‚¬Â¢", "â€¢"],
-      ["Ã‚Â·", "Â·"],
-      ["Ãƒâ€šÂ·", "Â·"],
-      ["Ã¢â€°Â¥", "â‰¥"],
-      ["Ã‚â‰¥", "â‰¥"],
-      ["Ã¢Ë†â€™", "âˆ’"],
-      ["Ã¢â‚¬â€œ", "â€“"],
-      ["Ã¢â‚¬â€", "â€”"],
-      ["Ã¢â€ â€™", "â†’"],
-      ["Ã¢â€ Â", "â†"],
-      ["Ã¢Å“â€œ", "âœ“"],
-      ["Ã¢Å“â€”", "âœ•"],
-      ["Ã¢Ëœâ€¦", "â˜…"],
-      ["Ã°Å¸â€˜â€¹", "ðŸ‘‹"],
-      ["Ã°Å¸Å½Â¯", "ðŸŽ¯"]
+      ["ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢", "Ã¢â‚¬Â¢"],
+      ["ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢", "Ã¢â‚¬Â¢"],
+      ["Ãƒâ€šÃ‚·", "Ã‚·"],
+      ["ÃƒÆ’Ã¢â‚¬Å¡Ã‚·", "Ã‚·"],
+      ["ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥", "Ã¢â€°Â¥"],
+      ["Ãƒâ€šÃ¢â€°Â¥", "Ã¢â€°Â¥"],
+      ["ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢", "Ã¢Ë†â€™"],
+      ["ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“", "Ã¢â‚¬â€œ"],
+      ["ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â", "Ã¢â‚¬â€"],
+      ["ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢", "Ã¢â€ â€™"],
+      ["ÃƒÂ¢Ã¢â‚¬Â Ã‚Â", "Ã¢â€ Â"],
+      ["ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“", "Ã¢Å“â€œ"],
+      ["ÃƒÂ¢Ã…â€œÃ¢â‚¬â€", "Ã¢Å“â€¢"],
+      ["ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦", "Ã¢Ëœ…"],
+      ["ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ¢â‚¬Â¹", "Ã°Å¸â€˜â€¹"],
+      ["ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯", "Ã°Å¸Å½Â¯"]
     ];
 
     for (const [bad, good] of replacements) {
       s = s.split(bad).join(good);
     }
 
-    if (/[ÃƒÃ‚Ã¢Ã°]/.test(s)) {
+    if (/[ÃƒÆ’Ãƒâ€šÃƒÂ¢ÃƒÂ°]/.test(s)) {
       try {
         const allByteChars = Array.from(s)
           .every(ch => ch.charCodeAt(0) >= 0 && ch.charCodeAt(0) <= 255);
@@ -2413,7 +2326,7 @@ async function refreshLocalMarket(){
             .map(ch => `%${ch.charCodeAt(0).toString(16).padStart(2, "0")}`)
             .join("");
           const fixed = decodeURIComponent(encoded);
-          if (fixed && !fixed.includes("ï¿½")) s = fixed;
+          if (fixed && !fixed.includes("Ã¯Â¿Â½")) s = fixed;
         }
       } catch (_) {}
     }
@@ -2439,7 +2352,7 @@ async function refreshLocalMarket(){
       const tag = parent.tagName.toLowerCase();
       if (tag === "script" || tag === "style") continue;
 
-      if (/[ÃƒÃ‚Ã¢Ã°]/.test(node.nodeValue || "")) {
+      if (/[ÃƒÆ’Ãƒâ€šÃƒÂ¢ÃƒÂ°]/.test(node.nodeValue || "")) {
         nodes.push(node);
       }
     }
@@ -2653,12 +2566,12 @@ async function refreshLocalMarket(){
       <div class="sv-fo-history-head">
         <div>
           <strong>Last 3 Trading Days</strong>
-          <small>Historical A1 setups Â· Today + previous 3 NSE sessions</small>
+          <small>Historical A1 setups Ã‚· Today + previous 3 NSE sessions</small>
         </div>
       </div>
       ${blocks}
       <div class="sv-fo-history-footer">
-        A1 Criteria: Score â‰¥ 90 Â· Trend = Very Strong Â· RR â‰¥ 1.50 Â· RVOL â‰¥ 1.50 Â· Valid Directional OI Â· OI N/A Excluded Â· Max 10 Setups
+        A1 Criteria: Score Ã¢â€°Â¥ 90 Ã‚· Trend = Very Strong Ã‚· RR Ã¢â€°Â¥ 1.50 Ã‚· RVOL Ã¢â€°Â¥ 1.50 Ã‚· Valid Directional OI Ã‚· OI N/A Excluded Ã‚· Max 10 Setups
       </div>
     `;
   };
@@ -3392,102 +3305,4 @@ async function refreshLocalMarket(){
   }
 
   start();
-})();
-/* SV_FO_DATA_BRIDGE_FINAL */
-(() => {
-  "use strict";
-
-  const PAGE = "sv-futures-page";
-  const API = "/api/futures?history_days=3";
-
-  const money = v => {
-    const n = Number(v);
-    return Number.isFinite(n)
-      ? n.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})
-      : "--";
-  };
-
-  const esc = v => String(v ?? "--")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
-
-  function row(x){
-    const action = String(x.action || "").toUpperCase();
-    const cls = action.includes("BUY") ? "sv-fo-buy" : action.includes("SELL") ? "sv-fo-sell" : "";
-    return `<tr>
-      <td>${esc(x.time || x.generated)}</td>
-      <td class="sv-fo-stock">${esc(x.symbol || x.trading_symbol)}</td>
-      <td>${money(x.ltp)}</td>
-      <td>${Number.isFinite(Number(x.score)) ? Number(x.score).toFixed(0) : "--"}</td>
-      <td>${money(x.entry)}</td>
-      <td>${money(x.sl)}</td>
-      <td>${money(x.target)}</td>
-      <td>${Number.isFinite(Number(x.rr)) ? Number(x.rr).toFixed(2) : "--"}</td>
-      <td><span class="sv-fo-action ${cls}">${esc(action)}</span></td>
-    </tr>`;
-  }
-
-  function historyBlock(history){
-    if(!Array.isArray(history) || !history.length) return "";
-    return `<div id="sv-fo-history-bridge" style="margin-top:16px">
-      <div style="font-weight:800;font-size:14px;margin:0 0 12px;color:#E7EEF7">LAST 3 TRADING DAYS</div>
-      ${history.map(d => `<div style="margin:0 0 18px">
-        <div style="font-weight:800;margin:0 0 8px;color:#DCE8F5">
-          ${esc(d.date)} <span style="opacity:.7">(${Number(d.count)||0} setups)</span>
-        </div>
-        <div class="sv-fo-table-wrap">
-          <table class="sv-fo-table">
-            <thead><tr>
-              <th>TIME</th><th>STOCK</th><th>LTP</th><th>SCORE</th>
-              <th>ENTRY</th><th>SL</th><th>TARGET</th><th>RR</th><th>ACTION</th>
-            </tr></thead>
-            <tbody>${(Array.isArray(d.rows)?d.rows:[]).map(row).join("")}</tbody>
-          </table>
-        </div>
-      </div>`).join("")}
-    </div>`;
-  }
-
-  async function refresh(){
-    const page = document.getElementById(PAGE);
-    const body = document.getElementById("sv-fo-body");
-    if(!page || !body) return;
-
-    try{
-      const r = await fetch(`${API}&sv=${Date.now()}`,{cache:"no-store"});
-      if(!r.ok) throw new Error("HTTP "+r.status);
-      const data = await r.json();
-
-      const results = Array.isArray(data.results) ? data.results.slice(0,10) : [];
-      body.innerHTML = results.length
-        ? results.map(row).join("")
-        : `<tr><td colspan="9" class="sv-fo-empty">NO A1 FUTURES SETUPS</td></tr>`;
-
-      const count = document.getElementById("sv-fo-count");
-      if(count) count.textContent = `${results.length} setup${results.length === 1 ? "" : "s"}`;
-
-      const status = document.getElementById("sv-fo-status");
-      if(status) status.textContent = "LIVE";
-
-      let old = document.getElementById("sv-fo-history-bridge");
-      if(old) old.remove();
-
-      const card = page.querySelector(".sv-fo-card");
-      if(card){
-        card.insertAdjacentHTML("afterend",historyBlock(data.history));
-      }
-    }catch(e){
-      console.warn("StockVersity F&O bridge:",e);
-    }
-  }
-
-  let lastPage = false;
-  setInterval(() => {
-    const exists = !!document.getElementById(PAGE);
-    if(exists && !lastPage) refresh();
-    if(exists) refresh();
-    lastPage = exists;
-  },5000);
 })();
