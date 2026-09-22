@@ -1185,86 +1185,145 @@ async function refreshLocalMarket(){
   };
 
   function buildFuturesPage() {
-    let page=get(FO_PAGE_ID);
-    if(page)return page;
+    let page = get(FO_PAGE_ID);
+    if (page) return page;
 
-    if(!document.getElementById("sv-fno-frozen-design-style")){
-      const style=document.createElement("style");
-      style.id="sv-fno-frozen-design-style";
-      style.textContent=`
-#sv-futures-page{padding:0 8px 30px!important;color:#eef4f8}
-#sv-futures-page .sv-fd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:18px}
-#sv-futures-page .sv-fd-title{margin:0;font-size:28px;line-height:1.15;font-weight:800}
-#sv-futures-page .sv-fd-sub{margin:7px 0 0;color:#8fa3b7;font-size:12px}
-#sv-futures-page .sv-fd-tabs{display:flex;border:1px solid rgba(120,160,200,.18);background:rgba(8,22,36,.72);border-radius:9px;overflow:hidden}
-#sv-futures-page .sv-fd-tab{border:0;background:transparent;color:#a8b8c8;padding:11px 34px;font-size:12px;font-weight:800;cursor:pointer}
-#sv-futures-page .sv-fd-tab.active{background:#12c98b;color:#06151e}
-#sv-futures-page .sv-fd-card{border:1px solid rgba(120,160,200,.16);background:rgba(8,22,36,.72);border-radius:9px;overflow:hidden}
-#sv-futures-page .sv-fd-card-head{display:flex;align-items:center;padding:15px 16px;border-bottom:1px solid rgba(120,160,200,.12)}
-#sv-futures-page .sv-fd-card-title{font-size:15px;font-weight:800}
-#sv-futures-page .sv-fd-live{margin-left:auto;color:#16d28d;font-size:10px;font-weight:800}
-#sv-futures-page .sv-fd-refresh{margin-left:16px;border:1px solid rgba(120,160,200,.22);background:#102235;color:#dce8f2;border-radius:6px;padding:7px 12px;font-size:10px;font-weight:800;cursor:pointer}
-#sv-futures-page .sv-fd-scroll{overflow:auto}
-#sv-futures-page table{width:100%;min-width:1180px;border-collapse:collapse}
-#sv-futures-page th{padding:11px 10px;text-align:left;background:rgba(13,31,48,.9);color:#8297aa;font-size:9px;font-weight:800;letter-spacing:.35px;white-space:nowrap}
-#sv-futures-page td{padding:12px 10px;border-top:1px solid rgba(120,160,200,.09);color:#d7e2ec;font-size:11px;white-space:nowrap}
-#sv-futures-page tbody tr:hover td{background:rgba(20,42,62,.32)}
-#sv-futures-page .sv-fd-day{display:flex;align-items:center;gap:8px;padding:12px 14px;background:rgba(7,18,30,.95);border-top:1px solid rgba(120,160,200,.12);border-bottom:1px solid rgba(120,160,200,.10)}
-#sv-futures-page .sv-fd-day:before{content:"";width:4px;height:28px;border-radius:3px;background:#12c98b}
-#sv-futures-page .sv-fd-day-name{font-size:12px;font-weight:800;color:#f1f5f8}
-#sv-futures-page .sv-fd-day-count{color:#8297aa;font-size:11px}
-#sv-futures-page .sv-fd-summary{margin-left:auto;color:#9aacbd;font-size:10px}
-#sv-futures-page .sv-fd-long{color:#19d995}.sv-fd-short{color:#ff6170}
-#sv-futures-page .sv-fd-type{display:inline-flex;min-width:48px;justify-content:center;padding:5px 8px;border-radius:5px;font-size:9px;font-weight:800}
-#sv-futures-page .sv-fd-long-bg{background:rgba(18,201,139,.16);color:#25dda0}
-#sv-futures-page .sv-fd-short-bg{background:rgba(255,90,105,.16);color:#ff7180}
-#sv-futures-page .sv-fd-score{display:inline-flex;min-width:34px;justify-content:center;padding:5px 7px;border-radius:5px;background:#12c98b;color:#062017;font-weight:900}
-#sv-futures-page .sv-fd-view{color:#6faaff;font-size:16px}
-#sv-futures-page .sv-fd-empty{padding:45px 15px;text-align:center;color:#7f94a7;font-size:12px}
-#sv-futures-page .sv-fd-footer{display:flex;justify-content:space-between;padding:11px 16px;color:#687f93;font-size:10px}
-@media(max-width:900px){#sv-futures-page .sv-fd-head{align-items:flex-start;flex-direction:column}}
+    if (!document.getElementById("sv-fno-frozen-layout-style")) {
+      const style = document.createElement("style");
+      style.id = "sv-fno-frozen-layout-style";
+      style.textContent = `
+#sv-futures-page{padding:0 0 28px!important;color:#eaf2f8}
+#sv-futures-page .sv-fno-layout-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:10px}
+#sv-futures-page .sv-fno-layout-title{margin:0;font-size:24px;line-height:1.15;font-weight:800;color:#f4f7fb}
+#sv-futures-page .sv-fno-layout-sub{margin:5px 0 0;color:#8fa3b6;font-size:10px}
+#sv-futures-page .sv-fno-layout-actions{display:flex;align-items:center;gap:10px}
+#sv-futures-page .sv-fno-layout-tabs{display:flex;border:1px solid rgba(119,157,193,.18);background:rgba(8,24,40,.82);border-radius:6px;overflow:hidden}
+#sv-futures-page .sv-fno-layout-tab{border:0;background:transparent;color:#b3c2d0;padding:8px 24px;font-size:10px;font-weight:800;cursor:pointer}
+#sv-futures-page .sv-fno-layout-tab.active{background:#12c98b;color:#061a16}
+#sv-futures-page .sv-fno-layout-range{height:34px;padding:0 11px;border:1px solid rgba(119,157,193,.18);border-radius:6px;background:#0a2035;color:#d9e5ee;font-size:10px;font-weight:700}
+#sv-futures-page .sv-fno-layout-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid rgba(119,157,193,.16);background:rgba(8,23,38,.76);border-radius:6px;overflow:hidden;margin-bottom:14px}
+#sv-futures-page .sv-fno-layout-info-box{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:42px;border-right:1px solid rgba(119,157,193,.12)}
+#sv-futures-page .sv-fno-layout-info-box:last-child{border-right:0}
+#sv-futures-page .sv-fno-layout-icon{width:24px;height:24px;border-radius:5px;display:grid;place-items:center;background:#102b45;color:#a8c4db;font-size:12px;font-weight:800}
+#sv-futures-page .sv-fno-layout-label{font-size:8px;color:#73899c;margin-bottom:2px}
+#sv-futures-page .sv-fno-layout-value{font-size:9px;color:#dce7ef;font-weight:700;white-space:nowrap}
+#sv-futures-page .sv-fno-layout-card{border:1px solid rgba(119,157,193,.16);background:rgba(7,21,35,.82);border-radius:7px;overflow:hidden}
+#sv-futures-page .sv-fno-layout-card-head{display:flex;align-items:center;gap:10px;padding:10px 11px;border-bottom:1px solid rgba(119,157,193,.12)}
+#sv-futures-page .sv-fno-layout-card-icon{color:#a4c6e4;font-size:12px}
+#sv-futures-page .sv-fno-layout-card-title{font-size:12px;font-weight:800;color:#eef5fa}
+#sv-futures-page .sv-fno-layout-search{margin-left:auto;width:150px;height:28px;border:1px solid rgba(119,157,193,.15);border-radius:5px;background:#0a1d30;color:#dce7ef;padding:0 10px;font-size:9px;outline:none}
+#sv-futures-page .sv-fno-layout-search::placeholder{color:#6f869b}
+#sv-futures-page .sv-fno-layout-day{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid rgba(119,157,193,.10);background:rgba(9,29,46,.78)}
+#sv-futures-page .sv-fno-layout-daybar{width:3px;height:20px;border-radius:2px;background:#13d995}
+#sv-futures-page .sv-fno-layout-day:nth-of-type(4n) .sv-fno-layout-daybar{background:#b7e33f}
+#sv-futures-page .sv-fno-layout-day-name{font-size:10px;font-weight:800;color:#eaf2f8}
+#sv-futures-page .sv-fno-layout-day-count{font-size:9px;color:#8298aa}
+#sv-futures-page .sv-fno-layout-day-summary{margin-left:auto;font-size:9px;color:#a0b2c2}
+#sv-futures-page .sv-fno-layout-long{color:#16d394}.sv-fno-layout-short{color:#ff5d6c}
+#sv-futures-page .sv-fno-layout-scroll{overflow-x:auto}
+#sv-futures-page .sv-fno-layout-table{width:100%;min-width:1060px;border-collapse:collapse;table-layout:auto}
+#sv-futures-page .sv-fno-layout-table th{height:30px;padding:0 8px;background:rgba(8,26,42,.95);border-bottom:1px solid rgba(119,157,193,.12);color:#748ca0;font-size:7px;letter-spacing:.35px;font-weight:800;white-space:nowrap;text-align:left}
+#sv-futures-page .sv-fno-layout-table td{height:34px;padding:0 8px;border-bottom:1px solid rgba(119,157,193,.08);color:#dce7ef;font-size:8px;white-space:nowrap}
+#sv-futures-page .sv-fno-layout-table tr:hover td{background:rgba(20,57,80,.16)}
+#sv-futures-page .sv-fno-layout-symbol{font-weight:800;color:#f4f8fb}
+#sv-futures-page .sv-fno-layout-type{display:inline-flex;padding:3px 6px;border-radius:4px;font-size:7px;font-weight:800}
+#sv-futures-page .sv-fno-layout-long-bg{background:rgba(18,201,139,.16);color:#28dc9e}
+#sv-futures-page .sv-fno-layout-short-bg{background:rgba(255,90,105,.16);color:#ff6d79}
+#sv-futures-page .sv-fno-layout-score{display:inline-flex;min-width:22px;justify-content:center;padding:3px 5px;border-radius:4px;background:#12c98b;color:#062017;font-weight:900}
+#sv-futures-page .sv-fno-layout-trend{color:#13dc96}
+#sv-futures-page .sv-fno-layout-change-up{color:#19d994}
+#sv-futures-page .sv-fno-layout-change-down{color:#ff626f}
+#sv-futures-page .sv-fno-layout-view{color:#72aefe;font-size:12px}
+#sv-futures-page .sv-fno-layout-empty{padding:42px 12px;text-align:center;color:#7d92a5;font-size:10px}
+#sv-futures-page .sv-fno-layout-footer{display:flex;justify-content:space-between;padding:9px 11px;color:#60788c;font-size:8px}
+@media(max-width:900px){#sv-futures-page .sv-fno-layout-info{grid-template-columns:repeat(2,minmax(0,1fr))}#sv-futures-page .sv-fno-layout-info-box:nth-child(2){border-right:0}#sv-futures-page .sv-fno-layout-info-box{border-bottom:1px solid rgba(119,157,193,.12)}#sv-futures-page .sv-fno-layout-head{align-items:flex-start;flex-direction:column}}
 `;
       document.head.appendChild(style);
     }
 
-    page=document.createElement("section");
-    page.id=FO_PAGE_ID;
-    page.className="sv-fd-page";
-    page.innerHTML=`
-      <div class="sv-fd-head">
+    page = document.createElement("section");
+    page.id = FO_PAGE_ID;
+    page.className = "sv-fno-frozen-layout";
+
+    page.innerHTML = `
+      <div class="sv-fno-layout-head">
         <div>
-          <h1 class="sv-fd-title">Futures &amp; Options</h1>
-          <p class="sv-fd-sub">Intraday Scanner &nbsp;â€º&nbsp; NSE F&amp;O &nbsp;Â·&nbsp; Rule-based A1 setups</p>
+          <h1 class="sv-fno-layout-title">Futures &amp; Options</h1>
+          <p class="sv-fno-layout-sub">Rule-based high probability setups for NSE F&amp;O (Last 3 Trading Days)</p>
         </div>
-        <div class="sv-fd-tabs">
-          <button class="sv-fd-tab active" data-fd-tab="futures">Futures</button>
-          <button class="sv-fd-tab" data-fd-tab="options">Options</button>
+
+        <div class="sv-fno-layout-actions">
+          <div class="sv-fno-layout-tabs">
+            <button type="button" class="sv-fno-layout-tab active" data-fno-tab="futures">Futures</button>
+            <button type="button" class="sv-fno-layout-tab" data-fno-tab="options">Options</button>
+          </div>
+          <select id="sv-fno-layout-range" class="sv-fno-layout-range">
+            <option value="3">â–£&nbsp;&nbsp; Last 3 Days</option>
+            <option value="5">â–£&nbsp;&nbsp; Last 5 Days</option>
+            <option value="10">â–£&nbsp;&nbsp; Last 10 Days</option>
+          </select>
         </div>
       </div>
-      <div class="sv-fd-card">
-        <div class="sv-fd-card-head">
-          <span class="sv-fd-card-title">F&amp;O Setups (Last 3 Days)</span>
-          <span class="sv-fd-live">â— LIVE</span>
-          <button id="sv-fd-refresh" class="sv-fd-refresh" type="button">REFRESH</button>
-        </div>
-        <div id="sv-fd-body"><div class="sv-fd-empty">Loading F&amp;O setups...</div></div>
-      </div>`;
 
-    const main=document.querySelector(".main-area");
-    if(!main)return null;
+      <div class="sv-fno-layout-info">
+        <div class="sv-fno-layout-info-box">
+          <div class="sv-fno-layout-icon">â—Ž</div>
+          <div><div class="sv-fno-layout-label">Strategy</div><div class="sv-fno-layout-value">StockVersity F&amp;O A1</div></div>
+        </div>
+        <div class="sv-fno-layout-info-box">
+          <div class="sv-fno-layout-icon">â–¥</div>
+          <div><div class="sv-fno-layout-label">Universe</div><div class="sv-fno-layout-value">NSE F&amp;O (210 contracts)</div></div>
+        </div>
+        <div class="sv-fno-layout-info-box">
+          <div class="sv-fno-layout-icon">â—·</div>
+          <div><div class="sv-fno-layout-label">Timeframe</div><div class="sv-fno-layout-value">5 Minute</div></div>
+        </div>
+        <div class="sv-fno-layout-info-box">
+          <div class="sv-fno-layout-icon">â–£</div>
+          <div><div class="sv-fno-layout-label">Last Updated</div><div class="sv-fno-layout-value" id="sv-fno-last-updated">--</div></div>
+        </div>
+      </div>
+
+      <div class="sv-fno-layout-card">
+        <div class="sv-fno-layout-card-head">
+          <span class="sv-fno-layout-card-icon">â–¥</span>
+          <span class="sv-fno-layout-card-title">F&amp;O Setups (Last 3 Days)</span>
+          <input id="sv-fno-layout-search" class="sv-fno-layout-search" type="search" placeholder="Search symbol..." autocomplete="off">
+        </div>
+        <div id="sv-fno-layout-body">
+          <div class="sv-fno-layout-empty">Loading F&amp;O setups...</div>
+        </div>
+      </div>
+    `;
+
+    const main = document.querySelector(".main-area");
+    if (!main) return null;
     main.appendChild(page);
 
-    page.querySelectorAll("[data-fd-tab]").forEach(btn=>{
-      btn.addEventListener("click",()=>{
-        page.querySelectorAll("[data-fd-tab]").forEach(x=>x.classList.toggle("active",x===btn));
-        if(btn.dataset.fdTab==="options"){
-          get("sv-fd-body").innerHTML='<div class="sv-fd-empty">Options live feed will appear here when enabled.</div>';
-        }else{
+    page.querySelectorAll("[data-fno-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        page.querySelectorAll("[data-fno-tab]").forEach(x => {
+          x.classList.toggle("active", x === button);
+        });
+
+        if (button.dataset.fnoTab === "options") {
+          get("sv-fno-layout-body").innerHTML =
+            '<div class="sv-fno-layout-empty">Options live feed will appear here when enabled.</div>';
+        } else {
           loadFuturesPage();
         }
       });
     });
-    get("sv-fd-refresh")?.addEventListener("click",loadFuturesPage);
+
+    get("sv-fno-layout-range")?.addEventListener("change", loadFuturesPage);
+
+    get("sv-fno-layout-search")?.addEventListener("input", event => {
+      const q = String(event.target.value || "").trim().toUpperCase();
+      page.querySelectorAll(".sv-fno-layout-table tbody tr").forEach(row => {
+        row.style.display = !q || row.textContent.toUpperCase().includes(q) ? "" : "none";
+      });
+    });
+
     return page;
   }
   function hideDashboard() {
@@ -1293,7 +1352,7 @@ async function refreshLocalMarket(){
   }
 
   function renderFuturesPage(payload) {
-    const body = get("sv-fd-body") || get("sv-fo-body");
+    const body = get("sv-fno-layout-body");
     if (!body) return;
 
     const esc = v => String(v ?? "--").replace(/[&<>"']/g, m => ({
@@ -1304,88 +1363,152 @@ async function refreshLocalMarket(){
       "'": "&#39;"
     }[m]));
 
-    const money = v => Number.isFinite(Number(v))
-      ? Number(v).toLocaleString("en-IN", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        })
+    const num = (v, d = 2) => Number.isFinite(Number(v))
+      ? Number(v).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d })
       : "--";
 
-    const direction = x => String(
+    const percent = v => Number.isFinite(Number(v))
+      ? `${Number(v).toFixed(2)}%`
+      : "--";
+
+    const actionDirection = x => String(
       x?.direction ||
       ((x?.action || "").toUpperCase().includes("SELL") ? "SHORT" : "LONG")
     ).toUpperCase();
 
-    const dayMap = new Map();
+    const trend = x => x?.trend_strength || x?.trend || "--";
+    const setupTime = x => x?.time || x?.generated || "--";
+    const symbol = x => x?.symbol || x?.stock || "--";
 
-    const add = (x, date) => {
-      const d = String(date || x?.date || payload?.session_date || "--");
-      if (!dayMap.has(d)) dayMap.set(d, []);
-      dayMap.get(d).push(x);
-    };
+    const days = [];
 
-    (Array.isArray(payload?.results) ? payload.results : [])
-      .forEach(x => add(x, x?.date || payload?.session_date));
+    if (Array.isArray(payload?.results) && payload.results.length) {
+      const todayDate = String(
+        payload?.session_date ||
+        payload?.results?.[0]?.session_date ||
+        new Date().toISOString().slice(0, 10)
+      );
 
-    (Array.isArray(payload?.history) ? payload.history : [])
-      .forEach(day => {
-        (Array.isArray(day?.rows) ? day.rows : [])
-          .forEach(x => add(x, day?.date || x?.date));
+      days.push({
+        date: todayDate,
+        rows: payload.results.map(x => ({
+          ...x,
+          date: todayDate,
+          session_date: todayDate,
+          historical: false
+        }))
       });
+    }
 
-    const days = [...dayMap.entries()].slice(0, 3);
+    if (Array.isArray(payload?.history)) {
+      payload.history.forEach(day => {
+        if (Array.isArray(day?.rows)) {
+          days.push({
+            date: String(day?.date || day?.rows?.[0]?.date || ""),
+            rows: day.rows
+          });
+        }
+      });
+    }
 
-    if (!days.length) {
-      body.innerHTML = '<div class="sv-fd-empty">No A1 futures setups available.</div>';
+    const unique = [];
+    const seen = new Set();
+
+    days.forEach(day => {
+      const safeDate = String(day.date || new Date().toISOString().slice(0, 10));
+      if (seen.has(safeDate)) return;
+      seen.add(safeDate);
+      unique.push({ ...day, date: safeDate });
+    });
+
+    const requested = Number(get("sv-fno-layout-range")?.value || 3);
+    const visibleDays = unique.slice(0, requested);
+
+    if (!visibleDays.length) {
+      body.innerHTML = '<div class="sv-fno-layout-empty">No F&amp;O setups available for the selected trading days.</div>';
       return;
     }
 
+    const currentStamp = payload?.updated_at || payload?.last_updated || new Date().toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+    const updatedNode = get("sv-fno-last-updated");
+    if (updatedNode) updatedNode.textContent = currentStamp;
+
     let total = 0;
+    let longCount = 0;
+    let shortCount = 0;
 
-    const sections = days.map(([date, list]) => {
-      total += list.length;
+    const sections = visibleDays.map(day => {
+      const rows = Array.isArray(day.rows) ? day.rows : [];
+      total += rows.length;
 
-      const longs = list.filter(x => direction(x) === "LONG").length;
-      const shorts = list.length - longs;
+      rows.forEach(x => actionDirection(x) === "LONG" ? longCount++ : shortCount++);
 
-      const rows = list.map(x => {
-        const dir = direction(x);
-        const buy = dir === "LONG";
-        const action = x?.action || (buy ? "STRONG BUY" : "STRONG SELL");
+      const rowsHtml = rows.map((x, i) => {
+        const dir = actionDirection(x);
+        const isLong = dir === "LONG";
+        const action = x?.action || (isLong ? "BUY" : "SELL");
+        const changeValue = x?.change_percent ?? x?.percent_change ?? x?.change ?? null;
+        const changeClass = Number(changeValue) >= 0 ? "sv-fno-layout-change-up" : "sv-fno-layout-change-down";
+        const target2 = x?.target2 ?? x?.target_2 ?? "--";
 
-        return `<tr>
-          <td>${esc(x?.time || x?.generated || "--")}</td>
-          <td><strong>${esc(x?.symbol || x?.stock || "--")}</strong></td>
-          <td>${money(x?.ltp ?? x?.price)}</td>
-          <td><span class="sv-fd-score">${esc(x?.score ?? "--")}</span></td>
-          <td>${money(x?.entry)}</td>
-          <td>${money(x?.sl ?? x?.stop_loss)}</td>
-          <td>${money(x?.target)}</td>
-          <td>${esc(x?.rr ?? "--")}</td>
-          <td><span class="${buy ? "sv-fd-buy" : "sv-fd-sell"}">${esc(action)}</span></td>
-        </tr>`;
+        return `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${esc(day.date)}</td>
+            <td class="sv-fno-layout-symbol">${esc(symbol(x))}</td>
+            <td><span class="sv-fno-layout-type ${isLong ? "sv-fno-layout-long-bg" : "sv-fno-layout-short-bg"}">${esc(dir)}</span></td>
+            <td>${num(x?.ltp ?? x?.price)}</td>
+            <td><span class="${changeClass}">${changeValue === null ? "--" : percent(changeValue)}</span></td>
+            <td>${esc(setupTime(x))}</td>
+            <td><span class="sv-fno-layout-score">${esc(x?.score ?? "--")}</span></td>
+            <td class="sv-fno-layout-trend">${esc(trend(x))}</td>
+            <td>${num(x?.entry)}</td>
+            <td>${num(x?.target ?? x?.target1)}</td>
+            <td>${num(target2)}</td>
+            <td>${num(x?.sl ?? x?.stop_loss)}</td>
+            <td>${x?.rr == null ? "--" : esc(Number.isFinite(Number(x.rr)) ? Number(x.rr).toFixed(2) : x.rr)}</td>
+            <td><span class="sv-fno-layout-view">â—‰</span></td>
+          </tr>`;
       }).join("");
 
-      return `<div class="sv-fd-day">
-        <span class="sv-fd-day-name">${esc(date)}</span>
-        <span class="sv-fd-day-count">(${list.length} ${list.length === 1 ? "setup" : "setups"})</span>
-        <span class="sv-fd-summary">${list.length} Setups &nbsp;|&nbsp; <span class="sv-fd-long">${longs} Long</span> &nbsp;|&nbsp; <span class="sv-fd-short">${shorts} Short</span></span>
-      </div>
-      <div class="sv-fd-scroll"><table>
-        <thead><tr>
-          <th>TIME</th><th>STOCK</th><th>LTP</th><th>SCORE</th>
-          <th>ENTRY</th><th>SL</th><th>TARGET</th><th>RR</th><th>ACTION</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>`;
+      const longs = rows.filter(x => actionDirection(x) === "LONG").length;
+      const shorts = rows.length - longs;
+
+      return `
+        <div class="sv-fno-layout-day">
+          <span class="sv-fno-layout-daybar"></span>
+          <span class="sv-fno-layout-day-name">${esc(day.date)}</span>
+          <span class="sv-fno-layout-day-count">(${rows.length} ${rows.length === 1 ? "setup" : "setups"})</span>
+          <span class="sv-fno-layout-day-summary">${rows.length} Setups&nbsp;&nbsp;|&nbsp;&nbsp;<span class="sv-fno-layout-long">${longs} Long</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span class="sv-fno-layout-short">${shorts} Short</span></span>
+        </div>
+        <div class="sv-fno-layout-scroll">
+          <table class="sv-fno-layout-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Date</th><th>Symbol</th><th>Type</th><th>LTP</th><th>Change %</th><th>Setup Time</th><th>Score</th><th>Trend</th><th>Entry</th><th>Target 1</th><th>Target 2</th><th>Stop Loss</th><th>R:R</th><th>View</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>`;
     }).join("");
 
-    body.innerHTML = `<div>${sections}</div>
-      <div class="sv-fd-footer">
-        <span>Showing last 3 trading days</span>
-        <span>Total ${total} setups</span>
+    body.innerHTML = `
+      ${sections}
+      <div class="sv-fno-layout-footer">
+        <span>Showing last ${visibleDays.length} trading days</span>
+        <span>${total} setups&nbsp;&nbsp;Â·&nbsp;&nbsp;${longCount} Long&nbsp;&nbsp;Â·&nbsp;&nbsp;${shortCount} Short</span>
       </div>`;
   }
+
+
   async function loadFuturesPage() {
     const page = buildFuturesPage();
 
@@ -3374,4 +3497,9 @@ async function refreshLocalMarket(){
 
   start();
 })();
+
+
+
+
+
 
