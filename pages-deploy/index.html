@@ -1,0 +1,558 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StockVersity Scanner Pro</title>
+  <meta name="theme-color" content="#07101d">
+  <style id="stockversity-css">
+:root{
+--bg:#07101d;--panel:#0b1829;--panel-alt:#0d1d30;--row:#0a1626;--border:#1c3047;--border-soft:#15283d;
+--text:#f4f7fb;--muted:#8ba0bd;--blue:#3182ff;--cyan:#18bfff;--green:#20d77a;--green-dark:#087b46;
+--red:#ff4f62;--red-dark:#8e1726;--orange:#ffad1f;--yellow:#ffd02a;--track:#172a42;--sidebar:#081523;--header:#091522
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Roboto,Arial,Helvetica,sans-serif}
+body{overflow:hidden}
+button{font:inherit}
+.app-shell{display:flex;width:100%;height:100vh;min-width:1400px}
+ .sidebar{width:263px;flex:0 0 263px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 12px}
+.brand{display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:18px;font-weight:800;padding:7px 12px 18px}.brand-copy{display:flex;flex-direction:column;line-height:1}.brand-line{display:flex;align-items:center;gap:5px}.brand-sub{font-size:8px;letter-spacing:1.5px;color:#38bff3;font-weight:800;margin-top:5px}.brand-pro{font-size:8px;font-weight:900;color:#86b7ff;background:#112844;border:1px solid #275987;border-radius:4px;padding:2px 4px}
+.brand-mark{font-size:15px;color:#dce5f2}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav-item{color:#c3cfdf;background:transparent;border:0;border-left:3px solid transparent;border-radius:7px;text-align:left;padding:12px 12px;font-size:14px;cursor:pointer}.nav-icon{width:18px;display:inline-block;text-align:center;color:#7f97b0}
+.nav-item:hover,.nav-item.active{background:#0e2034;border-left-color:var(--blue);color:#fff}
+.sidebar-bottom{margin-top:auto}.market-title{color:#4ca8ff;font-size:11px;font-weight:800;margin-bottom:5px}
+.sidebar-clock{font-size:19px;font-weight:800;margin-bottom:5px}.market-status{font-size:12px;color:#25dc7b;font-weight:700;line-height:1.5}.version{margin-top:14px;text-align:center;color:#60748d;font-size:9px}
+.main-area{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.main-header{height:84px;flex:0 0 84px;background:var(--header);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;padding:7px 12px;overflow:hidden}
+.quote-card{min-width:155px;max-width:190px;height:66px;padding:6px 9px;border-radius:7px;background:#0a1726;border:1px solid var(--border-soft);flex:0 0 auto}
+.quote-cyan{border-color:#164b69}.quote-orange{border-color:#5a4217}.quote-gold{border-color:#5a4814}
+.quote-name{font-size:11px;color:var(--muted);font-weight:800}.quote-price{font-size:21px;font-weight:800;margin-top:3px}.quote-change{font-size:11px;font-weight:800;color:var(--muted);margin-top:1px}
+.header-controls{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10px;font-weight:800}.status-dot{width:9px;height:9px;border-radius:50%;display:inline-block}.status-dot.live{background:var(--green);box-shadow:0 0 10px #20d77a66}.status-dot.offline{background:var(--red)}
+.header-controls button{border:1px solid var(--border);background:#0a1726;color:#dce5f2;width:32px;height:32px;border-radius:6px;cursor:pointer}
+.dashboard-scroll{min-height:0;flex:1;overflow:auto}.dashboard-scroll::-webkit-scrollbar{width:10px}.dashboard-scroll::-webkit-scrollbar-track{background:var(--bg)}.dashboard-scroll::-webkit-scrollbar-thumb{background:#263b55;border-radius:4px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));grid-auto-rows:minmax(250px,auto);gap:12px;padding:14px 14px 14px;min-width:1280px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 16px;min-width:0;overflow:hidden}
+.card-title{font-size:17px;font-weight:800;line-height:1.15;margin-bottom:10px}.card-title-row{display:flex;align-items:center;justify-content:space-between}.view-all{border:0;background:transparent;color:#4fb7e3;font-size:9px;font-weight:800;cursor:pointer}
+.pulse-head{display:flex;justify-content:space-between;align-items:center}.pulse-status{font-size:21px;font-weight:900}.pulse-score{font-size:16px;font-weight:800}.bullish,.green-text{color:var(--green)}.bearish,.red-text{color:var(--red)}.blue-text{color:var(--blue)}.muted{color:var(--muted)}.small{font-size:10px}
+.pulse-visual{display:flex;gap:12px;align-items:center;height:100px;margin-top:4px}.animal{flex:0 0 46%;height:92px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid #1c4c3a;background:linear-gradient(135deg,#0c3a27,#10233a)}.animal.bear{background:linear-gradient(135deg,#411e25,#10233a);border-color:#612f3a}.animal-text{font-size:18px;font-weight:900}
+.mini-chart{flex:1;height:86px;border-bottom:1px solid #18324d;background:repeating-linear-gradient(to bottom,transparent 0 25px,#18324d 26px 27px)}.mini-chart svg{width:100%;height:100%}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}.stat-box,.summary-grid>div,.oi-bottom>div{background:var(--row);border:1px solid var(--border-soft);border-radius:5px;padding:5px 6px}.stat-box span,.summary-grid span,.oi-bottom span{display:block;color:var(--muted);font-size:9px}.stat-box strong,.summary-grid strong,.oi-bottom strong{font-size:12px}
+.sector-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sector-column{background:var(--panel-alt);border:1px solid var(--green);border-radius:6px;padding:8px 10px;min-height:170px}.sector-column.bearish-col{border-color:var(--red)}
+.sector-column-title{font-size:12px;font-weight:800;color:var(--green);margin-bottom:7px}.bearish-col .sector-column-title{color:var(--red)}
+.sector-head,.mover-head,.table-head{display:grid;color:var(--muted);font-size:9px;font-weight:800}.sector-head{grid-template-columns:1.7fr 1fr .8fr}.sector-row{display:grid;grid-template-columns:1.7fr 1fr .8fr;align-items:center;gap:7px;margin:4px 0;font-size:10px}.bar{height:7px;background:var(--track);border-radius:4px;overflow:hidden}.bar>i{display:block;height:100%;border-radius:4px;background:var(--green)}.bearish-col .bar>i{background:var(--red)}
+.change-pos{color:var(--green);text-align:right;font-weight:800}.change-neg{color:var(--red);text-align:right;font-weight:800}.card-note{text-align:center;color:var(--muted);font-size:8px;margin-top:8px}
+.breadth-center{height:150px;display:flex;align-items:center;justify-content:center}.breadth-ring{width:122px;height:122px;border-radius:50%;background:conic-gradient(var(--green) var(--pct),#17324b 0deg);display:grid;place-items:center;position:relative}.breadth-ring:after{content:"";position:absolute;inset:11px;background:var(--panel);border-radius:50%}.breadth-ring div{position:relative;z-index:1;font-size:19px;font-weight:900}
+.breadth-rows{display:grid;gap:5px}.breadth-row{display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:3px 2px}.breadth-row:nth-child(1) strong{color:var(--green)}.breadth-row:nth-child(2) strong{color:var(--red)}.breadth-row:nth-child(3) strong{color:var(--muted)}
+.heatmap{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:40px;gap:5px}.heat{border-radius:5px;padding:5px;display:flex;flex-direction:column;justify-content:center;font-size:9px;border:1px solid var(--border-soft);font-weight:800}.heat small{font-size:8px;color:#dce5f2}
+.opp-head{grid-template-columns:3fr 2fr 1fr 2fr;padding:0 8px;margin-bottom:4px}.table-row{display:grid;grid-template-columns:3fr 2fr 1fr 2fr;gap:5px;background:var(--panel-alt);padding:7px 9px;border-radius:5px;margin:4px 0;font-size:11px}.table-row span:nth-child(3),.table-row span:nth-child(4){text-align:right}.signal-buy{color:var(--green);font-weight:800}.signal-sell{color:var(--red);font-weight:800}
+.donut-wrap{display:flex;justify-content:center;height:110px}.donut{width:105px;height:105px;border-radius:50%;background:conic-gradient(var(--green) var(--buy),var(--red) 0);display:grid;place-items:center;position:relative}.donut:after{content:"";position:absolute;inset:11px;background:var(--panel);border-radius:50%}.donut div{position:relative;z-index:1;font-size:21px;font-weight:800}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.summary-grid>div{text-align:center}.open-scanner{width:100%;height:30px;margin-top:8px;border:0;border-radius:5px;background:var(--blue);color:white;font-size:11px;font-weight:800;cursor:pointer}
+.movers-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mover-box{border-radius:7px;padding:7px 8px}.gainers{background:rgba(32,215,122,.05);border:1px solid var(--green-dark)}.losers{background:rgba(255,79,98,.05);border:1px solid var(--red-dark)}.sub-title{font-size:11px;font-weight:900;margin:2px 0 6px}.mover-head{grid-template-columns:2fr 1fr 1fr;background:#102235;border:1px solid #294158;border-radius:4px;padding:4px 6px}.mover-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;background:var(--panel-alt);padding:6px 7px;border-radius:5px;margin:4px 0;font-size:10px}.mover-row span:nth-child(2),.mover-row span:nth-child(3){text-align:right}
+.alert-head{grid-template-columns:1fr 2fr;padding:0 8px;margin-bottom:4px}.alerts-row{display:grid;grid-template-columns:1fr 2fr;gap:7px;background:var(--panel-alt);padding:7px 9px;border-radius:5px;margin:4px 0;font-size:11px}.alerts-row span:nth-child(2){text-align:right}
+.flow-section{padding:6px 0}.flow-head,.flow-values,.flow-net{display:flex;justify-content:space-between;align-items:center}.flow-head span,.flow-net span{font-size:11px;font-weight:800}.flow-head strong{font-size:14px}.flow-values{font-size:10px;color:var(--muted);margin-top:2px}.flow-net{margin-top:15px;padding-top:10px;border-top:1px solid var(--border-soft)}.flow-net strong{font-size:15px}
+.deriv-gauge{height:120px;position:relative;display:flex;justify-content:center}.deriv-arc{width:140px;height:70px;border:16px solid var(--track);border-bottom:0;border-radius:140px 140px 0 0;position:absolute;top:12px}.deriv-arc:before{content:"";position:absolute;left:-16px;top:-16px;width:140px;height:70px;border:16px solid transparent;border-top-color:var(--red);border-right-color:var(--yellow);border-radius:140px 140px 0 0;transform:rotate(28deg)}.deriv-arc:after{content:"";position:absolute;left:-16px;top:-16px;width:140px;height:70px;border:16px solid transparent;border-top-color:var(--green);border-left-color:var(--green);border-radius:140px 140px 0 0;transform:rotate(-22deg)}.deriv-needle{position:absolute;left:50%;top:52px;width:3px;height:55px;background:var(--text);transform-origin:50% 100%;transform:translateX(-50%) rotate(34deg);border-radius:3px}.deriv-center{position:absolute;top:72px;font-size:18px;font-weight:900}.deriv-status{text-align:center;font-size:15px;font-weight:900;margin-top:-4px;margin-bottom:4px}.deriv-stats{margin-top:5px}.deriv-stats>div{min-height:34px}
+.oi-header{display:flex;align-items:center;gap:10px}.oi-header strong{font-size:17px}.oi-header span{font-size:12px;font-weight:800}.oi-legend{margin-left:auto;display:flex;gap:10px;font-size:9px;font-weight:800}.oi-chart{width:100%;height:125px;margin-top:8px}.oi-grid line{stroke:#17304a;stroke-width:1}.oi-bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}.oi-bottom>div{text-align:center}
+.statusbar{height:24px;flex:0 0 24px;border-top:1px solid var(--border);background:#06101b;display:flex;align-items:center;justify-content:space-between;padding:0 10px;color:#5e7691;font-size:9px}
+@media(max-width:1500px){.dashboard-grid{grid-template-columns:repeat(4,minmax(245px,1fr));min-width:1160px}.quote-card{min-width:145px}.app-shell{min-width:1300px}}
+
+
+/* v3 visual fidelity pass: match the frozen desktop proportions more closely */
+.brand{justify-content:flex-start;padding-left:12px;padding-bottom:24px;gap:7px}
+.brand-copy{display:flex;flex-direction:column;line-height:1.05}.brand-main{font-size:18px;font-weight:850}.brand-sub{font-size:9px;font-weight:800;letter-spacing:1.6px;color:#31c0ff;margin-top:4px}
+.brand-pro{font-size:8px;font-weight:900;color:#7db5ff;background:#132a45;border:1px solid #1f4c77;border-radius:4px;padding:2px 4px;margin-left:2px;vertical-align:2px}
+.nav{gap:4px}.nav-item{display:flex;align-items:center;gap:9px;padding:10px 11px;font-size:14px}.nav-icon{width:18px;text-align:center;color:#8ea6c0;font-size:13px}.nav-item.active .nav-icon{color:#fff}
+.sidebar-bottom{padding:0 3px}.version{margin-top:20px;color:#5d738d}
+.main-header{gap:7px;padding:7px 10px}.quote-card{padding:6px 10px}.quote-name{font-size:11px;letter-spacing:.25px}.quote-price{font-size:21px;line-height:1.05}.quote-change{font-size:11px}
+.header-controls{gap:8px;padding-left:6px}.header-market{display:flex;flex-direction:column;gap:2px;min-width:94px}.header-market-top{display:flex;align-items:center;gap:6px}.header-market-label{font-size:10px}.header-time{font-size:10px;color:#cbd6e4}.icon-btn{font-size:14px;line-height:1}.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#10315a;border:1px solid #24558c;color:#d8eaff;font-size:10px;font-weight:900}
+.dashboard-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:250px;gap:12px;padding:12px 14px 14px;min-width:0}
+.card{border-radius:9px;padding:14px 17px}.card-title{font-size:17px;letter-spacing:.15px}.pulse-status{font-size:22px}.pulse-score{font-size:16px}
+.pulse-visual{height:104px}.animal{flex-basis:47%;height:92px}.animal-art{font-size:46px;filter:drop-shadow(0 0 10px rgba(32,215,122,.18))}.animal.bear .animal-art{filter:drop-shadow(0 0 10px rgba(255,79,98,.18))}
+.stats-row{gap:7px}.stat-box{padding:6px 7px}.stat-box span{font-size:8px}.stat-box strong{font-size:12px}
+.sector-columns{gap:14px}.sector-column{min-height:172px;padding:9px 10px}.sector-column-title{font-size:11px}.sector-row{font-size:9px;margin:5px 0}.bar{height:6px}.card-note{font-size:8px}
+.breadth-center{height:128px}.breadth-ring{width:120px;height:120px}.breadth-rows{margin-top:2px}
+.heatmap{grid-template-columns:repeat(6,1fr);grid-auto-rows:38px;gap:5px}.heat{font-size:8px;padding:4px}.heat small{font-size:7px}
+.table-row{padding:8px 9px;margin:5px 0}.opp-head{padding:0 8px}.open-scanner{height:31px}
+.movers-columns{gap:9px}.mover-box{padding:7px}.mover-head{font-size:8px}.mover-row{font-size:9px;padding:6px}
+.alerts-row{padding:8px 9px;font-size:10px}
+.flow-section{padding:7px 0}.flow-head span{font-size:10px}.flow-head strong{font-size:13px}.flow-values{font-size:9px}.flow-net span{font-size:9px}.flow-net strong{font-size:14px}
+.deriv-gauge{height:118px}.oi-chart{height:120px}.statusbar{height:25px;flex-basis:25px}
+@media(max-width:1500px){.quote-card{min-width:145px}.header-market{min-width:84px}.dashboard-grid{min-width:0}}
+
+/* v4 precision pass */
+.animal{background:linear-gradient(135deg,#0a3123 0%,#0d2232 100%);border-color:#1b4b3b;box-shadow:inset 0 0 35px rgba(32,215,122,.04)}
+.bull-mark{font-size:28px;font-weight:900;letter-spacing:1px;color:#e9fff4;text-shadow:0 0 16px rgba(32,215,122,.25)}
+.pulse-visual{height:108px}.mini-chart{height:88px}
+.breadth-center{height:136px}.breadth-ring{width:126px;height:126px;background:conic-gradient(var(--green) 0deg 35deg,#f5c536 35deg 130deg,var(--red) 130deg 180deg,#17324b 180deg 360deg);transform:rotate(180deg);border-radius:50%}.breadth-ring:after{inset:12px}.breadth-ring div{transform:rotate(-180deg)}
+.card{box-shadow:0 1px 0 rgba(255,255,255,.015),0 12px 24px rgba(0,0,0,.08)}
+@media(max-width:1500px){.app-shell{min-width:1400px}.sidebar{width:263px;flex-basis:263px}.quote-card{min-width:150px}}
+
+/* Frozen StockVersity sidebar â€” matched to the approved reference UI. */
+ .frozen-sidebar{
+  width:220px;
+  flex:0 0 220px;
+  background:#071523;
+  border-right:1px solid #20344a;
+  padding:8px 6px 6px;
+  box-sizing:border-box;
+}
+.frozen-brand{
+  height:58px;
+  background:#06101d;
+  border-bottom:1px solid #17324b;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  gap:7px;
+  box-sizing:border-box;
+}
+.frozen-brand-logo{position:relative;width:43px;height:43px;flex:0 0 43px;font-family:Roboto,Arial,Helvetica,sans-serif;font-weight:900;}
+.frozen-brand-logo .sv-s{position:absolute;left:2px;top:1px;font-size:34px;color:#fff;line-height:1;transform:skew(-8deg);}
+.frozen-brand-logo .sv-v{position:absolute;left:12px;top:7px;font-size:29px;color:#12c8ff;line-height:1;transform:skew(-12deg);}
+.frozen-brand-logo .sv-check{position:absolute;left:23px;top:8px;font-size:15px;color:#2458d9;line-height:1;}
+.frozen-brand-name{color:#fff;font-family:Roboto,Arial,Helvetica,sans-serif;font-size:17px;letter-spacing:-.3px;font-weight:800;white-space:nowrap;}
+.frozen-brand .brand-pro{margin-left:auto;font-size:8px;font-weight:900;color:#fff;background:#2864e8;border:1px solid #3c77ed;border-radius:5px;padding:2px 4px;}
+.focus-card{margin:12px 0 0;border:1px solid #b34cf3;border-radius:16px;background:linear-gradient(145deg,#314fe6 0%,#5723c8 48%,#ce2086 100%);padding:15px 14px 13px;color:#fff;box-sizing:border-box;}
+.focus-greeting{font-size:17px;font-weight:800;line-height:1.15;margin-bottom:14px;}
+.focus-greeting span{font-size:15px;}
+.focus-title{font-size:17px;font-weight:800;line-height:1.15;margin-bottom:14px;}
+.focus-accent{height:5px;border-radius:4px;background:linear-gradient(90deg,#1ad8ef 0%,#5a7cf0 45%,#ffb92b 100%);margin-bottom:11px;}
+.focus-quote{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:700;line-height:1.18;}
+.quote-mark{font-size:27px;line-height:.75;color:#6d74ef;font-weight:900;}
+.focus-divider{height:1px;background:rgba(255,255,255,.42);margin:9px 0 14px;}
+.focus-today{display:flex;gap:10px;align-items:flex-start;}
+.focus-target{font-size:19px;line-height:1;margin-top:3px;}
+.focus-label{font-size:15px;font-weight:900;color:#16d6f3;margin-bottom:4px;}
+.focus-copy{font-size:15px;line-height:1.2;font-weight:700;}
+.frozen-divider{height:2px;background:#4a9ad7;margin:16px 6px 12px;opacity:.85;}
+.frozen-nav{display:flex;flex-direction:column;gap:2px;padding:0 0 0 0;}
+ .frozen-nav-item{min-height:42px;border:0;background:transparent;color:#f1f5fb;border-radius:11px;text-align:left;padding:0 7px;display:flex;align-items:center;gap:11px;font-size:17px;font-weight:500;cursor:pointer;width:100%;}
+.frozen-nav-item:hover{background:#0d2238;}
+.frozen-nav-item.active{background:#2864e8;font-weight:800;}
+.frozen-nav-icon{width:26px;flex:0 0 26px;text-align:center;font-size:18px;line-height:1;color:#12d9ff;}
+.frozen-nav-item.active .frozen-nav-icon{color:#fff;}
+.frozen-expand b{margin-left:auto;font-size:20px;font-weight:500;color:#fff;}
+.frozen-sidebar .sidebar-bottom{margin-top:auto;padding:5px 2px 0;}
+.frozen-sidebar .version{margin-top:20px;text-align:center;color:#60748d;font-size:9px;}
+
+
+/* V11: exact compact frozen-sidebar sizing for 100% browser zoom / 150% Windows scaling */
+.frozen-sidebar{width:180px !important;flex:0 0 180px !important;padding:5px 5px 5px !important;}
+.frozen-brand{height:52px !important;padding:0 7px !important;gap:5px !important;}
+.frozen-brand-logo{width:32px !important;height:30px !important;flex:0 0 32px !important;}
+.frozen-brand-logo svg{display:block;width:32px;height:25px;}
+.frozen-brand-name{font-size:13px !important;letter-spacing:-.25px !important;}
+.frozen-brand .brand-pro{font-size:7px !important;border-radius:4px !important;padding:2px 4px !important;}
+.focus-card{margin:9px 0 0 !important;border-radius:12px !important;padding:12px 9px 10px !important;}
+.focus-greeting{font-size:13px !important;margin-bottom:11px !important;}
+.focus-greeting span{font-size:12px !important;}
+.focus-title{font-size:13px !important;margin-bottom:11px !important;}
+.focus-accent{height:4px !important;margin-bottom:9px !important;}
+.focus-quote{gap:5px !important;font-size:11px !important;line-height:1.16 !important;}
+.quote-mark{font-size:21px !important;}
+.focus-divider{margin:8px 0 11px !important;}
+.focus-today{gap:7px !important;}
+.focus-target{font-size:16px !important;}
+.focus-label{font-size:11px !important;margin-bottom:3px !important;}
+.focus-copy{font-size:11px !important;line-height:1.17 !important;}
+.frozen-divider{margin:13px 0 10px !important;height:1px !important;}
+.frozen-nav{gap:0 !important;}
+.frozen-nav-item{min-height:33px !important;padding:0 5px !important;gap:7px !important;border-radius:8px !important;font-size:11px !important;}
+.frozen-nav-icon{width:17px !important;flex-basis:17px !important;font-size:14px !important;}
+.frozen-expand b{font-size:15px !important;}
+.frozen-sidebar .sidebar-bottom{padding:3px 2px 0 !important;}
+.frozen-sidebar .market-title{font-size:8px !important;margin-bottom:3px !important;}
+.frozen-sidebar .sidebar-clock{font-size:14px !important;margin-bottom:3px !important;}
+.frozen-sidebar .market-status{font-size:9px !important;line-height:1.35 !important;}
+.frozen-sidebar .version{margin-top:12px !important;font-size:7px !important;}
+
+/* V12: frozen sidebar 1:1 scale for 100% browser zoom */
+.frozen-sidebar{width:272px !important;flex:0 0 272px !important;padding:8px 6px 6px !important;}
+.frozen-sidebar{display:flex !important;flex-direction:column !important;}
+.frozen-nav{flex:0 0 auto !important;}
+.frozen-brand{height:58px !important;padding:0 6px 7px !important;gap:0 !important;border-bottom:1px solid #19314a !important;}
+.frozen-brand-logo{width:212px !important;height:50px !important;flex:0 0 212px !important;background-image:url("data:image/png;base64,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") !important;background-repeat:no-repeat !important;background-size:212px 55px !important;background-position:center !important;}
+.frozen-brand-logo svg{display:none !important}
+.frozen-brand-name,.frozen-brand .brand-pro{display:none !important}
+.focus-card{margin:18px 0 0 !important;border-radius:20px !important;padding:22px 16px 18px !important;width:100% !important;}
+.focus-greeting{font-size:20px !important;margin-bottom:20px !important;}
+.focus-greeting span{font-size:19px !important}
+.focus-title{font-size:20px !important;margin-bottom:15px !important;}
+.focus-accent{height:4px !important;margin-bottom:12px !important;}
+.focus-quote{gap:9px !important;font-size:16px !important;line-height:1.2 !important}
+.quote-mark{font-size:31px !important}
+.focus-divider{margin:12px 0 18px !important}
+.focus-today{gap:12px !important}
+.focus-target{font-size:23px !important}
+.focus-label{font-size:16px !important;margin-bottom:6px !important}
+.focus-copy{font-size:16px !important;line-height:1.25 !important}
+.frozen-divider{margin:23px 0 17px !important;height:2px !important}
+.frozen-nav{gap:2px !important}
+.frozen-nav-item{min-height:48px !important;padding:0 12px !important;gap:11px !important;border-radius:11px !important;font-size:17px !important}
+.frozen-nav-icon{width:22px !important;flex-basis:22px !important;font-size:20px !important}
+.frozen-expand b{font-size:20px !important}
+.frozen-sidebar .sidebar-bottom{padding:6px 4px 0 !important}
+.frozen-sidebar .market-title{font-size:11px !important;margin-bottom:5px !important}
+.frozen-sidebar .sidebar-clock{font-size:18px !important;margin-bottom:4px !important}
+.frozen-sidebar .market-status{font-size:11px !important;line-height:1.45 !important}
+.frozen-sidebar .version{margin-top:22px !important;font-size:9px !important}
+
+/* V15: final proportional correction from V14 */
+.frozen-sidebar{width:210px !important;flex:0 0 210px !important;padding:7px 5px 5px !important;}
+.frozen-brand{height:50px !important;padding:0 5px 5px !important;}
+.frozen-brand-logo{width:164px !important;height:42px !important;flex:0 0 164px !important;background-size:164px 42px !important;}
+.focus-card{margin:14px 0 0 !important;border-radius:16px !important;padding:16px 12px 13px !important;}
+.focus-greeting{font-size:16px !important;margin-bottom:15px !important;}
+.focus-greeting span{font-size:15px !important}
+.focus-title{font-size:16px !important;margin-bottom:12px !important;}
+.focus-accent{height:4px !important;margin-bottom:9px !important;}
+.focus-quote{gap:7px !important;font-size:13px !important;line-height:1.18 !important}
+.quote-mark{font-size:25px !important}
+.focus-divider{margin:9px 0 13px !important}
+.focus-today{gap:9px !important}
+.focus-target{font-size:19px !important}
+.focus-label{font-size:13px !important;margin-bottom:5px !important}
+.focus-copy{font-size:13px !important;line-height:1.2 !important}
+.frozen-divider{margin:16px 0 12px !important;height:2px !important}
+.frozen-nav{gap:1px !important}
+.frozen-nav-item{min-height:37px !important;padding:0 8px !important;gap:8px !important;border-radius:9px !important;font-size:14px !important}
+.frozen-nav-icon{width:19px !important;flex-basis:19px !important;font-size:17px !important}
+.frozen-expand b{font-size:17px !important}
+.frozen-sidebar .sidebar-bottom{padding:4px 3px 0 !important}
+.frozen-sidebar .market-title{font-size:9px !important;margin-bottom:3px !important}
+.frozen-sidebar .sidebar-clock{font-size:15px !important;margin-bottom:3px !important}
+.frozen-sidebar .market-status{font-size:9px !important;line-height:1.35 !important}
+.frozen-sidebar .version{margin-top:16px !important;font-size:8px !important}
+
+
+/* V17: restore frozen sidebar proportions without touching dashboard/header structure */
+.frozen-sidebar{width:272px !important;flex:0 0 272px !important;padding:8px 6px 6px !important;}
+.frozen-brand{height:64px !important;padding:0 6px 7px !important;gap:0 !important;}
+.frozen-brand-logo{width:236px !important;height:56px !important;flex:0 0 236px !important;background-size:236px 61px !important;background-position:center !important;}
+.focus-card{margin:14px 0 0 !important;border-radius:16px !important;padding:18px 14px 15px !important;}
+.focus-greeting{font-size:18px !important;margin-bottom:17px !important;}
+.focus-greeting span{font-size:17px !important}
+.focus-title{font-size:18px !important;margin-bottom:13px !important;}
+.focus-accent{height:4px !important;margin-bottom:10px !important;}
+.focus-quote{gap:8px !important;font-size:15px !important;line-height:1.18 !important}
+.quote-mark{font-size:28px !important}
+.focus-divider{margin:10px 0 15px !important}
+.focus-today{gap:10px !important}
+.focus-target{font-size:21px !important}
+.focus-label{font-size:15px !important;margin-bottom:5px !important}
+.focus-copy{font-size:15px !important;line-height:1.2 !important}
+.frozen-divider{margin:18px 4px 14px !important;height:2px !important}
+.frozen-nav{gap:2px !important}
+.frozen-nav-item{min-height:44px !important;padding:0 9px !important;gap:10px !important;border-radius:10px !important;font-size:16px !important;}
+.frozen-nav-icon{width:22px !important;flex-basis:22px !important;font-size:19px !important}
+.frozen-expand b{font-size:19px !important}
+.frozen-sidebar .sidebar-bottom{padding:5px 3px 0 !important}
+.frozen-sidebar .market-title{font-size:10px !important;margin-bottom:4px !important}
+.frozen-sidebar .sidebar-clock{font-size:17px !important;margin-bottom:3px !important}
+.frozen-sidebar .market-status{font-size:10px !important;line-height:1.4 !important}
+.frozen-sidebar .version{margin-top:18px !important;font-size:8px !important}
+
+/* Preserve full-size market ticker cards; only sidebar is being corrected. */
+.main-header{height:84px !important;flex:0 0 84px !important;padding:7px 12px !important;gap:8px !important;}
+.quote-card{min-width:180px !important;max-width:200px !important;height:66px !important;padding:6px 10px !important;}
+.quote-name{font-size:10px !important;}
+.quote-price{font-size:17px !important;line-height:1.05 !important;}
+.quote-change{font-size:10px !important;}
+
+/* V20: keep frozen sidebar scrollbar subtle, thin, and visually continuous with the sidebar. */
+.frozen-sidebar{scrollbar-width:thin;scrollbar-color:#0f1d2d transparent;}
+.frozen-sidebar::-webkit-scrollbar{width:5px;}
+.frozen-sidebar::-webkit-scrollbar-track{background:transparent;}
+.frozen-sidebar::-webkit-scrollbar-thumb{background:#0f1d2d;border-radius:999px;}
+.frozen-sidebar::-webkit-scrollbar-thumb:hover{background:#14263a;}
+
+/* V18: keep frozen sidebar bottom status fully visible without changing upper sidebar proportions. */
+.frozen-sidebar{position:relative !important;overflow-y:auto !important;overflow-x:hidden !important;}
+.frozen-sidebar .sidebar-bottom{position:static !important;left:auto !important;right:auto !important;bottom:auto !important;margin-top:16px !important;padding:0 3px 8px !important;flex:0 0 auto !important;}
+.frozen-sidebar .version{margin-top:10px !important;}
+
+/* V21: freeze logo + focus card + divider + Dashboard; scroll the remaining sidebar menu. */
+.sidebar-fixed-top{position:sticky;top:0;z-index:30;background:var(--sidebar);}
+.frozen-nav-fixed{margin-bottom:2px;}
+.frozen-nav-scroll{padding-bottom:8px;}
+
+/* V23: match frozen right-side dashboard composition without changing sidebar/header. */
+.dashboard-grid{
+  grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  grid-auto-rows:320px !important;
+  gap:12px !important;
+  padding:10px 14px 14px !important;
+}
+.market-pulse-card{grid-column:span 4 !important;grid-row:1 !important;}
+.sector-strength-card{grid-column:span 8 !important;grid-row:1 !important;}
+.market-breadth-card,.market-heatmap-card,.scanner-summary-card,.live-alerts-card{display:none !important;}
+.sector-advance-card{grid-column:span 5 !important;grid-row:2 !important;}
+.opportunities-card{grid-column:span 7 !important;grid-row:2 !important;}
+.top-movers-card{grid-column:span 8 !important;grid-row:3 !important;}
+.institutional-flow-card{grid-column:span 4 !important;grid-row:3 !important;}
+.derivatives-card{grid-column:span 4 !important;grid-row:4 !important;}
+.nifty-oi-card{grid-column:span 8 !important;grid-row:4 !important;}
+.sector-advance-list{display:grid;gap:6px;margin-top:2px;}
+.sector-advance-row{display:grid;grid-template-columns:68px 1.55fr 1.9fr;align-items:center;gap:12px;background:#071523;padding:10px 9px;border-radius:2px;min-height:40px;}
+.sector-advance-row strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sector-advance-row>i{height:12px;background:#18314b;border-radius:8px;overflow:hidden;display:block;}
+.sector-advance-row>i>b{height:100%;display:block;border-radius:8px;background:linear-gradient(90deg,#58c7ff,#1c344e);}
+.adv-score{font-size:14px;font-weight:900;}.score-blue{color:#35b6ff}.score-red{color:#ff5574}.score-green{color:#48e878}.score-orange{color:#ffb52b}.score-purple{color:#7277ff}
+.market-pulse-card .card-title,.sector-strength-card .card-title,.sector-advance-card .card-title,.opportunities-card .card-title,.top-movers-card .card-title,.institutional-flow-card .card-title,.derivatives-card .card-title,.nifty-oi-card .card-title{font-size:17px !important;}
+.market-pulse-card .pulse-visual{height:170px !important}.market-pulse-card .animal{height:150px !important}.market-pulse-card .mini-chart{height:132px !important}.market-pulse-card .stats-row{margin-top:10px !important}.market-pulse-card .stat-box{padding:8px !important}.market-pulse-card .stat-box strong{font-size:14px !important}.market-pulse-card .stat-box span{font-size:10px !important}.market-pulse-card .bull-mark{font-size:34px !important}
+.sector-strength-card .sector-columns{gap:18px !important}.sector-strength-card .sector-column{min-height:224px !important;padding:10px 12px !important}.sector-strength-card .sector-column-title{font-size:14px !important}.sector-strength-card .sector-row{font-size:13px !important;margin:7px 0 !important}.sector-strength-card .sector-head{font-size:10px !important}.sector-strength-card .bar{height:8px !important}.sector-strength-card .card-note{font-size:9px !important;margin-top:9px !important}
+.opportunities-card .table-row{font-size:13px !important;padding:10px 10px !important;margin:5px 0 !important}.opportunities-card .opp-head{font-size:10px !important}
+.top-movers-card .mover-head{font-size:10px !important;padding:6px 8px !important}.top-movers-card .mover-row{font-size:13px !important;padding:8px 10px !important}.top-movers-card .sub-title{font-size:13px !important}
+.institutional-flow-card .flow-head span{font-size:13px !important}.institutional-flow-card .flow-head strong{font-size:17px !important}.institutional-flow-card .flow-values{font-size:12px !important}.institutional-flow-card .flow-net span{font-size:13px !important}.institutional-flow-card .flow-net strong{font-size:17px !important}
+.derivatives-card .deriv-gauge{height:150px !important}.derivatives-card .deriv-arc{transform:scale(1.18)}.derivatives-card .deriv-needle{transform:translateX(-50%) rotate(34deg) scaleY(1.18);}.derivatives-card .deriv-status{font-size:17px !important}.derivatives-card .summary-grid strong{font-size:13px !important}
+.nifty-oi-card .oi-header strong{font-size:21px !important}.nifty-oi-card .oi-header span{font-size:13px !important}.nifty-oi-card .oi-chart{height:175px !important}.nifty-oi-card .oi-bottom>div{padding:8px !important}.nifty-oi-card .oi-bottom strong{font-size:14px !important}
+</style>
+
+<style id="v31-header-sizing">
+/* V31: match the frozen header card proportions from the reference. */
+.main-header{gap:6px !important;padding-left:4px !important;padding-right:4px !important;}
+.quote-card{border:none !important;min-width:150px !important;max-width:150px !important;width:150px !important;margin:0 !important;box-sizing:border-box !important;}
+.quote-name{font-size:13px !important;line-height:1.1 !important;font-weight:800 !important;color:#dce5f2 !important;letter-spacing:0 !important;}
+.quote-price{font-size:21px !important;line-height:1.05 !important;font-weight:800 !important;}
+.quote-change{font-size:10px !important;font-weight:800 !important;}
+</style>
+<style id="sv-institutional-card-style">
+.sv-institutional-card{box-sizing:border-box;min-width:0;width:100%;height:100%;padding:16px 18px;border:1px solid var(--border);border-radius:9px;background:var(--card);color:var(--text);overflow:hidden}
+.sv-if-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.sv-if-title span:first-child{font-size:13px;font-weight:900;letter-spacing:.2px}
+.sv-if-title span:last-child{font-size:10px;color:var(--muted);white-space:nowrap}
+.sv-if-block{padding:9px 0 11px}
+.sv-if-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sv-if-head span{font-size:12px;font-weight:900}
+.sv-if-head strong{font-size:14px;font-weight:900}
+.sv-if-values{display:flex;justify-content:space-between;gap:12px;margin-top:5px;font-size:10px;color:var(--muted)}
+.sv-if-total{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:11px;border-top:1px solid var(--border-soft)}
+.sv-if-total span{font-size:10px;font-weight:900}
+.sv-if-total strong{font-size:15px;font-weight:900}
+</style></head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar frozen-sidebar">
+    <div class="sidebar-fixed-top">
+    <div class="frozen-brand">
+      <div class="frozen-brand-logo" aria-label="StockVersity logo">
+        <svg viewBox="0 0 52 40" role="img" aria-hidden="true">
+          <path d="M5 9c3-6 13-9 20-6 7 3 9 8 7 13-2 5-8 8-15 7-4-1-7-3-10-5" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round"/>
+          <path d="M14 28l9-15 7 8 10-14" fill="none" stroke="#12c8ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M38 7l3 0-1 4" fill="none" stroke="#2458d9" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M8 34c9 4 24 4 34-2" fill="none" stroke="#2458d9" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="frozen-brand-name">STOCKVERSITY</div>
+      <span class="brand-pro">PRO</span>
+    </div>
+
+    <div class="focus-card">
+      <div class="focus-greeting">Hello, Rajesh! <span>ðŸ‘‹</span></div>
+      <div class="focus-title">Today's Market Focus</div>
+      <div class="focus-accent"></div>
+      <div class="focus-quote"><span class="quote-mark">â€œ</span><div><div>No setup?</div><div>No trade.</div></div></div>
+      <div class="focus-divider"></div>
+      <div class="focus-today"><div class="focus-target">ðŸŽ¯</div><div><div class="focus-label">Focus for Today:</div><div class="focus-copy">Cash is a position.<br>Wait patiently until<br>the market offers<br>an edge.</div></div></div>
+    </div>
+
+    <div class="frozen-divider"></div>
+
+    <nav class="frozen-nav frozen-nav-fixed">
+      <button class="frozen-nav-item active"><span class="frozen-nav-icon">âŒ‚</span><span>Dashboard</span></button>
+    </nav>
+    </div>
+
+    <nav class="frozen-nav frozen-nav-scroll">
+      <button class="frozen-nav-item"><span class="frozen-nav-icon">â—‰</span><span>Sector Rotation</span></button>
+      <button class="frozen-nav-item frozen-expand"><span class="frozen-nav-icon">âŒ•</span><span>Intraday Scanner</span><b>+</b></button>
+      <button class="frozen-nav-item frozen-expand"><span class="frozen-nav-icon">â—Ž</span><span>Stocks</span><b>+</b></button>
+      <button class="frozen-nav-item frozen-expand"><span class="frozen-nav-icon">â–¥</span><span>Future &amp; Options</span><b>+</b></button>
+      <button class="frozen-nav-item"><span class="frozen-nav-icon">â‚¿</span><span>Crypto &amp; Gold</span></button>
+      <button class="frozen-nav-item"><span class="frozen-nav-icon">â–£</span><span>Mutual Funds&nbsp; ETFs</span></button>
+      <button class="frozen-nav-item"><span class="frozen-nav-icon">â–¤</span><span>News</span></button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="market-title">MARKET TIME</div>
+      <div id="clock" class="sidebar-clock">--:--:--</div>
+      <div id="market-status" class="market-status">NSE &nbsp; â— OPEN<br>BSE &nbsp; â— OPEN</div>
+      <div class="version">StockVersity Scanner Pro</div>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="main-header">
+      <div class="quote-card"><div class="quote-name">NIFTY 50</div><div id="nifty-price" class="quote-price">--</div><div id="nifty-change" class="quote-change">--</div></div>
+      <div class="quote-card"><div class="quote-name">BANK NIFTY</div><div id="banknifty-price" class="quote-price">--</div><div id="banknifty-change" class="quote-change">--</div></div>
+      <div class="quote-card"><div class="quote-name">INDIA VIX</div><div id="vix-price" class="quote-price">--</div><div id="vix-change" class="quote-change">--</div></div>
+      <div class="quote-card quote-cyan"><div class="quote-name">GIFT NIFTY</div><div id="gift-price" class="quote-price">--</div><div id="gift-change" class="quote-change">--</div></div>
+      <div class="quote-card quote-orange"><div class="quote-name">BTC / USD</div><div id="btc-price" class="quote-price">$--</div><div id="btc-change" class="quote-change">--</div></div>
+      <div class="quote-card quote-gold"><div class="quote-name">GOLD / USD</div><div id="gold-price" class="quote-price">$--</div><div id="gold-change" class="quote-change">--</div></div>
+      <div class="header-controls">
+        <div class="header-market"><div class="header-market-top"><span id="connection-dot" class="status-dot offline"></span><span id="connection-text" class="header-market-label">API OFFLINE</span></div><span id="header-time" class="header-time">--:--:-- IST</span></div>
+        <button class="icon-btn" aria-label="Theme">â˜¼</button>
+        <button class="icon-btn" aria-label="Notifications">â—‰</button>
+        <button class="icon-btn" aria-label="Settings">âš™</button>
+        <div class="avatar">RR</div>
+        <button id="refresh-btn" aria-label="Refresh">â†»</button>
+      </div>
+    </header>
+
+    <section class="dashboard-scroll">
+      <div class="dashboard-grid">
+
+        <!-- ROW 1: Market Pulse / Sector Strength / Market Breadth / Market Heatmap -->
+        <section class="card market-pulse-card">
+          <div class="card-title">MARKET PULSE</div>
+          <div class="pulse-head"><div id="pulse-status" class="pulse-status bullish">BULLISH</div><div id="pulse-score" class="pulse-score bullish">78 / 100</div></div>
+          <div class="pulse-visual">
+            <div id="market-animal" class="animal bull"><div class="animal-art"><div class="bull-mark">BULL</div></div></div>
+            <div class="mini-chart"><svg viewBox="0 0 300 90" preserveAspectRatio="none"><polyline id="pulse-line" points="0,62 35,48 60,52 95,34 120,40 150,21 180,30 210,14 240,20 270,8 300,14" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box"><span>Momentum</span><strong id="pulse-momentum">Strong</strong></div>
+            <div class="stat-box"><span>Trend</span><strong id="pulse-trend">Positive</strong></div>
+            <div class="stat-box"><span>Volatility</span><strong id="pulse-volatility" class="blue-text">Low</strong></div>
+            <div class="stat-box"><span>Breadth</span><strong id="pulse-breadth">Healthy</strong></div>
+          </div>
+        </section>
+
+        <section class="card sector-strength-card">
+          <div class="card-title">TODAY SECTOR STRENGTH</div>
+          <div class="sector-columns">
+            <div class="sector-column">
+              <div class="sector-column-title">TOP 5 BULLISH SECTORS</div>
+              <div class="sector-head"><span>SECTOR</span><span>STRENGTH</span><span>CHANGE</span></div>
+              <div id="bullish-sectors"></div>
+            </div>
+            <div class="sector-column bearish-col">
+              <div class="sector-column-title">TOP 5 BEARISH SECTORS</div>
+              <div class="sector-head"><span>SECTOR</span><span>STRENGTH</span><span>CHANGE</span></div>
+              <div id="bearish-sectors"></div>
+            </div>
+          </div>
+          <div class="card-note">Strength is based on live % change of NSE sectoral indices.</div>
+        </section>
+
+        <section class="card market-breadth-card">
+          <div class="card-title">MARKET BREADTH</div>
+          <div class="breadth-center">
+            <div id="breadth-ring" class="breadth-ring" style="--pct:0deg"><div id="breadth-value">0%</div></div>
+          </div>
+          <div class="breadth-rows">
+            <div class="breadth-row"><span>ADVANCES</span><strong id="advances">--</strong></div>
+            <div class="breadth-row"><span>DECLINES</span><strong id="declines">--</strong></div>
+            <div class="breadth-row"><span>UNCHANGED</span><strong id="unchanged">--</strong></div>
+          </div>
+        </section>
+
+        <section class="card market-heatmap-card">
+          <div class="card-title">MARKET HEATMAP</div>
+          <div id="heatmap" class="heatmap"></div>
+          <div class="card-note">Live NIFTY 500 heatmap-ready market view.</div>
+        </section>
+
+        <!-- ROW 2: Sector Advance / Top Opportunities -->
+        <section class="card sector-advance-card">
+          <div class="card-title">SECTOR ADVANCE</div>
+          <div class="sector-advance-list">
+            <div class="sector-advance-row"><span class="adv-score score-blue">66.67</span><strong>Aerospace &amp; Defence</strong><i><b style="width:72%"></b></i></div>
+            <div class="sector-advance-row"><span class="adv-score score-red">56.38</span><strong>Consumer discretionary</strong><i><b style="width:58%"></b></i></div>
+            <div class="sector-advance-row"><span class="adv-score score-green">45.54</span><strong>Auto</strong><i><b style="width:48%"></b></i></div>
+            <div class="sector-advance-row"><span class="adv-score score-orange">41.67</span><strong>FMCG</strong><i><b style="width:42%"></b></i></div>
+            <div class="sector-advance-row"><span class="adv-score score-purple">33.33</span><strong>Telecom-service</strong><i><b style="width:34%"></b></i></div>
+          </div>
+        </section>
+
+        <!-- ROW 2: Top Opportunities / Scanner Summary / Top Movers / Live Scanner Alerts -->
+        <section class="card opportunities-card">
+          <div class="card-title-row"><div class="card-title">TOP OPPORTUNITIES</div><button class="view-all">VIEW ALL  â†’</button></div>
+          <div class="table-head opp-head"><span>STOCK</span><span>SIGNAL</span><span>SCORE</span><span>PRICE</span></div>
+          <div id="opportunities"></div>
+        </section>
+
+        <section class="card scanner-summary-card">
+          <div class="card-title">SCANNER SUMMARY</div>
+          <div class="donut-wrap"><div id="donut" class="donut" style="--buy:0deg"><div id="donut-total">0</div></div></div>
+          <div class="summary-grid">
+            <div><span>BUY</span><strong id="summary-buy" class="green-text">0</strong></div>
+            <div><span>SELL</span><strong id="summary-sell" class="red-text">0</strong></div>
+            <div><span>AVG</span><strong id="summary-avg" class="blue-text">0</strong></div>
+          </div>
+          <button class="open-scanner">OPEN SCANNER</button>
+        </section>
+
+        <section class="card top-movers-card">
+          <div class="card-title">TOP MOVERS</div>
+          <div class="movers-columns">
+            <div class="mover-box gainers">
+              <div class="sub-title green-text">F&amp;O TOP GAINERS</div>
+              <div class="mover-head"><span>STOCK</span><span>LTP</span><span>% CHANGE</span></div>
+              <div id="gainers"></div>
+            </div>
+            <div class="mover-box losers">
+              <div class="sub-title red-text">F&amp;O TOP LOSERS</div>
+              <div class="mover-head"><span>STOCK</span><span>LTP</span><span>% CHANGE</span></div>
+              <div id="losers"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card live-alerts-card">
+          <div class="card-title">LIVE SCANNER ALERTS</div>
+          <div class="table-head alert-head"><span>SYMBOL</span><span>TRIGGER</span></div>
+          <div id="alerts"></div>
+        </section>
+
+        <!-- ROW 3: Institutional Flow / Derivatives Pulse / NIFTY OI Chart -->
+                <section class="sv-institutional-card">
+          <div class="sv-if-title"><span>INSTITUTIONAL FLOW</span><span id="institutional-date">04 Sep 2026</span></div>
+          <div class="sv-if-block">
+            <div class="sv-if-head"><span>FII</span><strong id="fii-net">-₹3,111.94 Cr</strong></div>
+            <div class="sv-if-values"><span id="fii-buy">BUY ₹13,857.58 Cr</span><span id="fii-sell">SELL ₹16,969.52 Cr</span></div>
+          </div>
+          <div class="sv-if-block">
+            <div class="sv-if-head"><span>DII</span><strong id="dii-net">+₹8,930.12 Cr</strong></div>
+            <div class="sv-if-values"><span id="dii-buy">BUY ₹19,254.19 Cr</span><span id="dii-sell">SELL ₹10,324.07 Cr</span></div>
+          </div>
+          <div class="sv-if-total"><span>NET INSTITUTIONAL FLOW</span><strong id="institutional-net">+₹5,818.18 Cr</strong></div>
+        </section><section class="card derivatives-card">
+          <div class="card-title">DERIVATIVES PULSE</div>
+          <div class="deriv-gauge"><div class="deriv-arc" id="deriv-arc"></div><div class="deriv-needle" id="deriv-needle"></div><div class="deriv-center">72%</div></div>
+          <div class="deriv-status green-text">BULLISH</div>
+          <div class="summary-grid deriv-stats">
+            <div><span>PCR</span><strong class="green-text">1.18</strong></div>
+            <div><span>MAX PAIN</span><strong class="blue-text">25,500</strong></div>
+            <div><span>FUT OI</span><strong class="green-text">+4.2%</strong></div>
+            <div><span>VIX</span><strong class="green-text">12.42</strong></div>
+          </div>
+        </section>
+
+        <section class="card nifty-oi-card">
+          <div class="card-title">NIFTY OI CHART</div>
+          <div class="oi-header"><strong>25,488.90</strong><span class="green-text">+0.97%</span><div class="oi-legend"><span class="green-text">CALL OI</span><span class="red-text">PUT OI</span><span class="blue-text">PRICE</span></div></div>
+          <svg class="oi-chart" viewBox="0 0 500 150" preserveAspectRatio="none">
+            <g class="oi-grid">
+              <line x1="0" y1="20" x2="500" y2="20"/><line x1="0" y1="60" x2="500" y2="60"/><line x1="0" y1="100" x2="500" y2="100"/><line x1="0" y1="140" x2="500" y2="140"/>
+            </g>
+            <g id="oi-bars"></g>
+            <polyline points="15,106 58,96 101,84 144,75 187,62 230,57 273,52 316,55 359,46 402,36 445,28 485,20" fill="none" stroke="var(--blue)" stroke-width="3"/>
+          </svg>
+          <div class="oi-bottom"><div><span>CALL WALL</span><strong class="red-text">25,600</strong></div><div><span>MAX PAIN</span><strong class="blue-text">25,500</strong></div><div><span>PUT WALL</span><strong class="green-text">25,300</strong></div></div>
+        </section>
+
+      </div>
+    </section>
+
+    <footer class="statusbar"><span>StockVersity Scanner Pro</span><span>Live market dashboard</span><span id="last-updated">Last update: --</span></footer>
+  </main>
+</div>
+<script src="/app.js?v=fno-20260922"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"66edc992a9384b8fa4b80ae13157a628","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
+
