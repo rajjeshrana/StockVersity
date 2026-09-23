@@ -1083,8 +1083,8 @@ async function refreshLocalMarket(){
       console.error("[LOCAL MARKET DIRECT BIND]", error);
     }
   }
-  refreshLocalMarket();
-  window.setInterval(refreshLocalMarket, 3000);
+  // DIRECT LOCAL HEADER OVERRIDE DISABLED
+  // Existing StockVersity header binding remains the sole header updater.
 })();
 
 // ============================================================
