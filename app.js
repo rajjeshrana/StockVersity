@@ -1,4 +1,4 @@
-﻿const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 const API_BASE = window.STOCKVERSITY_API_BASE || "https://api.stockversity.in";
 const MARKET_URL = `${API_BASE}/api/market`;
 const FUTURES_URL = "/api/futures";
@@ -1185,142 +1185,100 @@ async function refreshLocalMarket(){
   };
 
   function buildFuturesPage() {
-    let page = get(FO_PAGE_ID);
-    if (page) return page;
+    let page=get(FO_PAGE_ID);
+    if(page) return page;
 
-    if (!document.getElementById("sv-fno-frozen-layout-style")) {
-      const style = document.createElement("style");
-      style.id = "sv-fno-frozen-layout-style";
-      style.textContent = `
-#sv-futures-page{padding:0 0 28px!important;color:#eaf2f8}
-#sv-futures-page .sv-fno-layout-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:10px}
-#sv-futures-page .sv-fno-layout-title{margin:0;font-size:24px;line-height:1.15;font-weight:800;color:#f4f7fb}
-#sv-futures-page .sv-fno-layout-sub{margin:5px 0 0;color:#8fa3b6;font-size:10px}
-#sv-futures-page .sv-fno-layout-actions{display:flex;align-items:center;gap:10px}
-#sv-futures-page .sv-fno-layout-tabs{display:flex;border:1px solid rgba(119,157,193,.18);background:rgba(8,24,40,.82);border-radius:6px;overflow:hidden}
-#sv-futures-page .sv-fno-layout-tab{border:0;background:transparent;color:#b3c2d0;padding:8px 24px;font-size:10px;font-weight:800;cursor:pointer}
-#sv-futures-page .sv-fno-layout-tab.active{background:#12c98b;color:#061a16}
-#sv-futures-page .sv-fno-layout-range{height:34px;padding:0 11px;border:1px solid rgba(119,157,193,.18);border-radius:6px;background:#0a2035;color:#d9e5ee;font-size:10px;font-weight:700}
-#sv-futures-page .sv-fno-layout-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid rgba(119,157,193,.16);background:rgba(8,23,38,.76);border-radius:6px;overflow:hidden;margin-bottom:14px}
-#sv-futures-page .sv-fno-layout-info-box{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:42px;border-right:1px solid rgba(119,157,193,.12)}
-#sv-futures-page .sv-fno-layout-info-box:last-child{border-right:0}
-#sv-futures-page .sv-fno-layout-icon{width:24px;height:24px;border-radius:5px;display:grid;place-items:center;background:#102b45;color:#a8c4db;font-size:12px;font-weight:800}
-#sv-futures-page .sv-fno-layout-label{font-size:8px;color:#73899c;margin-bottom:2px}
-#sv-futures-page .sv-fno-layout-value{font-size:9px;color:#dce7ef;font-weight:700;white-space:nowrap}
-#sv-futures-page .sv-fno-layout-card{border:1px solid rgba(119,157,193,.16);background:rgba(7,21,35,.82);border-radius:7px;overflow:hidden}
-#sv-futures-page .sv-fno-layout-card-head{display:flex;align-items:center;gap:10px;padding:10px 11px;border-bottom:1px solid rgba(119,157,193,.12)}
-#sv-futures-page .sv-fno-layout-card-icon{color:#a4c6e4;font-size:12px}
-#sv-futures-page .sv-fno-layout-card-title{font-size:12px;font-weight:800;color:#eef5fa}
-#sv-futures-page .sv-fno-layout-search{margin-left:auto;width:150px;height:28px;border:1px solid rgba(119,157,193,.15);border-radius:5px;background:#0a1d30;color:#dce7ef;padding:0 10px;font-size:9px;outline:none}
-#sv-futures-page .sv-fno-layout-search::placeholder{color:#6f869b}
-#sv-futures-page .sv-fno-layout-day{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid rgba(119,157,193,.10);background:rgba(9,29,46,.78)}
-#sv-futures-page .sv-fno-layout-daybar{width:3px;height:20px;border-radius:2px;background:#13d995}
-#sv-futures-page .sv-fno-layout-day:nth-of-type(4n) .sv-fno-layout-daybar{background:#b7e33f}
-#sv-futures-page .sv-fno-layout-day-name{font-size:10px;font-weight:800;color:#eaf2f8}
-#sv-futures-page .sv-fno-layout-day-count{font-size:9px;color:#8298aa}
-#sv-futures-page .sv-fno-layout-day-summary{margin-left:auto;font-size:9px;color:#a0b2c2}
-#sv-futures-page .sv-fno-layout-long{color:#16d394}.sv-fno-layout-short{color:#ff5d6c}
-#sv-futures-page .sv-fno-layout-scroll{overflow-x:auto}
-#sv-futures-page .sv-fno-layout-table{width:100%;min-width:1060px;border-collapse:collapse;table-layout:auto}
-#sv-futures-page .sv-fno-layout-table th{height:30px;padding:0 8px;background:rgba(8,26,42,.95);border-bottom:1px solid rgba(119,157,193,.12);color:#748ca0;font-size:7px;letter-spacing:.35px;font-weight:800;white-space:nowrap;text-align:left}
-#sv-futures-page .sv-fno-layout-table td{height:34px;padding:0 8px;border-bottom:1px solid rgba(119,157,193,.08);color:#dce7ef;font-size:8px;white-space:nowrap}
-#sv-futures-page .sv-fno-layout-table tr:hover td{background:rgba(20,57,80,.16)}
-#sv-futures-page .sv-fno-layout-symbol{font-weight:800;color:#f4f8fb}
-#sv-futures-page .sv-fno-layout-type{display:inline-flex;padding:3px 6px;border-radius:4px;font-size:7px;font-weight:800}
-#sv-futures-page .sv-fno-layout-long-bg{background:rgba(18,201,139,.16);color:#28dc9e}
-#sv-futures-page .sv-fno-layout-short-bg{background:rgba(255,90,105,.16);color:#ff6d79}
-#sv-futures-page .sv-fno-layout-score{display:inline-flex;min-width:22px;justify-content:center;padding:3px 5px;border-radius:4px;background:#12c98b;color:#062017;font-weight:900}
-#sv-futures-page .sv-fno-layout-trend{color:#13dc96}
-#sv-futures-page .sv-fno-layout-change-up{color:#19d994}
-#sv-futures-page .sv-fno-layout-change-down{color:#ff626f}
-#sv-futures-page .sv-fno-layout-view{color:#72aefe;font-size:12px}
-#sv-futures-page .sv-fno-layout-empty{padding:42px 12px;text-align:center;color:#7d92a5;font-size:10px}
-#sv-futures-page .sv-fno-layout-footer{display:flex;justify-content:space-between;padding:9px 11px;color:#60788c;font-size:8px}
-@media(max-width:900px){#sv-futures-page .sv-fno-layout-info{grid-template-columns:repeat(2,minmax(0,1fr))}#sv-futures-page .sv-fno-layout-info-box:nth-child(2){border-right:0}#sv-futures-page .sv-fno-layout-info-box{border-bottom:1px solid rgba(119,157,193,.12)}#sv-futures-page .sv-fno-layout-head{align-items:flex-start;flex-direction:column}}
+    const STYLE_ID = "sv-fno-9col-final-style";
+    if(!document.getElementById(STYLE_ID)){
+      const style=document.createElement("style");
+      style.id=STYLE_ID;
+      style.textContent=`
+#sv-futures-page{padding:0 10px 34px!important;color:#eef4f8}
+#sv-futures-page .sv-fd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:18px}
+#sv-futures-page .sv-fd-title{margin:0;font-size:30px;line-height:1.15;font-weight:800;letter-spacing:-.2px}
+#sv-futures-page .sv-fd-sub{margin:8px 0 0;color:#9aabba;font-size:14px;font-weight:600}
+#sv-futures-page .sv-fd-tabs{display:flex;border:1px solid rgba(120,160,200,.22);background:rgba(8,22,36,.76);border-radius:9px;overflow:hidden}
+#sv-futures-page .sv-fd-tab{border:0;background:transparent;color:#b8c5d4;padding:12px 34px;font-size:14px;font-weight:800;cursor:pointer}
+#sv-futures-page .sv-fd-tab.active{background:#12c98b;color:#06151e}
+#sv-futures-page .sv-fd-card{border:1px solid rgba(120,160,200,.18);background:rgba(8,22,36,.76);border-radius:10px;overflow:hidden}
+#sv-futures-page .sv-fd-card-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(120,160,200,.14)}
+#sv-futures-page .sv-fd-card-title{font-size:18px;font-weight:800}
+#sv-futures-page .sv-fd-live{margin-left:auto;color:#16d28d;font-size:12px;font-weight:800}
+#sv-futures-page .sv-fd-search{width:180px;border:1px solid rgba(120,160,200,.20);background:#0c1d2f;color:#e8f0f5;border-radius:7px;padding:8px 10px;font-size:12px;outline:none}
+#sv-futures-page .sv-fd-refresh{border:1px solid rgba(120,160,200,.22);background:#102235;color:#dce8f2;border-radius:7px;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer}
+#sv-futures-page .sv-fd-scroll{overflow:auto}
+#sv-futures-page table{width:100%;min-width:980px;border-collapse:collapse}
+#sv-futures-page th{padding:13px 12px;text-align:left;background:rgba(13,31,48,.94);color:#91a5b7;font-size:12px;font-weight:800;letter-spacing:.35px;white-space:nowrap}
+#sv-futures-page td{padding:15px 12px;border-top:1px solid rgba(120,160,200,.10);color:#e5edf3;font-size:14px;line-height:1.35;white-space:nowrap}
+#sv-futures-page tbody tr:hover td{background:rgba(20,42,62,.34)}
+#sv-futures-page .sv-fd-stock{font-weight:800;color:#f3f7fa}
+#sv-futures-page .sv-fd-day{display:flex;align-items:center;gap:9px;padding:14px 16px;background:rgba(7,18,30,.96);border-top:1px solid rgba(120,160,200,.13);border-bottom:1px solid rgba(120,160,200,.10)}
+#sv-futures-page .sv-fd-day:before{content:"";width:4px;height:30px;border-radius:3px;background:#12c98b}
+#sv-futures-page .sv-fd-day-name{font-size:16px;font-weight:800;color:#f1f5f8}
+#sv-futures-page .sv-fd-day-count{color:#93a5b6;font-size:13px}
+#sv-futures-page .sv-fd-summary{margin-left:auto;color:#9aacbd;font-size:12px;font-weight:700}
+#sv-futures-page .sv-fd-long{color:#19d995}
+#sv-futures-page .sv-fd-short{color:#ff6170}
+#sv-futures-page .sv-fd-type{display:inline-flex;min-width:54px;justify-content:center;padding:5px 9px;border-radius:5px;font-size:11px;font-weight:800}
+#sv-futures-page .sv-fd-long-bg{background:rgba(18,201,139,.16);color:#25dda0}
+#sv-futures-page .sv-fd-short-bg{background:rgba(255,90,105,.16);color:#ff7180}
+#sv-futures-page .sv-fd-score{display:inline-flex;min-width:36px;justify-content:center;padding:5px 8px;border-radius:5px;background:#12c98b;color:#062017;font-size:13px;font-weight:900}
+#sv-futures-page .sv-fd-action{display:inline-flex;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:900}
+#sv-futures-page .sv-fd-buy{color:#16d28d;background:rgba(22,210,141,.12)}
+#sv-futures-page .sv-fd-sell{color:#ff6675;background:rgba(255,90,105,.11)}
+#sv-futures-page .sv-fd-empty{padding:52px 18px;text-align:center;color:#8ea2b5;font-size:14px;font-weight:700}
+#sv-futures-page .sv-fd-footer{display:flex;justify-content:space-between;padding:13px 16px;color:#71869a;font-size:12px}
+@media(max-width:1050px){#sv-futures-page .sv-fd-head{align-items:flex-start;flex-direction:column}#sv-futures-page .sv-fd-tabs{align-self:flex-start}}
+@media(max-width:720px){#sv-futures-page .sv-fd-search{width:140px}#sv-futures-page .sv-fd-card-head{flex-wrap:wrap}}
 `;
       document.head.appendChild(style);
     }
 
-    page = document.createElement("section");
-    page.id = FO_PAGE_ID;
-    page.className = "sv-fno-frozen-layout";
-
-    page.innerHTML = `
-      <div class="sv-fno-layout-head">
+    page=document.createElement("section");
+    page.id=FO_PAGE_ID;
+    page.className="sv-fd-page";
+    page.innerHTML=`
+      <div class="sv-fd-head">
         <div>
-          <h1 class="sv-fno-layout-title">Futures &amp; Options</h1>
-          <p class="sv-fno-layout-sub">Rule-based high probability setups for NSE F&amp;O (Last 3 Trading Days)</p>
+          <h1 class="sv-fd-title">Futures &amp; Options</h1>
+          <p class="sv-fd-sub">Intraday Scanner &gt; NSE F&amp;O - Today + Previous 3 Trading Days</p>
         </div>
-
-        <div class="sv-fno-layout-actions">
-          <div class="sv-fno-layout-tabs">
-            <button type="button" class="sv-fno-layout-tab active" data-fno-tab="futures">Futures</button>
-            <button type="button" class="sv-fno-layout-tab" data-fno-tab="options">Options</button>
-          </div>
-          <select id="sv-fno-layout-range" class="sv-fno-layout-range">
-            <option value="3">â–£&nbsp;&nbsp; Last 3 Days</option>
-            <option value="5">â–£&nbsp;&nbsp; Last 5 Days</option>
-            <option value="10">â–£&nbsp;&nbsp; Last 10 Days</option>
-          </select>
+        <div class="sv-fd-tabs">
+          <button class="sv-fd-tab active" data-fd-tab="futures">Futures</button>
+          <button class="sv-fd-tab" data-fd-tab="options">Options</button>
         </div>
       </div>
+      <div class="sv-fd-card">
+        <div class="sv-fd-card-head">
+          <span class="sv-fd-card-title">F&amp;O Setups (Today + Previous 3 Trading Days)</span>
+          <span class="sv-fd-live">LIVE</span>
+          <input id="sv-fd-search" class="sv-fd-search" type="search" placeholder="Search symbol..." autocomplete="off">
+          <button id="sv-fd-refresh" class="sv-fd-refresh" type="button">REFRESH</button>
+        </div>
+        <div id="sv-fd-body"><div class="sv-fd-empty">Loading F&amp;O setups...</div></div>
+      </div>`;
 
-      <div class="sv-fno-layout-info">
-        <div class="sv-fno-layout-info-box">
-          <div class="sv-fno-layout-icon">â—Ž</div>
-          <div><div class="sv-fno-layout-label">Strategy</div><div class="sv-fno-layout-value">StockVersity F&amp;O A1</div></div>
-        </div>
-        <div class="sv-fno-layout-info-box">
-          <div class="sv-fno-layout-icon">â–¥</div>
-          <div><div class="sv-fno-layout-label">Universe</div><div class="sv-fno-layout-value">NSE F&amp;O (210 contracts)</div></div>
-        </div>
-        <div class="sv-fno-layout-info-box">
-          <div class="sv-fno-layout-icon">â—·</div>
-          <div><div class="sv-fno-layout-label">Timeframe</div><div class="sv-fno-layout-value">5 Minute</div></div>
-        </div>
-        <div class="sv-fno-layout-info-box">
-          <div class="sv-fno-layout-icon">â–£</div>
-          <div><div class="sv-fno-layout-label">Last Updated</div><div class="sv-fno-layout-value" id="sv-fno-last-updated">--</div></div>
-        </div>
-      </div>
-
-      <div class="sv-fno-layout-card">
-        <div class="sv-fno-layout-card-head">
-          <span class="sv-fno-layout-card-icon">â–¥</span>
-          <span class="sv-fno-layout-card-title">F&amp;O Setups (Last 3 Days)</span>
-          <input id="sv-fno-layout-search" class="sv-fno-layout-search" type="search" placeholder="Search symbol..." autocomplete="off">
-        </div>
-        <div id="sv-fno-layout-body">
-          <div class="sv-fno-layout-empty">Loading F&amp;O setups...</div>
-        </div>
-      </div>
-    `;
-
-    const main = document.querySelector(".main-area");
-    if (!main) return null;
+    const main=document.querySelector(".main-area");
+    if(!main) return null;
     main.appendChild(page);
 
-    page.querySelectorAll("[data-fno-tab]").forEach(button => {
-      button.addEventListener("click", () => {
-        page.querySelectorAll("[data-fno-tab]").forEach(x => {
-          x.classList.toggle("active", x === button);
-        });
-
-        if (button.dataset.fnoTab === "options") {
-          get("sv-fno-layout-body").innerHTML =
-            '<div class="sv-fno-layout-empty">Options live feed will appear here when enabled.</div>';
+    page.querySelectorAll("[data-fd-tab]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        page.querySelectorAll("[data-fd-tab]").forEach(x=>x.classList.toggle("active",x===btn));
+        if(btn.dataset.fdTab==="options"){
+          get("sv-fd-body").innerHTML='<div class="sv-fd-empty">Options live feed will appear here when enabled.</div>';
         } else {
           loadFuturesPage();
         }
       });
     });
 
-    get("sv-fno-layout-range")?.addEventListener("change", loadFuturesPage);
-
-    get("sv-fno-layout-search")?.addEventListener("input", event => {
-      const q = String(event.target.value || "").trim().toUpperCase();
-      page.querySelectorAll(".sv-fno-layout-table tbody tr").forEach(row => {
-        row.style.display = !q || row.textContent.toUpperCase().includes(q) ? "" : "none";
+    get("sv-fd-refresh")?.addEventListener("click",loadFuturesPage);
+    get("sv-fd-search")?.addEventListener("input",()=>{
+      const q=String(get("sv-fd-search")?.value||"").trim().toUpperCase();
+      document.querySelectorAll("#sv-futures-page tbody tr").forEach(tr=>{
+        const stock=String(tr.querySelector("td:nth-child(2)")?.textContent||"").toUpperCase();
+        tr.style.display=!q || stock.includes(q)?"":"none";
       });
     });
 
@@ -1352,163 +1310,85 @@ async function refreshLocalMarket(){
   }
 
   function renderFuturesPage(payload) {
-    const body = get("sv-fno-layout-body");
-    if (!body) return;
+    const body=get("sv-fd-body");
+    if(!body) return;
 
-    const esc = v => String(v ?? "--").replace(/[&<>"']/g, m => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[m]));
+    const esc=v=>String(v??"--").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+    const num=(v,d=2)=>Number.isFinite(Number(v))?Number(v).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d}):"--";
+    const safeDate=v=>String(v??"").slice(0,10);
+    const timeOf=x=>x?.time||x?.generated||"--";
+    const symbolOf=x=>x?.symbol||x?.stock||x?.trading_symbol||"--";
+    const directionOf=x=>String(x?.direction||((x?.action||"").includes("SELL")?"SHORT":"LONG")).toUpperCase();
+    const actionOf=x=>String(x?.action||((directionOf(x)==="SHORT")?"SELL":"BUY")).toUpperCase();
+    const scoreOf=x=>Number.isFinite(Number(x?.score))?Number(x.score).toFixed(0):"--";
 
-    const num = (v, d = 2) => Number.isFinite(Number(v))
-      ? Number(v).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d })
-      : "--";
+    const labelDate=(date,isToday=false)=>{
+      const d=safeDate(date);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return esc(d);
+      const dt=new Date(d+"T00:00:00+05:30");
+      const txt=dt.toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
+      return isToday ? txt+" - TODAY" : txt;
+    };
 
-    const percent = v => Number.isFinite(Number(v))
-      ? `${Number(v).toFixed(2)}%`
-      : "--";
+    const days=[];
+    const session=safeDate(payload?.session_date);
+    const todayRows=Array.isArray(payload?.results)?payload.results:[];
+    if(session) days.push({date:session,rows:todayRows,isToday:true});
 
-    const actionDirection = x => String(
-      x?.direction ||
-      ((x?.action || "").toUpperCase().includes("SELL") ? "SHORT" : "LONG")
-    ).toUpperCase();
-
-    const trend = x => x?.trend_strength || x?.trend || "--";
-    const setupTime = x => x?.time || x?.generated || "--";
-    const symbol = x => x?.symbol || x?.stock || "--";
-
-    const days = [];
-
-    if (Array.isArray(payload?.results) && payload.results.length) {
-      const todayDate = String(
-        payload?.session_date ||
-        payload?.results?.[0]?.session_date ||
-        new Date().toISOString().slice(0, 10)
-      );
-
-      days.push({
-        date: todayDate,
-        rows: payload.results.map(x => ({
-          ...x,
-          date: todayDate,
-          session_date: todayDate,
-          historical: false
-        }))
-      });
-    }
-
-    if (Array.isArray(payload?.history)) {
-      payload.history.forEach(day => {
-        if (Array.isArray(day?.rows)) {
-          days.push({
-            date: String(day?.date || day?.rows?.[0]?.date || ""),
-            rows: day.rows
-          });
-        }
-      });
-    }
-
-    const unique = [];
-    const seen = new Set();
-
-    days.forEach(day => {
-      const safeDate = String(day.date || new Date().toISOString().slice(0, 10));
-      if (seen.has(safeDate)) return;
-      seen.add(safeDate);
-      unique.push({ ...day, date: safeDate });
+    (Array.isArray(payload?.history)?payload.history:[]).forEach(day=>{
+      const d=safeDate(day?.date);
+      if(!d || d===session) return;
+      days.push({date:d,rows:Array.isArray(day?.rows)?day.rows:[],isToday:false});
     });
 
-    const requested = Number(get("sv-fno-layout-range")?.value || 3);
-    const visibleDays = unique.slice(0, requested);
-
-    if (!visibleDays.length) {
-      body.innerHTML = '<div class="sv-fno-layout-empty">No F&amp;O setups available for the selected trading days.</div>';
+    const finalDays=days.slice(0,4);
+    if(!finalDays.length){
+      body.innerHTML='<div class="sv-fd-empty">No F&amp;O setups available for the selected trading days.</div>';
       return;
     }
 
-    const currentStamp = payload?.updated_at || payload?.last_updated || new Date().toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true
-    });
-    const updatedNode = get("sv-fno-last-updated");
-    if (updatedNode) updatedNode.textContent = currentStamp;
+    let total=0;
+    const sections=finalDays.map(day=>{
+      const list=day.rows.slice(0,10);
+      total+=list.length;
+      const longs=list.filter(x=>directionOf(x)==="LONG").length;
+      const shorts=list.length-longs;
+      const rowsHtml=list.length?list.map(x=>{
+        const dir=directionOf(x);
+        const action=actionOf(x);
+        const actionClass=action.includes("BUY")?"sv-fd-buy":"sv-fd-sell";
+        return `<tr>
+          <td>${esc(timeOf(x))}</td>
+          <td class="sv-fd-stock">${esc(symbolOf(x))}</td>
+          <td>${num(x.ltp??x.price)}</td>
+          <td><span class="sv-fd-score">${scoreOf(x)}</span></td>
+          <td>${num(x.entry)}</td>
+          <td>${num(x.sl??x.stop_loss)}</td>
+          <td>${num(x.target??x.target_price)}</td>
+          <td>${num(x.rr)}</td>
+          <td><span class="sv-fd-action ${actionClass}">${esc(action||dir)}</span></td>
+        </tr>`;
+      }).join(""): '<tr><td colspan="9" class="sv-fd-empty">No qualifying A1 setups for this trading day.</td></tr>';
 
-    let total = 0;
-    let longCount = 0;
-    let shortCount = 0;
-
-    const sections = visibleDays.map(day => {
-      const rows = Array.isArray(day.rows) ? day.rows : [];
-      total += rows.length;
-
-      rows.forEach(x => actionDirection(x) === "LONG" ? longCount++ : shortCount++);
-
-      const rowsHtml = rows.map((x, i) => {
-        const dir = actionDirection(x);
-        const isLong = dir === "LONG";
-        const action = x?.action || (isLong ? "BUY" : "SELL");
-        const changeValue = x?.change_percent ?? x?.percent_change ?? x?.change ?? null;
-        const changeClass = Number(changeValue) >= 0 ? "sv-fno-layout-change-up" : "sv-fno-layout-change-down";
-        const target2 = x?.target2 ?? x?.target_2 ?? "--";
-
-        return `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${esc(day.date)}</td>
-            <td class="sv-fno-layout-symbol">${esc(symbol(x))}</td>
-            <td><span class="sv-fno-layout-type ${isLong ? "sv-fno-layout-long-bg" : "sv-fno-layout-short-bg"}">${esc(dir)}</span></td>
-            <td>${num(x?.ltp ?? x?.price)}</td>
-            <td><span class="${changeClass}">${changeValue === null ? "--" : percent(changeValue)}</span></td>
-            <td>${esc(setupTime(x))}</td>
-            <td><span class="sv-fno-layout-score">${esc(x?.score ?? "--")}</span></td>
-            <td class="sv-fno-layout-trend">${esc(trend(x))}</td>
-            <td>${num(x?.entry)}</td>
-            <td>${num(x?.target ?? x?.target1)}</td>
-            <td>${num(target2)}</td>
-            <td>${num(x?.sl ?? x?.stop_loss)}</td>
-            <td>${x?.rr == null ? "--" : esc(Number.isFinite(Number(x.rr)) ? Number(x.rr).toFixed(2) : x.rr)}</td>
-            <td><span class="sv-fno-layout-view">â—‰</span></td>
-          </tr>`;
-      }).join("");
-
-      const longs = rows.filter(x => actionDirection(x) === "LONG").length;
-      const shorts = rows.length - longs;
-
-      return `
-        <div class="sv-fno-layout-day">
-          <span class="sv-fno-layout-daybar"></span>
-          <span class="sv-fno-layout-day-name">${esc(day.date)}</span>
-          <span class="sv-fno-layout-day-count">(${rows.length} ${rows.length === 1 ? "setup" : "setups"})</span>
-          <span class="sv-fno-layout-day-summary">${rows.length} Setups&nbsp;&nbsp;|&nbsp;&nbsp;<span class="sv-fno-layout-long">${longs} Long</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span class="sv-fno-layout-short">${shorts} Short</span></span>
-        </div>
-        <div class="sv-fno-layout-scroll">
-          <table class="sv-fno-layout-table">
-            <thead>
-              <tr>
-                <th>#</th><th>Date</th><th>Symbol</th><th>Type</th><th>LTP</th><th>Change %</th><th>Setup Time</th><th>Score</th><th>Trend</th><th>Entry</th><th>Target 1</th><th>Target 2</th><th>Stop Loss</th><th>R:R</th><th>View</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-        </div>`;
+      return `<div class="sv-fd-day">
+        <span class="sv-fd-day-name">${labelDate(day.date,day.isToday)}</span>
+        <span class="sv-fd-day-count">(${list.length} ${list.length===1?"setup":"setups"})</span>
+        <span class="sv-fd-summary">${list.length} Setups | <span class="sv-fd-long">${longs} Long</span> | <span class="sv-fd-short">${shorts} Short</span></span>
+      </div>
+      <div class="sv-fd-scroll"><table>
+        <thead><tr><th>TIME</th><th>STOCK</th><th>LTP</th><th>SCORE</th><th>ENTRY</th><th>SL</th><th>TARGET</th><th>RR</th><th>ACTION</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table></div>`;
     }).join("");
 
-    body.innerHTML = `
-      ${sections}
-      <div class="sv-fno-layout-footer">
-        <span>Showing last ${visibleDays.length} trading days</span>
-        <span>${total} setups&nbsp;&nbsp;Â·&nbsp;&nbsp;${longCount} Long&nbsp;&nbsp;Â·&nbsp;&nbsp;${shortCount} Short</span>
-      </div>`;
+    body.innerHTML=`<div>${sections}</div><div class="sv-fd-footer"><span>Showing Today + Previous 3 Trading Days</span><span>Total ${total} setups</span></div>`;
+
+    // Remove mojibake / non-ASCII glyphs from this F&amp;O page only.
+    const walker=document.createTreeWalker(document.getElementById(FO_PAGE_ID),NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n=>{ n.nodeValue=String(n.nodeValue||"").replace(/[^\x20-\x7E]/g,""); });
   }
-
-
   async function loadFuturesPage() {
     const page = buildFuturesPage();
 
@@ -3503,3 +3383,273 @@ async function refreshLocalMarket(){
 
 
 
+
+/* SV_FNO_PRESENTATION_FIX_20260923 */
+(() => {
+  "use strict";
+
+  const PAGE_IDS = ["sv-intraday-futures-page", "sv-futures-page"];
+
+  const cleanText = value => {
+    let s = String(value ?? "");
+    s = s.replace(/F\s*&\s*O/gi, "Futures and Options");
+    s = s.replace(/[^\x00-\x7F]/g, "");
+    s = s.replace(/\s*\|\s*/g, " ");
+    s = s.replace(/\s*\+\s*/g, " and ");
+    s = s.replace(/\s{2,}/g, " ");
+    return s;
+  };
+
+  const formatDatePlain = value => {
+    const m = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return String(value ?? "").trim();
+
+    const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00+05:30`);
+    if (Number.isNaN(d.getTime())) return String(value ?? "").trim();
+
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "Asia/Kolkata"
+    });
+  };
+
+  function removeColumn(table, index) {
+    table.querySelectorAll("tr").forEach(row => {
+      const cells = row.children;
+      if (cells[index]) cells[index].remove();
+    });
+  }
+
+  function forceNineColumns(table) {
+    if (!table) return;
+
+    const headers = [...table.querySelectorAll("thead th")];
+    if (!headers.length) return;
+
+    const remove = [];
+
+    headers.forEach((th, index) => {
+      const label = cleanText(th.textContent)
+        .trim()
+        .toUpperCase();
+
+      if (
+        label === "TREND STRENGTH" ||
+        label === "OI SETUP" ||
+        label === "RVOL"
+      ) {
+        remove.push(index);
+      }
+    });
+
+    remove.sort((a, b) => b - a).forEach(index => removeColumn(table, index));
+
+    const head = [...table.querySelectorAll("thead th")];
+
+    const expected = [
+      "TIME",
+      "STOCK",
+      "LTP",
+      "SCORE",
+      "ENTRY",
+      "SL",
+      "TARGET",
+      "RR",
+      "ACTION"
+    ];
+
+    if (head.length === 9) {
+      head.forEach((th, i) => {
+        th.textContent = expected[i];
+      });
+    }
+
+    table.querySelectorAll("tbody td[colspan]").forEach(td => {
+      td.setAttribute("colspan", "9");
+    });
+  }
+
+  function cleanPageText(page) {
+    const walker = document.createTreeWalker(
+      page,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+
+          const tag = parent.tagName;
+          if (tag === "SCRIPT" || tag === "STYLE") {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const nodes = [];
+    let node;
+
+    while ((node = walker.nextNode())) nodes.push(node);
+
+    nodes.forEach(n => {
+      const cleaned = cleanText(n.nodeValue);
+      if (cleaned !== n.nodeValue) n.nodeValue = cleaned;
+    });
+  }
+
+  function apply(page) {
+    if (!page) return;
+
+    const currentDate =
+      page.querySelector("#sv-fo-real-date") ||
+      page.querySelector("#sv-fo-v7-date");
+
+    if (currentDate) {
+      const raw = currentDate.textContent
+        .replace(/\s*\([^)]*\)\s*$/, "")
+        .trim();
+
+      currentDate.textContent =
+        `${formatDatePlain(raw)} (TODAY)`;
+    }
+
+    page.querySelectorAll(
+      ".sv-fo-history-head strong, .sv-fo-v7-history-head strong"
+    ).forEach(el => {
+      el.textContent = "PREVIOUS 3 TRADING DAYS";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-block-head strong"
+    ).forEach((el, index) => {
+      const rawDate = el.textContent
+        .replace(/\s*\([^)]*\)\s*$/, "")
+        .trim();
+
+      const label =
+        index === 0
+          ? "YESTERDAY"
+          : "PREVIOUS TRADING DAY";
+
+      el.textContent =
+        `${formatDatePlain(rawDate)} (${label})`;
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-v7-day-head strong"
+    ).forEach((el, index) => {
+      const raw = el.textContent.trim();
+
+      let date = raw;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        date = formatDatePlain(raw);
+      }
+
+      const label =
+        index === 0
+          ? "YESTERDAY"
+          : "PREVIOUS TRADING DAY";
+
+      el.textContent = `${date} (${label})`;
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-badge"
+    ).forEach(el => {
+      el.style.display = "none";
+    });
+
+    page.querySelectorAll("table").forEach(forceNineColumns);
+
+    page.querySelectorAll(
+      ".sv-fo-history-footer"
+    ).forEach(el => {
+      el.textContent =
+        "A1 criteria: Score 90 or higher. Trend Very Strong. RR 1.50 or higher. RVOL 1.50 or higher.";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-table th, .sv-fo-v7-table th"
+    ).forEach(el => {
+      el.style.fontSize = "12px";
+      el.style.padding = "14px 12px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-table td, .sv-fo-v7-table td"
+    ).forEach(el => {
+      el.style.fontSize = "14px";
+      el.style.padding = "15px 12px";
+      el.style.lineHeight = "1.35";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-block-head strong, .sv-fo-v7-day-head strong"
+    ).forEach(el => {
+      el.style.fontSize = "17px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-head strong, .sv-fo-v7-history-head strong"
+    ).forEach(el => {
+      el.style.fontSize = "18px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-stock, .sv-fo-real-score, .sv-fo-v7-stock, .sv-fo-v7-score"
+    ).forEach(el => {
+      el.style.fontSize = "14.5px";
+      el.style.fontWeight = "800";
+    });
+
+    cleanPageText(page);
+  }
+
+  let busy = false;
+  let queued = false;
+
+  function run() {
+    if (busy) return;
+    busy = true;
+
+    try {
+      const page = PAGE_IDS
+        .map(id => document.getElementById(id))
+        .find(Boolean);
+
+      if (page) apply(page);
+    } finally {
+      busy = false;
+    }
+  }
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+
+    setTimeout(() => {
+      queued = false;
+      run();
+    }, 50);
+  }
+
+  const observer = new MutationObserver(schedule);
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  run();
+  setTimeout(run, 300);
+  setTimeout(run, 1000);
+  setTimeout(run, 2500);
+  setInterval(run, 10000);
+})();

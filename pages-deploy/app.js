@@ -3384,3 +3384,272 @@ async function refreshLocalMarket(){
 
 
 
+/* SV_FNO_PRESENTATION_FIX_20260923 */
+(() => {
+  "use strict";
+
+  const PAGE_IDS = ["sv-intraday-futures-page", "sv-futures-page"];
+
+  const cleanText = value => {
+    let s = String(value ?? "");
+    s = s.replace(/F\s*&\s*O/gi, "Futures and Options");
+    s = s.replace(/[^\x00-\x7F]/g, "");
+    s = s.replace(/\s*\|\s*/g, " ");
+    s = s.replace(/\s*\+\s*/g, " and ");
+    s = s.replace(/\s{2,}/g, " ");
+    return s;
+  };
+
+  const formatDatePlain = value => {
+    const m = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return String(value ?? "").trim();
+
+    const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00+05:30`);
+    if (Number.isNaN(d.getTime())) return String(value ?? "").trim();
+
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "Asia/Kolkata"
+    });
+  };
+
+  function removeColumn(table, index) {
+    table.querySelectorAll("tr").forEach(row => {
+      const cells = row.children;
+      if (cells[index]) cells[index].remove();
+    });
+  }
+
+  function forceNineColumns(table) {
+    if (!table) return;
+
+    const headers = [...table.querySelectorAll("thead th")];
+    if (!headers.length) return;
+
+    const remove = [];
+
+    headers.forEach((th, index) => {
+      const label = cleanText(th.textContent)
+        .trim()
+        .toUpperCase();
+
+      if (
+        label === "TREND STRENGTH" ||
+        label === "OI SETUP" ||
+        label === "RVOL"
+      ) {
+        remove.push(index);
+      }
+    });
+
+    remove.sort((a, b) => b - a).forEach(index => removeColumn(table, index));
+
+    const head = [...table.querySelectorAll("thead th")];
+
+    const expected = [
+      "TIME",
+      "STOCK",
+      "LTP",
+      "SCORE",
+      "ENTRY",
+      "SL",
+      "TARGET",
+      "RR",
+      "ACTION"
+    ];
+
+    if (head.length === 9) {
+      head.forEach((th, i) => {
+        th.textContent = expected[i];
+      });
+    }
+
+    table.querySelectorAll("tbody td[colspan]").forEach(td => {
+      td.setAttribute("colspan", "9");
+    });
+  }
+
+  function cleanPageText(page) {
+    const walker = document.createTreeWalker(
+      page,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+
+          const tag = parent.tagName;
+          if (tag === "SCRIPT" || tag === "STYLE") {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const nodes = [];
+    let node;
+
+    while ((node = walker.nextNode())) nodes.push(node);
+
+    nodes.forEach(n => {
+      const cleaned = cleanText(n.nodeValue);
+      if (cleaned !== n.nodeValue) n.nodeValue = cleaned;
+    });
+  }
+
+  function apply(page) {
+    if (!page) return;
+
+    const currentDate =
+      page.querySelector("#sv-fo-real-date") ||
+      page.querySelector("#sv-fo-v7-date");
+
+    if (currentDate) {
+      const raw = currentDate.textContent
+        .replace(/\s*\([^)]*\)\s*$/, "")
+        .trim();
+
+      currentDate.textContent =
+        `${formatDatePlain(raw)} (TODAY)`;
+    }
+
+    page.querySelectorAll(
+      ".sv-fo-history-head strong, .sv-fo-v7-history-head strong"
+    ).forEach(el => {
+      el.textContent = "PREVIOUS 3 TRADING DAYS";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-block-head strong"
+    ).forEach((el, index) => {
+      const rawDate = el.textContent
+        .replace(/\s*\([^)]*\)\s*$/, "")
+        .trim();
+
+      const label =
+        index === 0
+          ? "YESTERDAY"
+          : "PREVIOUS TRADING DAY";
+
+      el.textContent =
+        `${formatDatePlain(rawDate)} (${label})`;
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-v7-day-head strong"
+    ).forEach((el, index) => {
+      const raw = el.textContent.trim();
+
+      let date = raw;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        date = formatDatePlain(raw);
+      }
+
+      const label =
+        index === 0
+          ? "YESTERDAY"
+          : "PREVIOUS TRADING DAY";
+
+      el.textContent = `${date} (${label})`;
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-badge"
+    ).forEach(el => {
+      el.style.display = "none";
+    });
+
+    page.querySelectorAll("table").forEach(forceNineColumns);
+
+    page.querySelectorAll(
+      ".sv-fo-history-footer"
+    ).forEach(el => {
+      el.textContent =
+        "A1 criteria: Score 90 or higher. Trend Very Strong. RR 1.50 or higher. RVOL 1.50 or higher.";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-table th, .sv-fo-v7-table th"
+    ).forEach(el => {
+      el.style.fontSize = "12px";
+      el.style.padding = "14px 12px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-table td, .sv-fo-v7-table td"
+    ).forEach(el => {
+      el.style.fontSize = "14px";
+      el.style.padding = "15px 12px";
+      el.style.lineHeight = "1.35";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-block-head strong, .sv-fo-v7-day-head strong"
+    ).forEach(el => {
+      el.style.fontSize = "17px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-history-head strong, .sv-fo-v7-history-head strong"
+    ).forEach(el => {
+      el.style.fontSize = "18px";
+      el.style.fontWeight = "800";
+    });
+
+    page.querySelectorAll(
+      ".sv-fo-real-stock, .sv-fo-real-score, .sv-fo-v7-stock, .sv-fo-v7-score"
+    ).forEach(el => {
+      el.style.fontSize = "14.5px";
+      el.style.fontWeight = "800";
+    });
+
+    cleanPageText(page);
+  }
+
+  let busy = false;
+  let queued = false;
+
+  function run() {
+    if (busy) return;
+    busy = true;
+
+    try {
+      const page = PAGE_IDS
+        .map(id => document.getElementById(id))
+        .find(Boolean);
+
+      if (page) apply(page);
+    } finally {
+      busy = false;
+    }
+  }
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+
+    setTimeout(() => {
+      queued = false;
+      run();
+    }, 50);
+  }
+
+  const observer = new MutationObserver(schedule);
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  run();
+  setTimeout(run, 300);
+  setTimeout(run, 1000);
+  setTimeout(run, 2500);
+  setInterval(run, 10000);
+})();
