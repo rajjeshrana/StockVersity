@@ -3653,3 +3653,76 @@ async function refreshLocalMarket(){
   setTimeout(run, 2500);
   setInterval(run, 10000);
 })();
+/* SV_FNO_NO_SUBTITLE_SEARCH_20260923 */
+(() => {
+  "use strict";
+
+  const PAGE_IDS = [
+    "sv-intraday-futures-page",
+    "sv-futures-page"
+  ];
+
+  function apply(page) {
+    if (!page) return;
+
+    /* Remove the subtitle under Futures and Options */
+    page.querySelectorAll(
+      ".sv-fno-template-sub, .sv-fo-modern-sub, .sv-fo-real-sub"
+    ).forEach(el => el.remove());
+
+    /* Remove F&O search controls only */
+    page.querySelectorAll(
+      "input[type='search'], input[placeholder*='Search' i], " +
+      "input[placeholder*='search' i], " +
+      ".sv-fno-search, .sv-fo-search, #sv-fo-search"
+    ).forEach(el => {
+      const parent = el.closest(
+        ".sv-fno-search, .sv-fo-search, .search, .search-box, .search-wrap"
+      );
+
+      if (parent && parent !== page) {
+        parent.remove();
+      } else {
+        el.remove();
+      }
+    });
+
+    /* Remove any remaining subtitle line containing the old wording */
+    [...page.querySelectorAll("p, small, div, span")].forEach(el => {
+      const t = String(el.textContent || "").trim();
+
+      if (
+        t === "Intraday Scanner > NSE Futures and Options - Today and Previous 3 Trading Days" ||
+        t === "Intraday Scanner NSE Futures and Options Today and Previous 3 Trading Days"
+      ) {
+        el.remove();
+      }
+    });
+  }
+
+  let queued = false;
+
+  function run() {
+    if (queued) return;
+    queued = true;
+
+    setTimeout(() => {
+      queued = false;
+
+      PAGE_IDS.forEach(id => {
+        const page = document.getElementById(id);
+        if (page) apply(page);
+      });
+    }, 40);
+  }
+
+  new MutationObserver(run).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  run();
+  setTimeout(run, 300);
+  setTimeout(run, 1000);
+  setTimeout(run, 2500);
+})();
